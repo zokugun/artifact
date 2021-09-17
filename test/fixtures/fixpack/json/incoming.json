@@ -1,0 +1,8 @@
+{
+	"sortToTop": [
+		"scripts",
+		"dependencies",
+		"devDependencies",
+		"optionalDependencies"
+	]
+}

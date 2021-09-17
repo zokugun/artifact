@@ -1,0 +1,8 @@
+{
+	"name": "my-awesome-project",
+	"version": "1.0.0",
+	"license": {
+		"type": "ISC",
+		"url": "https://opensource.org/licenses/ISC"
+	}
+}

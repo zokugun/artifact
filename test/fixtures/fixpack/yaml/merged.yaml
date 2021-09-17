@@ -1,0 +1,5 @@
+sortToTop:
+  - name
+  - displayName
+  - description
+  - version

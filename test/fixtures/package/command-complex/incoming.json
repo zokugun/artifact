@@ -1,0 +1,5 @@
+{
+	"scripts": {
+		"test": "foo & bar | FOO=bar BAR=baz baz"
+	}
+}

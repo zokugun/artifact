@@ -1,0 +1,8 @@
+{
+	"name": "my-awesome-project",
+	"version": "1.0.0",
+	"license": {
+		"type": "MIT",
+		"url": "https://www.opensource.org/licenses/mit-license.php"
+	}
+}

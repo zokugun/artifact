@@ -1,0 +1,92 @@
+{
+	"name": "@zokugun/artifact",
+	"description": "Boilerplate your project & keep your configurations up to date",
+	"version": "0.1.0",
+	"author": {
+		"name": "Baptiste Augrain",
+		"email": "daiyam@zokugun.org"
+	},
+	"license": "MIT",
+	"homepage": "https://github.com/zokugun/artifact",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/zokugun/artifact.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zokugun/artifact/issues"
+	},
+	"bin": {
+		"artifact": "bin/artifact",
+		"atf": "bin/artifact"
+	},
+	"scripts": {
+		"commit": "cz",
+		"compile": "tsc -p src",
+		"lint": "xo",
+		"prepare": "husky install;",
+		"prepublishOnly": "npm run compile",
+		"release": "release-it",
+		"test": "tsc -p test && mocha",
+		"test:dev": "mocha",
+		"test:watch": "tsc-watch -p test --onSuccess 'mocha'",
+		"watch": "tsc-watch -p src",
+		"watch:test": "tsc-watch -p test"
+	},
+	"dependencies": {
+		"commander": "^8.2.0",
+		"detect-indent": "^6.1.0",
+		"editorconfig": "^0.15.3",
+		"fs-extra": "^10.0.0",
+		"globby": "^11.0.4",
+		"istextorbinary": "^6.0.0",
+		"jsonc-parser": "^3.0.0",
+		"lodash": "^4.17.21",
+		"npm": "^7.23.0",
+		"pacote": "^11.3.5",
+		"tempy": "^1.0.1",
+		"yaml": "^1.10.2"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^13.1.0",
+		"@commitlint/config-conventional": "^13.1.0",
+		"@types/chai": "^4.2.17",
+		"@types/fs-extra": "^9.0.12",
+		"@types/lodash": "^4.14.172",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "^14.17.15",
+		"@types/npm": "^7.19.0",
+		"@types/pacote": "^11.1.1",
+		"@types/universalify": "^1.0.0",
+		"camelcase": "^6.2.0",
+		"chai": "^4.3.4",
+		"commitizen": "^4.2.4",
+		"eslint-plugin-chai-friendly": "^0.7.2",
+		"fixpack": "^4.0.0",
+		"husky": "^7.0.1",
+		"lint-staged": "^11.1.1",
+		"memfs": "^3.2.4",
+		"mocha": "^9.1.1",
+		"release-it": "^14.11.3",
+		"rewiremock": "^3.14.3",
+		"source-map-support": "^0.5.20",
+		"tsc-watch": "^4.5.0",
+		"typescript": "^4.2.4",
+		"universalify": "^2.0.0",
+		"xo": "^0.44.0"
+	},
+	"keywords": [
+		"boilerplate",
+		"boilerplates",
+		"codegeneration",
+		"codemod",
+		"codemods",
+		"configuration",
+		"configurations",
+		"generate",
+		"generator",
+		"project-generator",
+		"project-starter",
+		"project-template",
+		"scaffold"
+	]
+}

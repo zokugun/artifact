@@ -1,0 +1,8 @@
+{
+	"name": "my-awesome-project",
+	"version": "1.0.0",
+	"dependencies": {
+		"foobar": "0.1.0",
+		"quxbaz": "1.0.0"
+	}
+}

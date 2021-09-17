@@ -1,0 +1,7 @@
+{
+	"name": "my-awesome-project",
+	"version": "1.0.0",
+	"scripts": {
+		"test": "foo & bar | FOO=bar BAR=baz baz"
+	}
+}

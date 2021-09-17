@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		/* Basic Options */
+		"outDir": ".",
+		"rootDir": ".",
+		"composite": true,
+	},
+	"files": [
+		"package.json",
+	],
+}
