@@ -36,9 +36,9 @@ artifact add @daiyam/base @daiyam/lang-ts @daiyam/npm-ts
 ```
 
  With the previous command, `artifact` will pull the following packages:
-- [@daiyam/artifact-base](https://github.com/daiyam/artifact-config/tree/master/packages/base)
-- [@daiyam/artifact-lang-ts](https://github.com/daiyam/artifact-config/tree/master/packages/lang-ts)
-- [@daiyam/artifact-npm-ts](https://github.com/daiyam/artifact-config/tree/master/packages/npm-ts)
+- [@daiyam/artifact-base](https://github.com/daiyam/artifact-configs/tree/master/packages/base)
+- [@daiyam/artifact-lang-ts](https://github.com/daiyam/artifact-configs/tree/master/packages/lang-ts)
+- [@daiyam/artifact-npm-ts](https://github.com/daiyam/artifact-configs/tree/master/packages/npm-ts)
 
 Like `yeoman`, a configuration package must be prefixed with `artifact-`.
 
@@ -47,7 +47,7 @@ Configuration Package
 
 The configuration/boilerplate files must be put inside the folder `configs`.
 
-For example, the package [@daiyam/artifact-base](https://github.com/daiyam/artifact-config/tree/master/packages/base):
+For example, the package [@daiyam/artifact-base](https://github.com/daiyam/artifact-configs/tree/master/packages/base):
 
 ```
 artifact-configs/base/
