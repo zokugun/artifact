@@ -1,4 +1,4 @@
-import { flow } from 'lodash';
+import { flow, isPlainObject } from 'lodash';
 import { Route } from '../types/travel';
 import * as JSON from '../parsers/json';
 import * as YAML from '../parsers/yaml';
@@ -21,7 +21,14 @@ export function rc(...routes: Array<Route<Record<string, any>>>): Route<string> 
 			return flow(...routes, JSON.stringify)({ current: currentData, incoming: incomingData, ignores }) as string;
 		}
 		else {
-			return flow(...routes, YAML.stringify)({ current: currentData, incoming: incoming && YAML.parse(incoming), ignores }) as string;
+			const incomingData = incoming && YAML.parse(incoming);
+
+			if(isPlainObject(incomingData) || Array.isArray(incomingData)) {
+				return flow(...routes, YAML.stringify)({ current: currentData, incoming: incomingData, ignores }) as string;
+			}
+			else {
+				return incoming!;
+			}
 		}
 	};
 }
