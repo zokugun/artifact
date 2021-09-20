@@ -6,7 +6,7 @@ const commonFlow = composeSteps(
 	steps.readFiles,
 	steps.readEditorConfig,
 	steps.mergeTextFiles,
-	steps.updateTargetConfig,
+	steps.writeTargetConfig,
 	steps.insertFinalNewLine,
 	steps.applyFormatting,
 	steps.copyBinaryFiles,
@@ -20,7 +20,9 @@ export async function install(targetPath: string, incomingPath: string, options?
 		binaryFiles: [],
 		textFiles: [],
 		mergedTextFiles: [],
-		configs: [],
+		config: {
+			artifacts: [],
+		},
 		formats: [],
 		options: {
 			verbose: options?.verbose ?? false,

@@ -8,7 +8,7 @@ import { readEditorConfig } from './read-editor-config';
 import { readFiles } from './read-files';
 import { readIncomingPackage } from './read-incoming-package';
 import { readTargetConfig } from './read-target-config';
-import { updateTargetConfig } from './update-target-config';
+import { writeTargetConfig } from './write-target-config';
 import { writeTextFiles } from './write-text-files';
 
 export const steps = {
@@ -20,7 +20,7 @@ export const steps = {
 	readFiles,
 	readIncomingPackage,
 	readTargetConfig,
-	updateTargetConfig,
+	writeTargetConfig,
 	writeTextFiles,
 };
 

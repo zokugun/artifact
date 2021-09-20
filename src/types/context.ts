@@ -4,7 +4,7 @@ import { TextFile } from './text-file';
 
 export interface Context {
 	binaryFiles: string[];
-	configs: Config[];
+	config: Config;
 	configInfo?: {
 		name: string;
 		type: string;

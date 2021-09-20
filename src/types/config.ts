@@ -1,4 +1,6 @@
 export interface Config {
-	name: string;
-	version: string;
+	artifacts: Array<{
+		name: string;
+		version: string;
+	}>;
 }

@@ -1,14 +1,14 @@
 import yaml from 'yaml';
 import { Context } from '../types/context';
 
-export async function updateTargetConfig({ configs, configInfo, incomingPackage, mergedTextFiles }: Context): Promise<void> {
+export async function writeTargetConfig({ config, configInfo, incomingPackage, mergedTextFiles }: Context): Promise<void> {
 	const name = incomingPackage!.name as string;
 	const version = incomingPackage!.version as string;
 
 	let nf = true;
-	for(const config of configs) {
-		if(config.name === name) {
-			config.version = version;
+	for(const artifact of config.artifacts) {
+		if(artifact.name === name) {
+			artifact.version = version;
 			nf = false;
 
 			break;
@@ -16,7 +16,7 @@ export async function updateTargetConfig({ configs, configInfo, incomingPackage,
 	}
 
 	if(nf) {
-		configs.push({
+		config.artifacts.push({
 			name,
 			version,
 		});
@@ -30,7 +30,7 @@ export async function updateTargetConfig({ configs, configInfo, incomingPackage,
 		};
 	}
 
-	const data = configInfo.type === 'yaml' ? yaml.stringify(configs) : JSON.stringify(configs, null, '\t');
+	const data = configInfo.type === 'yaml' ? yaml.stringify(config) : JSON.stringify(config, null, '\t');
 
 	mergedTextFiles.push({
 		name: configInfo.name,

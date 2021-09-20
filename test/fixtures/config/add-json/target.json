@@ -1,6 +1,8 @@
-[
-	{
-		"name": "awesome-base",
-		"version": "1.0.0"
-	}
-]
+{
+	"artifacts": [
+		{
+			"name": "awesome-base",
+			"version": "1.0.0"
+		}
+	]
+}

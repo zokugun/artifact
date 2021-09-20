@@ -1,2 +1,3 @@
-- name: awesome-config
-  version: 1.0.0
+artifacts:
+  - name: awesome-config
+    version: 1.0.0

@@ -47,18 +47,18 @@ export async function readTargetConfig(context: Context): Promise<void> {
 	const finalNewLine = data.endsWith('\n');
 
 	if(type === 'json') {
-		context.configs = JSON.parse(data) as Config[];
+		context.config = JSON.parse(data) as Config;
 	}
 	else if(type === 'yaml') {
-		context.configs = yaml.parse(data) as Config[];
+		context.config = yaml.parse(data) as Config;
 	}
 	else {
 		try {
-			context.configs = JSON.parse(data) as Config[];
+			context.config = JSON.parse(data) as Config;
 			type = 'json';
 		}
 		catch {
-			context.configs = yaml.parse(data) as Config[];
+			context.config = yaml.parse(data) as Config;
 			type = 'yaml';
 		}
 	}
