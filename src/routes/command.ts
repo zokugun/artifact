@@ -1,5 +1,5 @@
 import { splitCommand, joinCommand } from '../utils/command';
-import { hash } from './hash';
+import { mapConcat } from './map-concat';
 
 export function command({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {
 	if(!incoming) {
@@ -13,7 +13,7 @@ export function command({ current, incoming }: { current: string | undefined; in
 	const currentCommand = splitCommand(current);
 	const incomingCommand = splitCommand(incoming);
 
-	const result = hash({
+	const result = mapConcat({
 		current: currentCommand,
 		incoming: incomingCommand,
 	});

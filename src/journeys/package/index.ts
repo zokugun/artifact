@@ -1,6 +1,6 @@
 import isPlainObject from 'lodash/isPlainObject';
 import { compose, fork, json } from '../../compositors';
-import { command, hash, listConcat, primitive } from '../../routes';
+import { command, listConcat, mapConcat, primitive } from '../../routes';
 import { buildJourneyPlan } from '../../utils/build-journey-plan';
 import { buildTravelPlan } from '../../utils/build-travel-plan';
 
@@ -9,32 +9,32 @@ const mainRoute = compose({
 	keywords: listConcat,
 	homepage: primitive,
 	bugs: fork(
-		[isPlainObject, hash],
+		[isPlainObject, mapConcat],
 		primitive,
 	),
 	license: fork(
-		[isPlainObject, hash],
+		[isPlainObject, mapConcat],
 		primitive,
 	),
 	licenses: listConcat,
 	author: fork(
-		[isPlainObject, hash],
+		[isPlainObject, mapConcat],
 		primitive,
 	),
 	repository: fork(
-		[isPlainObject, hash],
+		[isPlainObject, mapConcat],
 		primitive,
 	),
 	scripts: compose({
 		$$default: command,
 	}),
-	config: hash,
-	engines: hash,
-	dependencies: hash,
-	devDependencies: hash,
-	peerDependencies: hash,
-	optionalDependencies: hash,
-	bundledDependencies: hash,
+	config: mapConcat,
+	engines: mapConcat,
+	dependencies: mapConcat,
+	devDependencies: mapConcat,
+	peerDependencies: mapConcat,
+	optionalDependencies: mapConcat,
+	bundledDependencies: mapConcat,
 
 	// tools fields
 	browserslist: listConcat,
@@ -53,7 +53,7 @@ const mainRoute = compose({
 	],
 	$$default: fork(
 		[Array.isArray, listConcat],
-		[isPlainObject, hash],
+		[isPlainObject, mapConcat],
 		primitive,
 	),
 });

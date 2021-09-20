@@ -1,13 +1,13 @@
 import isPlainObject from 'lodash/isPlainObject';
 import { compose, fork, json, yaml } from '../../compositors';
-import { hash, listConcat, primitive } from '../../routes';
+import { listConcat, mapConcat, primitive } from '../../routes';
 import { buildJourneyPlan } from '../../utils/build-journey-plan';
 import { buildTravelPlan } from '../../utils/build-travel-plan';
 
 const mainRoute = compose({
 	$$default: fork(
 		[Array.isArray, listConcat],
-		[isPlainObject, hash],
+		[isPlainObject, mapConcat],
 		primitive,
 	),
 });
