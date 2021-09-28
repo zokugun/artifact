@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import { fixtures } from './utils/fixtures';
-import { install } from './rewires/install';
+import { add } from './rewires/artifact';
 
 describe('npmignore', () => {
 	const ignoreFxt = fixtures('ignore');
@@ -18,7 +18,7 @@ describe('npmignore', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/.npmignore', 'utf-8')).to.eql(ignoreFxt.default.merged);
 	}); // }}}
@@ -31,7 +31,7 @@ describe('npmignore', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/.npmignore', 'utf-8')).to.eql(ignoreFxt.merge.merged);
 	}); // }}}

@@ -1,4 +1,4 @@
-export type Args<T> = { current: T | undefined; incoming: T | undefined; ignores?: string[] };
+export type Args<T> = { current: T | undefined; incoming: T | undefined; filters?: string[]; ignores?: string[] };
 
 export type Route<T> = (args: Args<T>) => T;
 

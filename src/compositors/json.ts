@@ -25,12 +25,12 @@ const merge = compose({
 });
 
 export function json(...routes: Array<Route<Record<string, any>>>): Route<string> {
-	return ({ current, incoming, ignores }) => {
+	return ({ current, incoming, filters, ignores }) => {
 		const currentData = current && tryJson(current);
 		const incomingData = incoming && tryJson(incoming);
 
 		if((!current || currentData) && (!incoming || incomingData)) {
-			return flow(...routes, JSON.stringify)({ current: currentData, incoming: incomingData, ignores }) as string;
+			return flow(...routes, JSON.stringify)({ current: currentData, incoming: incomingData, filters, ignores }) as string;
 		}
 		else {
 			const { data: currentData, transform: currentTransform } = JSONC.parse(current) as { data: Record<string, any> | undefined; transform: Transform | undefined };
@@ -38,7 +38,7 @@ export function json(...routes: Array<Route<Record<string, any>>>): Route<string
 			const mergedTransform = merge({ current: currentTransform, incoming: incomingTransform });
 			const toJSON = (data: Record<string, any>) => JSONC.stringify(data, mergedTransform);
 
-			return flow(...routes, toJSON)({ current: currentData, incoming: incomingData, ignores }) as string;
+			return flow(...routes, toJSON)({ current: currentData, incoming: incomingData, filters, ignores }) as string;
 		}
 	};
 }

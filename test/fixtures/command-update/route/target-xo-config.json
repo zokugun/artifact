@@ -1,0 +1,13 @@
+{
+	"plugins": [
+		"chai"
+	],
+	"rules": {
+		"capitalized-comments": "on",
+		"complexity": "off",
+		"max-depth": [
+			"error",
+			2
+		]
+	}
+}

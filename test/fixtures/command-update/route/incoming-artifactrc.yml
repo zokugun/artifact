@@ -1,0 +1,7 @@
+update:
+  .xo-config.json:
+    route:
+      json:
+        compose:
+          rules: mapConcat
+          $$default: overwrite

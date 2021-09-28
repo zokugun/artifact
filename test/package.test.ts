@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import { fixtures } from './utils/fixtures';
-import { install } from './rewires/install';
+import { add } from './rewires/artifact';
 
 describe('package', () => {
 	const packageFxt = fixtures('package');
@@ -17,7 +17,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.commandComplex.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.commandComplex.merged);
 	}); // }}}
@@ -29,7 +29,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.dependencies.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.dependencies.merged);
 	}); // }}}
@@ -41,7 +41,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.homepage.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.homepage.merged);
 	}); // }}}
@@ -53,7 +53,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.keywords.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.keywords.merged);
 	}); // }}}
@@ -65,7 +65,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.licenseObject.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.licenseObject.merged);
 	}); // }}}
@@ -77,7 +77,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.licenseString.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.licenseString.merged);
 	}); // }}}
@@ -89,7 +89,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.name.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.name.merged);
 	}); // }}}
@@ -101,7 +101,7 @@ describe('package', () => {
 			'/incoming/configs/package.json': packageFxt.none.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.none.merged);
 	}); // }}}

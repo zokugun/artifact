@@ -1,3 +1,3 @@
 import { Context } from './context';
 
-export type Step = (context: Context) => Promise<void>;
+export type Step = (context: Context) => Promise<boolean | void>;

@@ -2,10 +2,12 @@ import { flow } from 'lodash';
 import { Args, Route } from '../types/travel';
 import * as YAML from '../parsers/yaml';
 
-function fromYaml({ current, incoming }: { current: string | undefined; incoming: string }): Args<Record<string, any>> {
+function fromYaml({ current, incoming, filters, ignores }: Args<string>): Args<Record<string, any>> {
 	return {
 		current: typeof current === 'undefined' ? undefined : YAML.parse(current),
-		incoming: YAML.parse(incoming),
+		incoming: YAML.parse(incoming!),
+		filters,
+		ignores,
 	};
 }
 

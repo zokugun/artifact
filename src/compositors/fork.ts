@@ -1,6 +1,6 @@
 import { Route } from '../types/travel';
 
-type ForkParameter = [(value: any) => boolean, Route<any>] | Route<any>;
+export type ForkParameter = [(value: any) => boolean, Route<any>] | Route<any>;
 
 export function fork<T>(...cases: ForkParameter[]): Route<T> {
 	return ({ current, incoming }) => {

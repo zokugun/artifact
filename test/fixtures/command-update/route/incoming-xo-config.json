@@ -1,0 +1,13 @@
+{
+	"plugins": [
+		"chai-friendly"
+	],
+	"rules": {
+		"capitalized-comments": "off",
+		"max-depth": [
+			"error",
+			8
+		],
+		"no-await-in-loop": "off"
+	}
+}

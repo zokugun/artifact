@@ -1,0 +1,15 @@
+{
+	"name": "test",
+	"version": "0.1.0",
+	"devDependencies": {
+		"@types/node": "^14.17.16",
+		"typescript": "^4.2.4",
+		"xo": "^0.43.0"
+	},
+	"scripts": {
+		"lint": "xo"
+	},
+	"keywords": [
+		"test"
+	]
+}

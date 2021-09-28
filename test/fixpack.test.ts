@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import { fixtures } from './utils/fixtures';
-import { install } from './rewires/install';
+import { add } from './rewires/artifact';
 
 describe('fixpack', () => {
 	const fixpackFxt = fixtures('fixpack');
@@ -18,7 +18,7 @@ describe('fixpack', () => {
 			'/incoming/configs/.fixpackrc': fixpackFxt.json.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.json.merged);
 	}); // }}}
@@ -30,7 +30,7 @@ describe('fixpack', () => {
 			'/incoming/configs/.fixpackrc': fixpackFxt.yaml.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.merged);
 	}); // }}}

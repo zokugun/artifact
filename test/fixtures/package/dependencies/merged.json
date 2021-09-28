@@ -2,8 +2,8 @@
 	"name": "my-awesome-project",
 	"version": "1.0.0",
 	"dependencies": {
+		"corge": "1.0.0",
 		"foobar": "1.0.0",
-		"quxbaz": "1.0.0",
-		"corge": "1.0.0"
+		"quxbaz": "1.0.0"
 	}
 }

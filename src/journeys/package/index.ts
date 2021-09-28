@@ -1,5 +1,5 @@
 import isPlainObject from 'lodash/isPlainObject';
-import { compose, fork, json } from '../../compositors';
+import { compose, fork, json, mapSort } from '../../compositors';
 import { command, listConcat, mapConcat, primitive } from '../../routes';
 import { buildJourneyPlan } from '../../utils/build-journey-plan';
 import { buildTravelPlan } from '../../utils/build-travel-plan';
@@ -25,16 +25,16 @@ const mainRoute = compose({
 		[isPlainObject, mapConcat],
 		primitive,
 	),
-	scripts: compose({
+	scripts: mapSort(compose({
 		$$default: command,
-	}),
-	config: mapConcat,
-	engines: mapConcat,
-	dependencies: mapConcat,
-	devDependencies: mapConcat,
-	peerDependencies: mapConcat,
-	optionalDependencies: mapConcat,
-	bundledDependencies: mapConcat,
+	})),
+	config: mapSort(mapConcat),
+	engines: mapSort(mapConcat),
+	dependencies: mapSort(mapConcat),
+	devDependencies: mapSort(mapConcat),
+	peerDependencies: mapSort(mapConcat),
+	optionalDependencies: mapSort(mapConcat),
+	bundledDependencies: mapSort(mapConcat),
 
 	// tools fields
 	browserslist: listConcat,

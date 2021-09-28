@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import pkg from '../package.json';
-import { add } from './commands/add';
+import { add, update } from './commands';
 
 const program = new Command();
 
@@ -12,5 +12,11 @@ program
 	.option('-v, --verbose', 'output more details')
 	.argument('<artifacts...>')
 	.action(add);
+
+program
+	.command('update')
+	.description('update the current project using the installed artifact')
+	.option('-v, --verbose', 'output more details')
+	.action(update);
 
 program.parse();

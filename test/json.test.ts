@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import { fixtures } from './utils/fixtures';
-import { install } from './rewires/install';
+import { add } from './rewires/artifact';
 
 describe('json', () => {
 	const editorConfigFxt = fixtures('editorconfig');
@@ -19,7 +19,7 @@ describe('json', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
@@ -31,7 +31,7 @@ describe('json', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
@@ -44,7 +44,7 @@ describe('json', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
@@ -57,7 +57,7 @@ describe('json', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
@@ -70,7 +70,7 @@ describe('json', () => {
 			'/incoming/configs/default.json': jsonFxt.merge.incoming,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.merge.merged);
 	}); // }}}

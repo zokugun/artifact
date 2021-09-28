@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import { fixtures } from './utils/fixtures';
-import { install } from './rewires/install';
+import { add } from './rewires/artifact';
 
 describe('editorconfig', () => {
 	const editorConfigFxt = fixtures('editorconfig');
@@ -18,7 +18,7 @@ describe('editorconfig', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/.editorconfig', 'utf-8')).to.eql(editorConfigFxt.default.space2);
 	}); // }}}
@@ -31,7 +31,7 @@ describe('editorconfig', () => {
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
-		await install('/target', '/incoming');
+		await add(['awesome-config']);
 
 		expect(vol.readFileSync('/target/.editorconfig', 'utf-8')).to.eql(editorConfigFxt.yaml.tab);
 	}); // }}}

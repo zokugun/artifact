@@ -1,6 +1,5 @@
 import minimatch from 'editorconfig/src/lib/fnmatch';
 import detectIndent from 'detect-indent';
-import { Context } from '../types/context';
 import { TextFile } from '../types/text-file';
 import { Format, IndentStyle } from '../types/format';
 
@@ -62,7 +61,7 @@ function indentWithTab(data: string): string { // {{{
 	}
 } // }}}
 
-export async function applyFormatting({ mergedTextFiles, formats }: Context): Promise<void> {
+export async function applyFormatting({ mergedTextFiles, formats }: { mergedTextFiles: TextFile[]; formats: Format[] }): Promise<void> {
 	for(const file of mergedTextFiles) {
 		for(const format of formats) {
 			if(fnmatch(file.name, format.glob)) {

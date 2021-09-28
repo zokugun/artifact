@@ -5,8 +5,8 @@ import fse from 'fs-extra';
 import { Context } from '../types/context';
 import { readBuffer } from '../utils/read-buffer';
 
-export async function readFiles(context: Context): Promise<void> {
-	const cwd = path.join(context.incomingPath, 'configs');
+export async function readFiles({ incomingPath, textFiles, binaryFiles, options }: Context): Promise<void> {
+	const cwd = path.join(incomingPath, 'configs');
 
 	const files = await globby(['**/*', '!**/*.lock', '!**/*-lock.*'], {
 		cwd,
@@ -24,33 +24,33 @@ export async function readFiles(context: Context): Promise<void> {
 				// the text file might be executable
 				const { mode } = await fse.stat(filePath);
 
-				context.textFiles.push({
+				textFiles.push({
 					name: file,
 					data,
 					mode,
 					finalNewLine,
 				});
 
-				if(context.options.verbose) {
+				if(options.verbose) {
 					console.log(`${file} is a shebang file`);
 				}
 			}
 			else {
-				context.textFiles.push({
+				textFiles.push({
 					name: file,
 					data,
 					finalNewLine,
 				});
 
-				if(context.options.verbose) {
+				if(options.verbose) {
 					console.log(`${file} is a text file`);
 				}
 			}
 		}
 		else {
-			context.binaryFiles.push(file);
+			binaryFiles.push(file);
 
-			if(context.options.verbose) {
+			if(options.verbose) {
 				console.log(`${file} is a binary file`);
 			}
 		}

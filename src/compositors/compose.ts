@@ -38,7 +38,7 @@ interface ComposeMap {
 }
 
 export function compose(map: ComposeMap): Route<Record<string, any>> {
-	return ({ current, incoming }) => {
+	return ({ current, incoming, filters }) => {
 		if(incoming === undefined) {
 			return current ?? {};
 		}
@@ -47,14 +47,25 @@ export function compose(map: ComposeMap): Route<Record<string, any>> {
 			return incoming;
 		}
 
-		const result = {};
 		const currentKeys = Object.keys(current);
 		const incomingKeys = Object.keys(incoming);
 		const newKeys = without(incomingKeys, ...currentKeys);
 
-		apply(map, currentKeys, current, incoming, result);
-		apply(map, newKeys, current, incoming, result);
+		if(filters) {
+			const result = { ...current };
 
-		return result;
+			apply(map, filters, current, incoming, result);
+			apply(map, newKeys, current, incoming, result);
+
+			return result;
+		}
+		else {
+			const result = {};
+
+			apply(map, currentKeys, current, incoming, result);
+			apply(map, newKeys, current, incoming, result);
+
+			return result;
+		}
 	};
 }

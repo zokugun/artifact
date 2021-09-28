@@ -1,0 +1,22 @@
+{
+	"main": "./lib/index.js",
+	"scripts": {
+		"bundle": "ncc build out/extension --out lib",
+		"compile": "tsc -p src",
+		"release": "release-it",
+		"vscode:prepublish": "npm run compile && npm run bundle",
+		"watch": "tsc-watch -p src --onSuccess 'npm run bundle'"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.23.0",
+		"@vercel/ncc": "^0.29.0",
+		"release-it": "^14.11.3",
+		"tsc-watch": "^4.4.0"
+	},
+	"activationEvents": [
+		"*"
+	],
+	"keywords": [
+		"ignore"
+	]
+}
