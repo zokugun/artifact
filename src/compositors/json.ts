@@ -2,7 +2,7 @@ import { flow, isPlainObject } from 'lodash';
 import { Route } from '../types/travel';
 import * as JSON from '../parsers/json';
 import * as JSONC from '../parsers/jsonc';
-import { listConcat, mapConcat, primitive } from '../routes';
+import { listConcat, primitive } from '../routes';
 import { Transform } from '../parsers/jsonc/transform';
 import { compose } from './compose';
 import { fork } from './fork';
@@ -19,7 +19,7 @@ function tryJson(value: string): Record<string, any> | undefined {
 const merge = compose({
 	$$default: fork(
 		[Array.isArray, listConcat],
-		[isPlainObject, mapConcat],
+		[isPlainObject, (...args) => merge(...args)],
 		primitive,
 	),
 });

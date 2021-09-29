@@ -11,40 +11,53 @@ describe('tsconfig', () => {
 		vol.reset();
 	}); // }}}
 
-	it('advanced', async () => { // {{{
+	it('add.advanced', async () => { // {{{
 		vol.fromJSON({
 			'/target/package.json': packageFxt.default.project,
-			'/incoming/configs/tsconfig.json': tsconfigFxt.advanced.merged,
+			'/incoming/configs/tsconfig.json': tsconfigFxt.addAdvanced.merged,
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.advanced.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.addAdvanced.merged);
 	}); // }}}
 
-	it('basic', async () => { // {{{
+	it('add.basic', async () => { // {{{
 		vol.fromJSON({
 			'/target/package.json': packageFxt.default.project,
-			'/incoming/configs/tsconfig.json': tsconfigFxt.basic.merged,
+			'/incoming/configs/tsconfig.json': tsconfigFxt.addBasic.merged,
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.basic.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.addBasic.merged);
 	}); // }}}
 
-	it('merge', async () => { // {{{
+	it('merge.basic', async () => { // {{{
 		vol.fromJSON({
-			'/target/tsconfig.json': tsconfigFxt.merge.target,
+			'/target/tsconfig.json': tsconfigFxt.mergeBasic.target,
 			'/target/package.json': packageFxt.default.project,
-			'/incoming/configs/tsconfig.json': tsconfigFxt.merge.incoming,
+			'/incoming/configs/tsconfig.json': tsconfigFxt.mergeBasic.incoming,
 			'/incoming/package.json': packageFxt.default.config,
 		}, '/');
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.merge.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.mergeBasic.merged);
+	}); // }}}
+
+	it('merge.dom', async () => { // {{{
+		vol.fromJSON({
+			'/target/tsconfig.json': tsconfigFxt.mergeDom.target,
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/configs/tsconfig.json': tsconfigFxt.mergeDom.incoming,
+			'/incoming/package.json': packageFxt.default.config,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.mergeDom.merged);
 	}); // }}}
 });
