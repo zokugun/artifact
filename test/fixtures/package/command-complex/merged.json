@@ -2,6 +2,6 @@
 	"name": "my-awesome-project",
 	"version": "1.0.0",
 	"scripts": {
-		"test": "foo & bar | FOO=bar BAR=baz baz"
+		"test": "foo --bar --baz foo & bar -a=b | FOO=bar BAR=baz baz --a=b"
 	}
 }

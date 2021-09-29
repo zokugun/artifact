@@ -7,6 +7,7 @@ import ignoreJourney from './ignore';
 import npmignoreJourney from './npmignore';
 import packageJourney from './package';
 import rcJourney from './rc';
+import tsConfigJourney from './tsconfig';
 
 const plans = [
 	packageJourney,
@@ -15,6 +16,7 @@ const plans = [
 	ignoreJourney,
 	commitlintJourney,
 	rcJourney,
+	tsConfigJourney,
 	defaultJourney,
 ];
 

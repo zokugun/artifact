@@ -1,5 +1,5 @@
 import { head, identity, last, trim } from 'lodash';
-import { Command } from './command';
+import { Command } from '../../types/command';
 
 export function splitCommand(command: string): Record<string, Command[]> {
 	const result: Record<string, Command[]> = {};

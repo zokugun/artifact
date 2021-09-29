@@ -1,4 +1,4 @@
-import { Command } from './command';
+import { Command } from '../../types/command';
 
 export function joinCommand(commands: Record<string, Command[]>): string {
 	const subcommands = [] as string[];
@@ -21,7 +21,12 @@ export function joinCommand(commands: Record<string, Command[]>): string {
 			}
 
 			if(value.separator) {
-				subcommand = `${subcommand} ${value.separator}`;
+				if(value.separator === ';') {
+					subcommand += ';';
+				}
+				else {
+					subcommand = `${subcommand} ${value.separator}`;
+				}
 			}
 
 			subcommands.push(subcommand);
