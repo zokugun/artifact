@@ -1,10 +1,12 @@
-import { createWriteStream } from 'fs';
 import process from 'process';
 import pacote from 'pacote';
 import tempy from 'tempy';
 import npm from 'npm';
+import ora from 'ora';
+import { cyan } from 'ansi-colors';
 import { composeSteps, steps } from '../steps';
 import { readConfig, writeConfig } from '../config';
+import { createDevNull } from '../utils/dev-null';
 
 const commonFlow = composeSteps(
 	steps.readIncomingPackage,
@@ -23,7 +25,7 @@ const commonFlow = composeSteps(
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean }): Promise<void> {
 	// @ts-expect-error log property isn't exposed
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-	npm.log.stream = createWriteStream('/dev/null');
+	npm.log.stream = createDevNull();
 
 	await npm.load();
 
@@ -39,11 +41,15 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 	const [config, configStats] = await readConfig(targetPath);
 
 	for(const artifact of config.artifacts) {
+		const spinner = ora(`${cyan.bold(artifact.name)}`).start();
+
 		const dir = tempy.directory();
 		const pkgResult = await pacote.extract(artifact.name, dir, { registry });
 
 		if(!pkgResult.resolved) {
 			if(options.force) {
+				spinner.fail();
+
 				if(options.verbose) {
 					console.log(`The artifact '${artifact.name}' couldn't be found, skipping...`);
 				}
@@ -58,6 +64,8 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 		const flowResult = await commonFlow(targetPath, dir, config, options);
 
 		if(!flowResult) {
+			spinner.succeed();
+
 			continue;
 		}
 
@@ -71,5 +79,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 		}
 
 		await writeConfig(config, configStats, flowResult.formats, targetPath, options);
+
+		spinner.succeed();
 	}
 }

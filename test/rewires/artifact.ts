@@ -10,6 +10,16 @@ rewiremock('npm').with({
 	load: async () => {
 		// do nothing
 	},
+	log: {},
+});
+rewiremock('ora').with(() => {
+	const ora = {
+		fail: () => null,
+		start: () => ora,
+		succeed: () => null,
+	};
+
+	return ora;
 });
 rewiremock('pacote').with({
 	extract: () => ({ resolved: true }),
@@ -21,6 +31,9 @@ rewiremock('process').with({
 });
 rewiremock('tempy').with({
 	directory: () => '/incoming',
+});
+rewiremock('../utils/dev-null').with({
+	createDevNull: () => null,
 });
 
 // unload to it can use mocked's fs

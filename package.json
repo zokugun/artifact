@@ -1,7 +1,7 @@
 {
 	"name": "@zokugun/artifact",
 	"description": "Boilerplate your project & keep your configurations up to date",
-	"version": "0.2.0",
+	"version": "0.1.0",
 	"author": {
 		"name": "Baptiste Augrain",
 		"email": "daiyam@zokugun.org"
@@ -33,6 +33,7 @@
 		"watch:test": "tsc-watch -p test"
 	},
 	"dependencies": {
+		"ansi-colors": "^4.1.1",
 		"commander": "^8.2.0",
 		"detect-indent": "^6.1.0",
 		"editorconfig": "^0.15.3",
@@ -43,6 +44,7 @@
 		"lodash": "^4.17.21",
 		"micromatch": "^4.0.4",
 		"npm": "^7.23.0",
+		"ora": "^5.4.1",
 		"pacote": "^11.3.5",
 		"semver": "^7.3.5",
 		"tempy": "^1.0.1",
