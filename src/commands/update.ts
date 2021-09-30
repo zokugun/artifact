@@ -1,3 +1,4 @@
+import { createWriteStream } from 'fs';
 import process from 'process';
 import pacote from 'pacote';
 import tempy from 'tempy';
@@ -20,6 +21,10 @@ const commonFlow = composeSteps(
 );
 
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean }): Promise<void> {
+	// @ts-expect-error log property isn't exposed
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+	npm.log.stream = createWriteStream('/dev/null');
+
 	await npm.load();
 
 	const registry = npm.config.get('registry') as string;
