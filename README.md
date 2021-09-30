@@ -63,16 +63,23 @@ artifact-configs/base/
   └── README.md
 ```
 
+Update
+------
+
+Update your configurations with the command:
+
+```
+artifact update
+```
+
+It is **recommended** to review the changes and manually revert any bad changes.
+
+Furthermore, a configuration package can control how to apply an update via the file `.artifactrc`.
+
 Yeoman
 ------
 
 `artifact` can be used in a yeoman generator. Ex: [@daiyam/generator-new-project](https://github.com/daiyam/generator-new-project)
-
-Limitation
-----------
-
-The `update` command haven't been developed, yet.<br />
-But, to keep your configurations up to date, you can *re-add* the configuration packages and manually revert the bad changes.
 
 Donations
 ---------
