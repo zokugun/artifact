@@ -34,4 +34,16 @@ describe('fixpack', () => {
 
 		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.merged);
 	}); // }}}
+
+	it('sort', async () => { // {{{
+		vol.fromJSON({
+			'/target/.fixpackrc': fixpackFxt.sort.target,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/.fixpackrc': fixpackFxt.sort.incoming,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.sort.merged);
+	}); // }}}
 });

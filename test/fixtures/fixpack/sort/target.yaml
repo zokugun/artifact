@@ -1,0 +1,7 @@
+sortToTop:
+  - name
+  - displayName
+  - description
+  - version
+  - homepage
+  - repository

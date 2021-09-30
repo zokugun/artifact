@@ -1,0 +1,11 @@
+sortToTop:
+  - name
+  - displayName
+  - description
+  - version
+  - private
+  - author
+  - publisher
+  - license
+  - homepage
+  - repository
