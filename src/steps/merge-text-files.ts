@@ -1,7 +1,7 @@
 import path from 'path';
 import fse from 'fs-extra';
-import { Context } from '../types/context';
 import { getJourney } from '../journeys';
+import { Context } from '../types/context';
 
 export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onMissing, onUpdate, filters, routes, options }: Context): Promise<void> {
 	for(const file of textFiles) {

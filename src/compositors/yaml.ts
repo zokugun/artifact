@@ -1,6 +1,6 @@
 import { flow } from 'lodash';
-import { Args, Route } from '../types/travel';
 import * as YAML from '../parsers/yaml';
+import { Args, Route } from '../types/travel';
 
 function fromYaml({ current, incoming, filters, ignores }: Args<string>): Args<Record<string, any>> {
 	return {

@@ -1,4 +1,5 @@
 import rewiremock from 'rewiremock';
+// eslint-disable-next-line import/order
 import { fs } from '../mocks/fs';
 
 rewiremock('fs').with(fs);
@@ -7,7 +8,7 @@ rewiremock('npm').with({
 	config: {
 		get: () => null,
 	},
-	load: async () => {
+	async load() {
 		// do nothing
 	},
 	log: {},
@@ -49,7 +50,9 @@ import { update } from '../../src/commands/update';
 
 rewiremock.disable();
 
+/* eslint-disable unicorn/prefer-export-from */
 export {
 	add,
 	update,
 };
+/* eslint-enable unicorn/prefer-export-from */

@@ -1,12 +1,12 @@
 import path from 'path';
-import yaml from 'yaml';
 import fse from 'fs-extra';
 import { isEmpty, isPlainObject } from 'lodash';
+import yaml from 'yaml';
+import { applyFormatting } from '../steps/apply-formatting';
+import { insertFinalNewLine } from '../steps/insert-final-new-line';
 import { Config, ConfigStats } from '../types/config';
 import { Options } from '../types/context';
-import { insertFinalNewLine } from '../steps/insert-final-new-line';
 import { Format } from '../types/format';
-import { applyFormatting } from '../steps/apply-formatting';
 
 export async function writeConfig({ artifacts, update }: Config, { name, finalNewLine, type }: ConfigStats, formats: Format[], targetPath: string, options: Options): Promise<void> {
 	const exported: {

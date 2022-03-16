@@ -1,9 +1,9 @@
 import { flow, isPlainObject } from 'lodash';
-import { Route } from '../types/travel';
 import * as JSON from '../parsers/json';
 import * as JSONC from '../parsers/jsonc';
-import { listConcat, primitive } from '../routes';
 import { Transform } from '../parsers/jsonc/transform';
+import { listConcat, primitive } from '../routes';
+import { Route } from '../types/travel';
 import { compose } from './compose';
 import { fork } from './fork';
 

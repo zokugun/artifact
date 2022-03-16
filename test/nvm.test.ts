@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { fixtures } from './utils/fixtures';
 import { add } from './rewires/artifact';
+import { fixtures } from './utils/fixtures';
 
 describe('nvm', () => {
 	const nvmrcFxt = fixtures('nvm');

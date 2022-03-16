@@ -1,7 +1,7 @@
 import path from 'path';
-import { getEncoding, isText } from 'istextorbinary';
-import globby from 'globby';
 import fse from 'fs-extra';
+import globby from 'globby';
+import { getEncoding, isText } from 'istextorbinary';
 import { Context } from '../types/context';
 import { readBuffer } from '../utils/read-buffer';
 

@@ -1,11 +1,11 @@
 import process from 'process';
-import pacote from 'pacote';
-import tempy from 'tempy';
+import { cyan } from 'ansi-colors';
 import npm from 'npm';
 import ora from 'ora';
-import { cyan } from 'ansi-colors';
-import { composeSteps, steps } from '../steps';
+import pacote from 'pacote';
+import tempy from 'tempy';
 import { readConfig, writeConfig } from '../config';
+import { composeSteps, steps } from '../steps';
 import { createDevNull } from '../utils/dev-null';
 
 const commonFlow = composeSteps(
@@ -24,7 +24,6 @@ const commonFlow = composeSteps(
 
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean }): Promise<void> {
 	// @ts-expect-error log property isn't exposed
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 	npm.log.stream = createDevNull();
 
 	await npm.load();

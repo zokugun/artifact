@@ -1,7 +1,7 @@
 import { flow, isPlainObject } from 'lodash';
-import { Route } from '../types/travel';
 import * as JSON from '../parsers/json';
 import * as YAML from '../parsers/yaml';
+import { Route } from '../types/travel';
 
 function tryJson(value: string): Record<string, any> | undefined {
 	try {

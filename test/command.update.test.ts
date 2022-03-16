@@ -1,8 +1,8 @@
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { vol } from 'memfs';
-import { fixtures } from './utils/fixtures';
 import { update } from './rewires/artifact';
+import { fixtures } from './utils/fixtures';
 
 use(chaiAsPromised);
 

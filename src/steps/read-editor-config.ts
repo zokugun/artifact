@@ -1,6 +1,6 @@
 import path from 'path';
-import fse from 'fs-extra';
 import * as editorconfig from 'editorconfig';
+import fse from 'fs-extra';
 import { Context } from '../types/context';
 import { IndentStyle } from '../types/format';
 

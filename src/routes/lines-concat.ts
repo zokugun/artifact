@@ -1,5 +1,5 @@
-import { trimFinalNewLine } from '../utils/trim-final-newline';
 import { toLines } from '../utils/to-lines';
+import { trimFinalNewLine } from '../utils/trim-final-newline';
 import { listConcat } from './list-concat';
 
 export function linesConcat({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {

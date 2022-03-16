@@ -1,7 +1,7 @@
-import minimatch from 'editorconfig/src/lib/fnmatch';
 import detectIndent from 'detect-indent';
-import { TextFile } from '../types/text-file';
+import minimatch from 'editorconfig/src/lib/fnmatch';
 import { Format, IndentStyle } from '../types/format';
+import { TextFile } from '../types/text-file';
 
 function applyFormat(file: TextFile, format: Format): void { // {{{
 	if(format.indentStyle === IndentStyle.SPACE) {

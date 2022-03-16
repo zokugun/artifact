@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
 import { Buffer } from 'buffer';
+import fs from 'fs/promises';
 
 export async function readBuffer(filepath: string, size: number, offset: number = 0): Promise<Buffer> {
 	const buffer = Buffer.alloc(size);

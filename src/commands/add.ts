@@ -1,9 +1,9 @@
 import process from 'process';
+import npm from 'npm';
 import pacote from 'pacote';
 import tempy from 'tempy';
-import npm from 'npm';
-import { composeSteps, steps } from '../steps';
 import { readConfig, writeConfig } from '../config';
+import { composeSteps, steps } from '../steps';
 
 const commonFlow = composeSteps(
 	steps.readIncomingPackage,

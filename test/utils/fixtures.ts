@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import path from 'path';
-import globby from 'globby';
 import camelcase from 'camelcase';
+import globby from 'globby';
 
 const BASENAME_REGEX = /^(.*)\.([^.]+)$/;
 
