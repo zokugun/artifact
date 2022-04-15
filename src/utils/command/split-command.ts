@@ -9,22 +9,25 @@ export function splitCommand(command: string): Record<string, Command[]> {
 	for(let i = 0; i < splitted.length; i++) {
 		const command = splitted[i];
 		const splittedSubcommand = command.split(/([\w-]+=\S+)\s/).filter(identity);
-		const subcommandWithArgs = last(splittedSubcommand)!.split(' ');
-		const subcommand = head(subcommandWithArgs)!.trim();
-		const args = subcommandWithArgs.slice(1);
-		const env = splittedSubcommand.slice(0, -1);
 
-		const parsedSubcommand: Command = {
-			args: args.map(trim),
-			env: env.map(trim),
-			separator: splitted[i + 1],
-		};
+		if(splittedSubcommand.length > 0) {
+			const subcommandWithArgs = last(splittedSubcommand)!.split(' ');
+			const subcommand = head(subcommandWithArgs)!.trim();
+			const args = subcommandWithArgs.slice(1);
+			const env = splittedSubcommand.slice(0, -1);
 
-		if(result[subcommand]) {
-			result[subcommand].push(parsedSubcommand);
-		}
-		else {
-			result[subcommand] = [parsedSubcommand];
+			const parsedSubcommand: Command = {
+				args: args.map(trim),
+				env: env.map(trim),
+				separator: splitted[i + 1],
+			};
+
+			if(result[subcommand]) {
+				result[subcommand].push(parsedSubcommand);
+			}
+			else {
+				result[subcommand] = [parsedSubcommand];
+			}
 		}
 
 		i++;

@@ -5,11 +5,15 @@ import { Context } from '../types/context';
 
 export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onMissing, onUpdate, filters, routes, options }: Context): Promise<void> {
 	for(const file of textFiles) {
+		if(options.verbose) {
+			console.log(`${file.name} is going to be merged`);
+		}
+
 		const journey = routes(file.name) ?? getJourney(file.name);
 
 		if(!journey) {
 			if(options.verbose) {
-				console.log(`${file.name}, no merger found`);
+				console.log(`${file.name}, no merger has been found`);
 			}
 
 			try {
@@ -27,6 +31,10 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 
 			mergedTextFiles.push(file);
 			continue;
+		}
+
+		if(options.verbose) {
+			console.log(`${file.name}, a merger has been found`);
 		}
 
 		const name = journey.alias ? path.join(path.dirname(file.name), journey.alias) : file.name;
