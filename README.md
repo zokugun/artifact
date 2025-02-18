@@ -32,11 +32,11 @@ With [node](http://nodejs.org) previously installed:
 Add the configuration packages:
 
 ```
-artifact add @daiyam/base @daiyam/lang-ts @daiyam/npm-ts
+artifact add @daiyam/lang-js @daiyam/lang-ts @daiyam/npm-ts
 ```
 
  With the previous command, `artifact` will pull the following packages:
-- [@daiyam/artifact-base](https://github.com/daiyam/artifact-configs/tree/master/packages/base)
+- [@daiyam/artifact-lang-js](https://github.com/daiyam/artifact-configs/tree/master/packages/lang-js)
 - [@daiyam/artifact-lang-ts](https://github.com/daiyam/artifact-configs/tree/master/packages/lang-ts)
 - [@daiyam/artifact-npm-ts](https://github.com/daiyam/artifact-configs/tree/master/packages/npm-ts)
 
@@ -47,10 +47,10 @@ Configuration Package
 
 The configuration/boilerplate files must be put inside the folder `configs`.
 
-For example, the package [@daiyam/artifact-base](https://github.com/daiyam/artifact-configs/tree/master/packages/base):
+For example, the package [@daiyam/artifact-lang-js](https://github.com/daiyam/artifact-configs/tree/master/packages/lang-js):
 
 ```
-artifact-configs/base/
+artifact-configs/lang-js/
   ├── configs/
   │  ├── .commitlintrc.yml
   │  ├── .editorconfig

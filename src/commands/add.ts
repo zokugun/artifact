@@ -10,6 +10,7 @@ const commonFlow = composeSteps(
 	steps.validateNotPresentPackage,
 	steps.readFiles,
 	steps.readEditorConfig,
+	steps.replaceTemplates,
 	steps.mergeTextFiles,
 	steps.insertFinalNewLine,
 	steps.applyFormatting,

@@ -9,6 +9,7 @@ import { readEditorConfig } from './read-editor-config';
 import { readFiles } from './read-files';
 import { readIncomingConfig } from './read-incoming-config';
 import { readIncomingPackage } from './read-incoming-package';
+import { replaceTemplates } from './replace-templates';
 import { validateNewerPackage } from './validate-newer-package';
 import { validateNotPresentPackage } from './validate-not-present-package';
 import { validateUpdatability } from './validate-updatability';
@@ -23,6 +24,7 @@ export const steps = {
 	readFiles,
 	readIncomingConfig,
 	readIncomingPackage,
+	replaceTemplates,
 	validateNewerPackage,
 	validateNotPresentPackage,
 	validateUpdatability,

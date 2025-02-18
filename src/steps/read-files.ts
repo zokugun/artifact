@@ -48,7 +48,10 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 			}
 		}
 		else {
-			binaryFiles.push(file);
+			binaryFiles.push({
+				source: file,
+				target: file,
+			});
 
 			if(options.verbose) {
 				console.log(`${file} is a binary file`);

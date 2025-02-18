@@ -1,0 +1,7 @@
+{
+	"name": "my-awesome-project",
+	"version": "1.0.0",
+	"bin": {
+		"my-awesome-project": "bin/my-awesome-project"
+	}
+}

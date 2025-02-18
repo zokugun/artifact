@@ -105,4 +105,16 @@ describe('package', () => {
 
 		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.none.merged);
 	}); // }}}
+
+	it('template', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.template.target,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/package.json': packageFxt.template.incoming,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.template.merged);
+	}); // }}}
 });

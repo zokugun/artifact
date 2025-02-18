@@ -1,10 +1,11 @@
+import { BinaryFile } from './binary-file';
 import { Config } from './config';
 import { Format } from './format';
 import { TextFile } from './text-file';
 import { Journey } from './travel';
 
 export interface Context {
-	binaryFiles: string[];
+	binaryFiles: BinaryFile[];
 	config: Config;
 	filters: (file: string) => string[] | undefined;
 	formats: Format[];

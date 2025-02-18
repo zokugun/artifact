@@ -2,15 +2,7 @@ import { flow, isPlainObject } from 'lodash';
 import * as JSON from '../parsers/json';
 import * as YAML from '../parsers/yaml';
 import { Route } from '../types/travel';
-
-function tryJson(value: string): Record<string, any> | undefined {
-	try {
-		return JSON.parse(value);
-	}
-	catch {
-		return undefined;
-	}
-}
+import { tryJson } from '../utils/try-json';
 
 export function rc(...routes: Array<Route<Record<string, any>>>): Route<string> {
 	return ({ current, incoming, filters, ignores }) => {

@@ -7,25 +7,25 @@ export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, o
 
 	for(const file of binaryFiles) {
 		try {
-			await fse.access(path.join(targetPath, file));
+			await fse.access(path.join(targetPath, file.source));
 
-			if(onUpdate(file)) {
+			if(onUpdate(file.source)) {
 				continue;
 			}
 		}
 		catch {
-			if(onMissing(file)) {
+			if(onMissing(file.source)) {
 				continue;
 			}
 		}
 
-		const source = path.join(cwd, file);
-		const target = path.join(targetPath, file);
+		const source = path.join(cwd, file.source);
+		const target = path.join(targetPath, file.target);
 
 		await fse.copyFile(source, target);
 
 		if(options.verbose) {
-			console.log(`${file} has been written as a binary file`);
+			console.log(`${file.target} has been written as a binary file`);
 		}
 	}
 }
