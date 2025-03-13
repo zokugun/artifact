@@ -15,6 +15,7 @@ const commonFlow = composeSteps(
 	steps.validateUpdatability,
 	steps.readFiles,
 	steps.readEditorConfig,
+	steps.replaceTemplates,
 	steps.mergeTextFiles,
 	steps.insertFinalNewLine,
 	steps.applyFormatting,

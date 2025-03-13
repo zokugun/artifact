@@ -4,7 +4,9 @@ import { add, update } from './commands';
 
 const program = new Command();
 
-program.version(pkg.version);
+program
+	.version(pkg.version, '-v, --version')
+	.description(pkg.description);
 
 program
 	.command('add')
