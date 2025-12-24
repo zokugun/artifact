@@ -1,43 +1,36 @@
 import process from 'process';
+import { cyan } from 'ansi-colors';
 import npm from 'npm';
+import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
-import { readConfig, writeConfig } from '../config';
+import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs';
 import { composeSteps, steps } from '../steps';
+import { resolveRequest } from '../utils/resolve-request';
 
-const commonFlow = composeSteps(
-	steps.readIncomingPackage,
-	steps.validateNotPresentPackage,
-	steps.readFiles,
-	steps.readEditorConfig,
-	steps.replaceTemplates,
-	steps.mergeTextFiles,
-	steps.insertFinalNewLine,
-	steps.applyFormatting,
-	steps.copyBinaryFiles,
-	steps.writeTextFiles,
+const { mainFlow } = composeSteps(
+	[
+		steps.readIncomingPackage,
+		steps.validateNotPresentPackage,
+		steps.readIncomingConfig,
+		steps.executeFirstBlock,
+	],
+	[
+		steps.readIncomingConfig,
+		steps.configureBranches,
+		steps.configureInstallFileActions,
+		steps.readFiles,
+		steps.readEditorConfig,
+		steps.replaceTemplates,
+		steps.mergeTextFiles,
+		steps.insertFinalNewLine,
+		steps.applyFormatting,
+		steps.copyBinaryFiles,
+		steps.writeTextFiles,
+		steps.removeFiles,
+		steps.executeNextBlock,
+	],
 );
-
-function expandSpec(spec: string): string { // {{{
-	if(spec.includes('/')) {
-		const [scope, name] = spec.split('/');
-
-		if(name.startsWith('artifact-')) {
-			return spec;
-		}
-		else {
-			return `${scope}/artifact-${name}`;
-		}
-	}
-	else {
-		if(spec.startsWith('artifact-')) {
-			return spec;
-		}
-		else {
-			return `artifact-${spec}`;
-		}
-	}
-} // }}}
 
 export async function add(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean }): Promise<void> {
 	await npm.load();
@@ -51,14 +44,19 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 		verbose: inputOptions?.verbose ?? false,
 	};
 
-	const [config, configStats] = await readConfig(targetPath);
+	const { config, configStats } = await readInstallConfig(targetPath);
 
 	for(const spec of specs) {
+		const request = resolveRequest(spec);
+		const spinner = ora(`${cyan.bold(request.name)}`).start();
+
 		const dir = tempy.directory();
-		const pkgResult = await pacote.extract(expandSpec(spec), dir, { registry });
+		const pkgResult = await pacote.extract(request.name, dir, { registry });
 
 		if(!pkgResult.resolved) {
 			if(options.force || options.skip) {
+				spinner.fail();
+
 				if(options.verbose) {
 					console.log(`The artifact '${spec}' couldn't be found, skipping...`);
 				}
@@ -70,32 +68,18 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 			}
 		}
 
-		const flowResult = await commonFlow(targetPath, dir, config, options);
+		const flowResult = await mainFlow(targetPath, dir, request, config, options);
 
-		if(!flowResult) {
+		if(!flowResult || !flowResult.result) {
+			spinner.succeed();
+
 			continue;
 		}
 
-		const { name, version } = flowResult.incomingPackage! as { name: string; version: string };
+		updateInstallConfig(config, flowResult.result);
 
-		let nf = true;
-		for(const artifact of config.artifacts) {
-			if(artifact.name === name) {
-				artifact.version = version;
+		await writeInstallConfig(config, configStats, flowResult.formats, targetPath, options);
 
-				nf = false;
-
-				break;
-			}
-		}
-
-		if(nf) {
-			config.artifacts.push({
-				name,
-				version,
-			});
-		}
-
-		await writeConfig(config, configStats, flowResult.formats, targetPath, options);
+		spinner.succeed();
 	}
 }

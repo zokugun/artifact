@@ -1,8 +1,14 @@
-import { readConfig } from '../config';
+import { readPackageConfig } from '../configs';
 import { Context } from '../types/context';
 
-export async function readIncomingConfig(context: Context): Promise<void> {
-	const [config] = await readConfig(context.incomingPath);
+export async function readIncomingConfig(context: Context): Promise<boolean | void> {
+	if(!context.incomingConfig) {
+		const config = await readPackageConfig(context.incomingPath);
 
-	context.incomingConfig = config;
+		if(!config) {
+			return true;
+		}
+
+		context.incomingConfig = config;
+	}
 }

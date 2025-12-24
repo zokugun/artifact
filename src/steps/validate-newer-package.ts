@@ -6,7 +6,7 @@ export async function validateNewerPackage({ incomingPackage, config, options }:
 		return;
 	}
 
-	const artifact = config.artifacts.find(({ name }) => name === incomingPackage!.name);
+	const artifact = config.artifacts[incomingPackage!.name];
 
 	if(artifact) {
 		return !gt(incomingPackage!.version, artifact.version);

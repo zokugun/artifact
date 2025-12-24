@@ -1,26 +1,37 @@
 import process from 'process';
 import { cyan } from 'ansi-colors';
+import { last } from 'lodash';
 import npm from 'npm';
 import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
-import { readConfig, writeConfig } from '../config';
+import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs';
 import { composeSteps, steps } from '../steps';
+import { Request } from '../types/config';
 import { createDevNull } from '../utils/dev-null';
 
-const commonFlow = composeSteps(
-	steps.readIncomingPackage,
-	steps.validateNewerPackage,
-	steps.readIncomingConfig,
-	steps.validateUpdatability,
-	steps.readFiles,
-	steps.readEditorConfig,
-	steps.replaceTemplates,
-	steps.mergeTextFiles,
-	steps.insertFinalNewLine,
-	steps.applyFormatting,
-	steps.copyBinaryFiles,
-	steps.writeTextFiles,
+const { mainFlow } = composeSteps(
+	[
+		steps.readIncomingPackage,
+		steps.validateNewerPackage,
+		steps.readIncomingConfig,
+		steps.executeFirstBlock,
+	],
+	[
+		steps.readIncomingConfig,
+		steps.configureBranches,
+		steps.configureUpdateFileActions,
+		steps.readFiles,
+		steps.readEditorConfig,
+		steps.replaceTemplates,
+		steps.mergeTextFiles,
+		steps.insertFinalNewLine,
+		steps.applyFormatting,
+		steps.copyBinaryFiles,
+		steps.writeTextFiles,
+		steps.removeFiles,
+		steps.executeNextBlock,
+	],
 );
 
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean }): Promise<void> {
@@ -38,20 +49,20 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 		verbose: inputOptions?.verbose ?? false,
 	};
 
-	const [config, configStats] = await readConfig(targetPath);
+	const { config, configStats } = await readInstallConfig(targetPath);
 
-	for(const artifact of config.artifacts) {
-		const spinner = ora(`${cyan.bold(artifact.name)}`).start();
+	for(const [name, artifact] of Object.entries(config.artifacts)) {
+		const spinner = ora(`${cyan.bold(name)}`).start();
 
 		const dir = tempy.directory();
-		const pkgResult = await pacote.extract(artifact.name, dir, { registry });
+		const pkgResult = await pacote.extract(name, dir, { registry });
 
 		if(!pkgResult.resolved) {
 			if(options.force) {
 				spinner.fail();
 
 				if(options.verbose) {
-					console.log(`The artifact '${artifact.name}' couldn't be found, skipping...`);
+					console.log(`The artifact '${name}' couldn't be found, skipping...`);
 				}
 
 				continue;
@@ -61,24 +72,19 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 			}
 		}
 
-		const flowResult = await commonFlow(targetPath, dir, config, options);
+		const request: Request = artifact.requires ? { name, variant: last(artifact.requires) } : { name };
 
-		if(!flowResult) {
+		const flowResult = await mainFlow(targetPath, dir, request, config, options);
+
+		if(!flowResult || !flowResult.result) {
 			spinner.succeed();
 
 			continue;
 		}
 
-		const { name, version } = flowResult.incomingPackage! as { name: string; version: string };
+		updateInstallConfig(config, flowResult.result);
 
-		for(const artifact of config.artifacts) {
-			if(artifact.name === name) {
-				artifact.version = version;
-				break;
-			}
-		}
-
-		await writeConfig(config, configStats, flowResult.formats, targetPath, options);
+		await writeInstallConfig(config, configStats, flowResult.formats, targetPath, options);
 
 		spinner.succeed();
 	}

@@ -1,6 +1,7 @@
 import path from 'path';
 import { Journey } from '../types/travel';
 import commitlintJourney from './commitlint';
+import configTSJourney from './config.ts';
 import defaultJourney from './default';
 import fixpackJourney from './fixpack';
 import gitignoreJourney from './gitignore';
@@ -19,6 +20,7 @@ const plans = [
 	packageJourney,
 	tsConfigJourney,
 	rcJourney,
+	configTSJourney,
 	defaultJourney,
 ];
 
@@ -27,6 +29,7 @@ export function getJourney(filename: string): Journey | undefined {
 
 	for(const plan of plans) {
 		const journey = plan(basename);
+
 		if(journey) {
 			return journey;
 		}

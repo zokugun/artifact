@@ -28,12 +28,12 @@
 		"release": "release-it",
 		"test": "tsc -p test && mocha",
 		"test:dev": "mocha",
-		"test:watch": "tsc-watch -p test --onSuccess 'mocha'",
-		"watch": "tsc-watch -p src",
+		"test:watch": "tsc-watch -p src -p test --onSuccess 'mocha'",
 		"watch:src": "tsc-watch -p src",
 		"watch:test": "tsc-watch -p test"
 	},
 	"dependencies": {
+		"@zokugun/configdotts-merge": "^0.1.0",
 		"ansi-colors": "^4.1.1",
 		"commander": "^9.0.0",
 		"dayjs": "^1.11.13",
@@ -50,6 +50,7 @@
 		"pacote": "^13.0.5",
 		"semver": "^7.3.5",
 		"tempy": "^1.0.1",
+		"untildify": "^4.0.0",
 		"yaml": "^1.10.2"
 	},
 	"devDependencies": {

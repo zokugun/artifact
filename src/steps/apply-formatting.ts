@@ -51,9 +51,9 @@ function indentWithSpace(data: string, size: number): string { // {{{
 } // }}}
 
 function indentWithTab(data: string): string { // {{{
-	const { type, indent } = detectIndent(data);
+	const { type, indent, amount } = detectIndent(data);
 
-	if(type === 'space') {
+	if(type === 'space' && amount > 1) {
 		return data.replace(new RegExp(indent, 'gm'), '\t');
 	}
 	else {

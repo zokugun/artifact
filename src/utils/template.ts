@@ -2,6 +2,7 @@ import path from 'path';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import fse from 'fs-extra';
+import { isNil, isPlainObject } from 'lodash';
 import * as YAML from '../parsers/yaml';
 import { tryJson } from './try-json';
 
@@ -41,7 +42,7 @@ export class TemplateEngine {
 			const fileContent = this.readConfigFile(name);
 			const value: unknown = this.getValueByPath(fileContent, propertyPath);
 
-			if(value === null || value === undefined) {
+			if(isNil(value)) {
 				throw new TemplateError(placeholder);
 			}
 
@@ -54,14 +55,14 @@ export class TemplateEngine {
 		let current: unknown = values;
 
 		for(const part of parts) {
-			if(current === null || current === undefined || typeof current !== 'object') {
+			if(!isPlainObject(current)) {
 				throw new TemplateError(`Property path not found: ${propertyPath}`);
 			}
 
-			current = current[part];
+			current = (current as Record<string, unknown>)[part];
 		}
 
-		if(current === null || current === undefined) {
+		if(isNil(current)) {
 			throw new TemplateError(`Property not found: ${propertyPath}`);
 		}
 

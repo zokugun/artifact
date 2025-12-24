@@ -1,28 +1,49 @@
 import { BinaryFile } from './binary-file';
-import { Config } from './config';
+import { Request, InstallConfig, PackageConfig, ArtifactResult, PackageManifest } from './config';
 import { Format } from './format';
 import { TextFile } from './text-file';
 import { Journey } from './travel';
 
-export interface Context {
+export type Context = {
+	packagePath: string;
+	request: Request;
 	binaryFiles: BinaryFile[];
-	config: Config;
+	config: InstallConfig;
 	filters: (file: string) => string[] | undefined;
 	formats: Format[];
-	incomingConfig?: Config;
-	incomingPackage?: Record<string, any>;
+	incomingName?: string;
+	incomingVersion?: string;
+	incomingVariant?: string;
+	incomingBranch?: string;
+	incomingConfig?: PackageConfig;
+	incomingPackage?: PackageManifest;
 	incomingPath: string;
 	mergedTextFiles: TextFile[];
-	onMissing: (file: string) => boolean;
-	onUpdate: (file: string) => boolean;
+	onExisting: (file: string) => 'merge' | 'overwrite' | 'skip';
+	onMissing: (file: string) => 'continue' | 'skip';
 	options: Options;
+	removedPatterns: string[];
 	routes: (file: string) => Journey | undefined;
 	targetPath: string;
 	textFiles: TextFile[];
-}
+	commonFlow: CommonFlow;
+	blocks: Block[];
+	result?: ArtifactResult;
+};
 
-export interface Options {
+export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, options: Options) => Promise<Context | undefined>;
+export type CommonFlow = (name: string, version: string, variant: string | undefined, branch: string | undefined, incomingPath: string, commonContext: Context) => Promise<Context | undefined>;
+
+export type Options = {
 	force: boolean;
 	skip: boolean;
 	verbose: boolean;
-}
+};
+
+export type Block = {
+	name: string;
+	version: string;
+	variant?: string;
+	branch?: string;
+	incomingPath: string;
+};

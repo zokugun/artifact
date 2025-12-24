@@ -15,6 +15,7 @@ const fs = {
 	readdirSync: mfs.readdirSync,
 	readFile: u(mfs.readFile),
 	readFileSync: mfs.readFileSync,
+	realpathSync: mfs.realpathSync,
 	realpath: u(mfs.realpath),
 	stat: u(mfs.stat),
 	statSync: mfs.statSync,

@@ -1,5 +1,4 @@
-import has from 'lodash/has';
-import without from 'lodash/without';
+import { has, isNil, without } from 'lodash';
 import { Route } from '../types/travel';
 
 function apply(map: ComposeMap, keys: string[], current: Record<string, any>, incoming: Record<string, any>, result: Record<string, any>): void {
@@ -14,7 +13,7 @@ function apply(map: ComposeMap, keys: string[], current: Record<string, any>, in
 		const transform = map[key] ?? map.$$default;
 
 		if(!transform || !has(incoming, key) || ignores.includes(key)) {
-			if(currentValue !== undefined) {
+			if(!isNil(currentValue)) {
 				result[key] = currentValue;
 			}
 
@@ -39,11 +38,11 @@ interface ComposeMap {
 
 export function compose(map: ComposeMap): Route<Record<string, any>> {
 	return ({ current, incoming, filters }) => {
-		if(incoming === undefined) {
+		if(isNil(incoming)) {
 			return current ?? {};
 		}
 
-		if(current === undefined || typeof current !== typeof incoming) {
+		if(isNil(current) || typeof current !== typeof incoming) {
 			return incoming;
 		}
 

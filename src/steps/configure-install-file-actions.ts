@@ -92,83 +92,76 @@ function buildTravel(route: Record<string, any>): Route<string> { // {{{
 	}
 } // }}}
 
-export async function validateUpdatability(context: Context): Promise<void> {
-	const { update } = context.incomingConfig!;
+export async function configureInstallFileActions(context: Context): Promise<void> {
+	const { install } = context.incomingConfig!;
 
-	if(typeof update === 'boolean') {
-		if(!update) {
-			context.onMissing = () => true;
-			context.onUpdate = () => true;
+	if(!install) {
+		return;
+	}
+
+	const overwritings: string[] = [];
+	const filters: Record<string, string[]> = {};
+	const routes: Record<string, Journey> = {};
+
+	for(const [file, fileUpdate] of Object.entries(install)) {
+		const { overwrite, remove, filter, route } = fileUpdate;
+
+		if(remove) {
+			context.removedPatterns.push(file);
+
+			continue;
+		}
+
+		if(overwrite) {
+			overwritings.push(file);
+		}
+
+		if(filter) {
+			filters[file] = filter;
+		}
+
+		if(route) {
+			const { alias } = route as { alias?: string };
+
+			if(alias) {
+				routes[file] = {
+					alias,
+					travel: buildTravel(route),
+				};
+			}
+			else {
+				routes[file] = {
+					travel: buildTravel(route),
+				};
+			}
 		}
 	}
-	else if(isPlainObject(update)) {
-		const missings: string[] = [];
-		const updates: string[] = [];
-		const filters: Record<string, string[]> = {};
-		const routes: Record<string, Journey> = {};
 
-		for(const [file, fileUpdate] of Object.entries(update)) {
-			const { missing, update, filter, route } = fileUpdate;
+	if(overwritings.length > 0) {
+		context.onExisting = (file) => isMatch(file, overwritings) ? 'overwrite' : 'merge';
+	}
 
-			if(missing === false) {
-				missings.push(file);
-			}
-
-			if(update === false) {
-				updates.push(file);
-			}
-
-			if(filter) {
-				filters[file] = filter;
-			}
-
-			if(route) {
-				const { alias } = route as { alias?: string };
-
-				if(alias) {
-					routes[file] = {
-						alias,
-						travel: buildTravel(route),
-					};
-				}
-				else {
-					routes[file] = {
-						travel: buildTravel(route),
-					};
+	if(!isEmpty(filters)) {
+		context.filters = (file) => {
+			for(const [pattern, value] of Object.entries(filters)) {
+				if(isMatch(file, pattern)) {
+					return value;
 				}
 			}
-		}
 
-		if(missings.length > 0) {
-			context.onMissing = (file) => isMatch(file, missings);
-		}
+			return undefined;
+		};
+	}
 
-		if(updates.length > 0) {
-			context.onUpdate = (file) => isMatch(file, updates);
-		}
-
-		if(!isEmpty(filters)) {
-			context.filters = (file) => {
-				for(const [pattern, value] of Object.entries(filters)) {
-					if(isMatch(file, pattern)) {
-						return value;
-					}
+	if(!isEmpty(routes)) {
+		context.routes = (file) => {
+			for(const [pattern, route] of Object.entries(routes)) {
+				if(isMatch(file, pattern)) {
+					return route;
 				}
+			}
 
-				return undefined;
-			};
-		}
-
-		if(!isEmpty(routes)) {
-			context.routes = (file) => {
-				for(const [pattern, route] of Object.entries(routes)) {
-					if(isMatch(file, pattern)) {
-						return route;
-					}
-				}
-
-				return undefined;
-			};
-		}
+			return undefined;
+		};
 	}
 }

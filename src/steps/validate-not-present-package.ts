@@ -7,7 +7,7 @@ export async function validateNotPresentPackage({ incomingPackage, config, optio
 
 	const { name } = incomingPackage as { name: string };
 
-	const artifact = config.artifacts.find((artifact) => artifact.name === name);
+	const artifact = config.artifacts[name];
 
 	if(artifact) {
 		if(options.skip) {

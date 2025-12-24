@@ -21,7 +21,7 @@ describe('json', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
+		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.space2);
 	}); // }}}
 
 	it('format.default.tab', async () => { // {{{

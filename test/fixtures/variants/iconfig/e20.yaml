@@ -1,0 +1,7 @@
+artifacts:
+  awesome-config:
+    version: 1.0.0
+    requires:
+      - "20"
+    provides:
+      - "14"

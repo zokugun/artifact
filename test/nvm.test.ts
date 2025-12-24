@@ -13,13 +13,13 @@ describe('nvm', () => {
 
 	it('default', async () => { // {{{
 		vol.fromJSON({
-			'/target/.nvmrc': nvmrcFxt.default.target,
+			'/target/.nvmrc': nvmrcFxt.default.v12,
 			'/incoming/package.json': packageFxt.default.config,
-			'/incoming/configs/.nvmrc': nvmrcFxt.default.incoming,
+			'/incoming/configs/.nvmrc': nvmrcFxt.default.v14,
 		}, '/');
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.incoming);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
 	}); // }}}
 });

@@ -49,7 +49,6 @@ const mainRoute = compose({
 		'os',
 		'cpu',
 		'preferGlobal',
-		'private',
 	],
 	$$default: fork(
 		[Array.isArray, listConcat],
