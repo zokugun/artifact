@@ -18,9 +18,11 @@ export async function removeFiles({ removedPatterns, targetPath, options }: Cont
 
 	for(const file of files) {
 		if(isMatch(file, removedPatterns)) {
-			const filePath = path.join(cwd, file);
+			if(!options.dryRun) {
+				const filePath = path.join(cwd, file);
 
-			await fse.unlink(filePath);
+				await fse.unlink(filePath);
+			}
 
 			if(options.verbose) {
 				console.log(`${file} has been removed`);

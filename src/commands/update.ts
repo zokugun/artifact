@@ -34,7 +34,7 @@ const { mainFlow } = composeSteps(
 	],
 );
 
-export async function update(inputOptions?: { force?: boolean; verbose?: boolean }): Promise<void> {
+export async function update(inputOptions?: { force?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
 	// @ts-expect-error log property isn't exposed
 	npm.log.stream = createDevNull();
 
@@ -47,6 +47,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 		force: inputOptions?.force ?? false,
 		skip: false,
 		verbose: inputOptions?.verbose ?? false,
+		dryRun: inputOptions?.dryRun ?? false,
 	};
 
 	const { config, configStats } = await readInstallConfig(targetPath);

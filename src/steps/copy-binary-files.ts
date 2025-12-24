@@ -30,9 +30,11 @@ export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, o
 			}
 		}
 
-		await fse.ensureFile(target);
+		if(!options.dryRun) {
+			await fse.ensureFile(target);
 
-		await fse.copyFile(source, target);
+			await fse.copyFile(source, target);
+		}
 
 		if(options.verbose) {
 			console.log(`${file.target} has been written as a binary file`);

@@ -29,9 +29,11 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 	await insertFinalNewLine({ mergedTextFiles: [file] });
 	await applyFormatting({ mergedTextFiles: [file], formats });
 
-	const filePath = path.join(targetPath, name);
+	if(!options.dryRun) {
+		const filePath = path.join(targetPath, name);
 
-	await fse.outputFile(filePath, file.data, 'utf-8');
+		await fse.outputFile(filePath, file.data, 'utf-8');
+	}
 
 	if(options.verbose) {
 		console.log(`${name} has been written`);

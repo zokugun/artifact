@@ -32,7 +32,7 @@ const { mainFlow } = composeSteps(
 	],
 );
 
-export async function add(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean }): Promise<void> {
+export async function add(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
 	await npm.load();
 
 	const registry = npm.config.get('registry') as string;
@@ -42,6 +42,7 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 		force: inputOptions?.force ?? false,
 		skip: inputOptions?.skip ?? false,
 		verbose: inputOptions?.verbose ?? false,
+		dryRun: inputOptions?.dryRun ?? false,
 	};
 
 	const { config, configStats } = await readInstallConfig(targetPath);

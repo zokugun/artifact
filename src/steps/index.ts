@@ -1,3 +1,4 @@
+import { bgBlue } from 'ansi-colors';
 import { CommonFlow, Context, MainFlow } from '../types/context';
 import { Step } from '../types/step';
 import { applyFormatting } from './apply-formatting';
@@ -78,7 +79,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 
 	const commonFlow: CommonFlow = async (name, version, variant, branch, incomingPath, mainContext) => {
 		if(mainContext.options.verbose) {
-			let message = `\n---> ${name} version=${version}`;
+			let message = `\n=== ${name} version=${version} ===\n`;
 
 			if(variant) {
 				message += ` variant=${variant}`;
@@ -88,7 +89,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 				message += ` branch=${branch}`;
 			}
 
-			console.log(message);
+			console.log(bgBlue(message));
 		}
 
 		const context: Context = {

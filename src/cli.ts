@@ -11,6 +11,7 @@ program
 program
 	.command('add')
 	.description('add an artifact to the current project')
+	.option('-d, --dry-run', 'fake install')
 	.option('-v, --verbose', 'output more details')
 	.argument('<artifacts...>')
 	.action(add);
@@ -18,6 +19,7 @@ program
 program
 	.command('update')
 	.description('update the current project using the installed artifacts')
+	.option('-d, --dry-run', 'fake update')
 	.option('-v, --verbose', 'output more details')
 	.alias('up')
 	.action(update);

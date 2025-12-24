@@ -45,6 +45,10 @@ export async function configureBranches(context: Context): Promise<void> {
 				}
 
 				if(found) {
+					if(context.options.verbose) {
+						console.log(`- branch: ${name}${variant ? `:${variant}` : ''} has been matched`);
+					}
+
 					bucket.push({
 						name: context.incomingName!,
 						version: context.incomingVersion!,
@@ -52,6 +56,11 @@ export async function configureBranches(context: Context): Promise<void> {
 						branch,
 						incomingPath: path.join(cwd, directory),
 					});
+				}
+				else {
+					if(context.options.verbose) {
+						console.log(`- branch: ${name}${variant ? `:${variant}` : ''} hasn't been matched (${artifact ? 'variant' : 'artifact'} not found)`);
+					}
 				}
 			}
 		}

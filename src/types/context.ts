@@ -38,6 +38,7 @@ export type Options = {
 	force: boolean;
 	skip: boolean;
 	verbose: boolean;
+	dryRun: boolean;
 };
 
 export type Block = {
