@@ -19,7 +19,7 @@ export async function configureBranches(context: Context): Promise<void> {
 
 			if(match) {
 				const [branch, name, variant] = match;
-				const packageName = name.replace(/:/g, '/');
+				const packageName = name.replace(/:(artifact-)?/g, '/artifact-');
 				const artifact = context.config.artifacts[packageName];
 				let found = false;
 
