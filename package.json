@@ -1,7 +1,7 @@
 {
 	"name": "@zokugun/artifact",
 	"description": "Boilerplate your project & keep your configurations up to date",
-	"version": "0.4.2",
+	"version": "0.4.3",
 	"author": {
 		"name": "Baptiste Augrain",
 		"email": "daiyam@zokugun.org"
