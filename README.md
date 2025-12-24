@@ -45,8 +45,6 @@ Choose the install mode that fits your workflow:
 	npx artifact --help
 	```
 
-Artifact requires [Node.js](http://nodejs.org) 18+.
-
 Quick Start
 -----------
 
