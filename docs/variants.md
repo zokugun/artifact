@@ -72,7 +72,7 @@ Troubleshooting checklist
 
 1. Confirm the package actually ships a `.artifactrc*` file with `variants.root` defined.
 3. Ensure the variant folder exists under `variants/` and contains the config files you expect.
-5. Re-run with `--verbose` to inspect the `--> <name>@<version>:<variant>(<branch>)` log entries.
+5. Re-run with `--verbose` to inspect the `--> <name> version=<version> variant=<variant> branch=<branch>` log entries.
 
 Related docs
 ------------
