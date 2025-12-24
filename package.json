@@ -33,7 +33,7 @@
 		"watch:test": "tsc-watch -p test"
 	},
 	"dependencies": {
-		"@zokugun/configdotts-merge": "^0.1.0",
+		"@zokugun/configdotts-merge": "^0.2.0",
 		"ansi-colors": "^4.1.1",
 		"commander": "^9.0.0",
 		"dayjs": "^1.11.13",
@@ -50,6 +50,7 @@
 		"pacote": "^13.0.5",
 		"semver": "^7.3.5",
 		"tempy": "^1.0.1",
+		"typescript": "^5.9.2",
 		"untildify": "^4.0.0",
 		"yaml": "^1.10.2"
 	},
@@ -82,7 +83,6 @@
 		"rewiremock": "^3.14.3",
 		"source-map-support": "^0.5.20",
 		"tsc-watch": "^4.5.0",
-		"typescript": "^4.2.4",
 		"universalify": "^2.0.0",
 		"xo": "^0.48.0"
 	},
