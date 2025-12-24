@@ -79,7 +79,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 
 	const commonFlow: CommonFlow = async (name, version, variant, branch, incomingPath, mainContext) => {
 		if(mainContext.options.verbose) {
-			let message = `\n=== ${name} version=${version} ===\n`;
+			let message = `${name} version=${version}`;
 
 			if(variant) {
 				message += ` variant=${variant}`;
@@ -89,7 +89,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 				message += ` branch=${branch}`;
 			}
 
-			console.log(bgBlue(message));
+			console.log(bgBlue(`\n=== ${message} ===\n`));
 		}
 
 		const context: Context = {
