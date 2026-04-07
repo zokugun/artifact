@@ -1,0 +1,2 @@
+variables:
+  BINARY_NAME: package.json.name.split('/').at(-1).split('-').at(0)

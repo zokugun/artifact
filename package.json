@@ -27,7 +27,7 @@
 		"release": "release-it",
 		"test": "tsc -p test && mocha",
 		"test:dev": "mocha",
-		"test:watch": "tsc-watch -p src -p test --onSuccess 'mocha'",
+		"test:watch": "tsc-watch -p src -p test --onSuccess 'mocha -g=\"\"'",
 		"watch:src": "tsc-watch -p src",
 		"watch:test": "tsc-watch -p test"
 	},
@@ -62,7 +62,7 @@
 		"@types/lodash": "^4.14.172",
 		"@types/micromatch": "^4.0.2",
 		"@types/mocha": "^9.0.0",
-		"@types/node": "^14.17.15",
+		"@types/node": "20.19.39",
 		"@types/npm": "^7.19.0",
 		"@types/pacote": "^11.1.1",
 		"@types/semver": "^7.3.8",

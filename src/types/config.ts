@@ -9,11 +9,13 @@ export type PackageManifest = {
 };
 
 export type PackageConfig = {
-	install: Record<string, FileInstall>;
-	update: boolean | Record<string, FileUpdate>;
-	variants?: Record<string, unknown>;
-	orphan?: boolean;
+	constants?: Record<string, string>;
 	extends?: string | number;
+	install: Record<string, FileInstall>;
+	orphan?: boolean;
+	update: boolean | Record<string, FileUpdate>;
+	variables?: Record<string, string>;
+	variants?: Record<string, unknown>;
 };
 
 export type Artifact = {
@@ -26,8 +28,10 @@ export type ArtifactResult = Artifact & { name: string };
 
 export type InstallConfig = {
 	artifacts: Record<string, Artifact>;
+	constants?: Record<string, string>;
 	install: Record<string, FileInstall>;
 	update: boolean | Record<string, FileUpdate>;
+	variables?: Record<string, string>;
 };
 
 export type OldInstallConfig = {

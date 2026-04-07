@@ -1,8 +1,14 @@
 import { Context } from '../types/context';
 import { TemplateEngine } from '../utils/template';
 
-export async function replaceTemplates({ textFiles, binaryFiles, targetPath }: Context): Promise<void> {
-	const engine = new TemplateEngine(targetPath);
+export async function replaceTemplates({ textFiles, binaryFiles, targetPath, config, incomingConfig }: Context): Promise<void> {
+	const variables = {
+		...incomingConfig?.variables,
+		...config?.variables,
+		...incomingConfig?.constants,
+		...config?.constants,
+	};
+	const engine = new TemplateEngine(targetPath, variables);
 
 	for(const file of textFiles) {
 		file.data = engine.render(file.data);

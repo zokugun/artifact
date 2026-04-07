@@ -74,6 +74,10 @@ export async function readInstallConfig(targetPath: string): Promise<{ config: I
 		}
 	}
 
+	if(typeof data.artifacts === 'undefined') {
+		data.artifacts = {};
+	}
+
 	if(typeof data.update === 'undefined') {
 		data.update = {};
 	}

@@ -8,7 +8,8 @@ import { tryJson } from './try-json';
 
 dayjs.extend(utc);
 
-const PLACEHOLDER_REGEX = /^((?:[^/]+(?:[^/]+\/)*\/)?\.?[^.]+(?:\.(?:json|ya?ml))?)\.(.*)$/;
+const NEXT_PROPERTY_REGEX = /^(\w+?)((?=\.|$).*)$/;
+const PLACEHOLDER_REGEX = /^((?:[^/.]+(?:[^/]+\/)*\/)?\.?[^.]+(?:\.(?:json|ya?ml))?)\.(.*)$/;
 
 class TemplateError extends Error {
 	constructor(message: string) { // {{{
@@ -18,55 +19,50 @@ class TemplateError extends Error {
 }
 
 export class TemplateEngine {
-	private readonly fileCache = new Map<string, Record<string, any>>();
 	private readonly basePath: string;
+	private readonly fileCache = new Map<string, Record<string, any>>();
+	private readonly variables: Record<string, string>;
+	private readonly variableCache = new Map<string, string>();
 
-	constructor(basePath: string) { // {{{
+	constructor(basePath: string, variables?: Record<string, string>) { // {{{
 		this.basePath = basePath;
+		this.variables = variables ?? {};
 	} // }}}
 
 	public render(template: string): string { // {{{
 		const pattern = /#\[\[(.*?)]]/g;
 
-		return template.replace(pattern, (_, placeholder: string) => {
-			const [name, propertyPath] = this.splitPlaceholder(placeholder);
-
-			if(!name || !propertyPath) {
-				throw new TemplateError(`Invalid placeholder format: ${placeholder}. Expected format: #[[filename.property]]`);
-			}
-
-			if(name === 'date') {
-				return this.toDate(propertyPath);
-			}
-
-			const fileContent = this.readConfigFile(name);
-			const value: unknown = this.getValueByPath(fileContent, propertyPath);
-
-			if(isNil(value)) {
-				throw new TemplateError(placeholder);
-			}
-
-			return String(value);
-		});
+		return template.replace(pattern, (_, placeholder: string) => this.resolveExpression(placeholder));
 	} // }}}
 
 	private getValueByPath(values: Record<string, any>, propertyPath: string): any { // {{{
-		const parts = propertyPath.split('.');
-		let current: unknown = values;
+		let currentPath = propertyPath;
+		let currentValue: unknown = values;
+		// eslint-disable-next-line @typescript-eslint/ban-types
+		let match: RegExpExecArray | null;
 
-		for(const part of parts) {
-			if(!isPlainObject(current)) {
+		while((match = NEXT_PROPERTY_REGEX.exec(currentPath))) {
+			if(!isPlainObject(currentValue)) {
 				throw new TemplateError(`Property path not found: ${propertyPath}`);
 			}
 
-			current = (current as Record<string, unknown>)[part];
+			currentValue = (currentValue as Record<string, unknown>)[match[1]];
+
+			if(isNil(currentValue)) {
+				throw new TemplateError(`Property not found: ${propertyPath}`);
+			}
+
+			currentPath = match[2];
+
+			if(currentPath.length === 0) {
+				return currentValue;
+			}
 		}
 
-		if(isNil(current)) {
-			throw new TemplateError(`Property not found: ${propertyPath}`);
-		}
+		// eslint-disable-next-line no-new-func
+		const fn = new Function('it', `return it${unescapeCode(currentPath)};`);
 
-		return current;
+		return fn(currentValue);
 	} // }}}
 
 	private parseFile(filename: string): Record<string, any> { // {{{
@@ -111,10 +107,52 @@ export class TemplateEngine {
 		return content;
 	} // }}}
 
+	private resolveExpression(expression: string): string { // {{{
+		const [name, propertyPath] = this.splitPlaceholder(expression);
+
+		if(!name || !propertyPath) {
+			throw new TemplateError(`Invalid expression format: ${expression}. Expected format: #[[filename.property]]`);
+		}
+
+		if(name === 'date') {
+			return this.toDate(propertyPath);
+		}
+		else if(name === 'vars') {
+			return this.resolveVariable(propertyPath);
+		}
+		else {
+			const fileContent = this.readConfigFile(name);
+			const value: unknown = this.getValueByPath(fileContent, propertyPath);
+
+			if(isNil(value)) {
+				throw new TemplateError(expression);
+			}
+
+			return String(value);
+		}
+	} // }}}
+
+	private resolveVariable(name: string): string { // {{{
+		if(this.variableCache.has(name)) {
+			return this.variableCache.get(name)!;
+		}
+
+		const expression = this.variables[name];
+		if(typeof expression !== 'string' || expression.trim().length === 0) {
+			throw new TemplateError(`Invalid variable: ${name}.`);
+		}
+
+		const content = this.resolveExpression(expression);
+
+		this.variableCache.set(name, content);
+
+		return content;
+	} // }}}
+
 	private splitPlaceholder(placeholder: string): [string, string] { // {{{
 		const matches = PLACEHOLDER_REGEX.exec(placeholder);
 		if(!matches) {
-			throw new TemplateError(`Invalid placeholder format: ${placeholder}. Expected format: #[[filename.property]]`);
+			throw new TemplateError(`Invalid expression format: ${placeholder}. Expected format: #[[filename.property]]`);
 		}
 
 		const [, filename, propertyPath] = matches;
@@ -136,4 +174,8 @@ export class TemplateEngine {
 			throw new TemplateError(`Invalid date format: ${format}`);
 		}
 	} // }}}
+}
+
+export function unescapeCode(code: string): string {
+	return code.replace(/\\('|\\)/g, '$1').replace(/[\r\t\n]/g, ' ');
 }
