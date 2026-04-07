@@ -46,6 +46,7 @@ export type FileInstall = {
 export type FileUpdate = {
 	filter?: string[];
 	missing?: boolean;
+	overwrite?: boolean;
 	route?: Record<string, any>;
 	update?: boolean;
 };

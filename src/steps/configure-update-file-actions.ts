@@ -82,10 +82,10 @@ function buildTravel(route: Record<string, any>): Route<string> { // {{{
 		return json(buildRoute(route.json));
 	}
 	else if(route.rc) {
-		return rc(buildRoute(route.json));
+		return rc(buildRoute(route.rc));
 	}
 	else if(route.yaml) {
-		return yaml(buildRoute(route.json));
+		return yaml(buildRoute(route.yaml));
 	}
 	else {
 		throw new Error('Can\'t build route');
@@ -102,20 +102,24 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		}
 	}
 	else if(isPlainObject(update)) {
-		const existings: string[] = [];
-		const missings: string[] = [];
+		const overwriteExistings: string[] = [];
+		const skipExistings: string[] = [];
+		const skipMissings: string[] = [];
 		const filters: Record<string, string[]> = {};
 		const routes: Record<string, Journey> = {};
 
 		for(const [file, fileUpdate] of Object.entries(update)) {
-			const { missing, update, filter, route } = fileUpdate;
+			const { missing, update, overwrite, filter, route } = fileUpdate;
 
 			if(missing === false) {
-				missings.push(file);
+				skipMissings.push(file);
 			}
 
 			if(update === false) {
-				existings.push(file);
+				skipExistings.push(file);
+			}
+			else if(overwrite) {
+				overwriteExistings.push(file);
 			}
 
 			if(filter) {
@@ -139,12 +143,12 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 			}
 		}
 
-		if(missings.length > 0) {
-			context.onMissing = (file) => isMatch(file, missings) ? 'skip' : 'continue';
+		if(skipMissings.length > 0) {
+			context.onMissing = (file) => isMatch(file, skipMissings) ? 'skip' : 'continue';
 		}
 
-		if(existings.length > 0) {
-			context.onExisting = (file) => isMatch(file, existings) ? 'skip' : 'merge';
+		if(skipExistings.length > 0 || overwriteExistings.length > 0) {
+			context.onExisting = (file) => isMatch(file, skipExistings) ? 'skip' : (isMatch(file, overwriteExistings) ? 'overwrite' : 'merge');
 		}
 
 		if(!isEmpty(filters)) {

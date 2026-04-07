@@ -82,10 +82,10 @@ function buildTravel(route: Record<string, any>): Route<string> { // {{{
 		return json(buildRoute(route.json));
 	}
 	else if(route.rc) {
-		return rc(buildRoute(route.json));
+		return rc(buildRoute(route.rc));
 	}
 	else if(route.yaml) {
-		return yaml(buildRoute(route.json));
+		return yaml(buildRoute(route.yaml));
 	}
 	else {
 		throw new Error('Can\'t build route');
@@ -99,7 +99,7 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 		return;
 	}
 
-	const overwritings: string[] = [];
+	const overwrites: string[] = [];
 	const filters: Record<string, string[]> = {};
 	const routes: Record<string, Journey> = {};
 
@@ -113,7 +113,7 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 		}
 
 		if(overwrite) {
-			overwritings.push(file);
+			overwrites.push(file);
 		}
 
 		if(filter) {
@@ -137,8 +137,8 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 		}
 	}
 
-	if(overwritings.length > 0) {
-		context.onExisting = (file) => isMatch(file, overwritings) ? 'overwrite' : 'merge';
+	if(overwrites.length > 0) {
+		context.onExisting = (file) => isMatch(file, overwrites) ? 'overwrite' : 'merge';
 	}
 
 	if(!isEmpty(filters)) {
