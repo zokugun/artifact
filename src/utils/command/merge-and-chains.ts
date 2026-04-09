@@ -59,11 +59,21 @@ export function mergeAndChains(current: string, incoming: string): string | unde
 					tailResult.push(currentPart);
 				}
 				else {
-					// keep current in chain, then include incoming after
-					chainResult.push(currentPart);
-					const coveredByCurrentTail = currentTail.some((t) => t.startsWith(`${incomingPart} `));
-					if(!coveredByCurrentTail) {
-						chainResult.push(incomingPart);
+					const currentAppearsLaterInIncoming = incomingAnd
+						.slice(i + 1)
+						.some((later) => prefixOfCommand(later) === cPref);
+
+					if(currentAppearsLaterInIncoming) {
+						// Incoming inserted a step before current and shifted current to the right.
+						chainResult.push(incomingPart, currentPart);
+					}
+					else {
+						// keep current in chain, then include incoming after
+						chainResult.push(currentPart);
+						const coveredByCurrentTail = currentTail.some((t) => t.startsWith(`${incomingPart} `));
+						if(!coveredByCurrentTail) {
+							chainResult.push(incomingPart);
+						}
 					}
 				}
 			}

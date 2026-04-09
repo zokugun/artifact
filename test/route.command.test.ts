@@ -211,4 +211,11 @@ describe('route.command', () => {
 			incoming: 'rimraf .src',
 		})).to.eql('rimraf lib .src .test');
 	}); // }}}
+
+	it('noflags.keep-order', async () => { // {{{
+		expect(command({
+			current: 'fixpack && npm run ci:lint && npm run lint',
+			incoming: 'fixpack && npm audit && npm run ci:lint',
+		})).to.eql('fixpack && npm audit && npm run ci:lint && npm run lint');
+	}); // }}}
 });
