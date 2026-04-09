@@ -1,5 +1,4 @@
-import { splitCommand, joinCommand, Command } from '../utils/command';
-import { listConcat } from './list-concat';
+import { splitCommand, joinCommand, mergeWithSemicolonMix, mergeAndChains, mergeOrSegments, mergeSemicolonSegments, mergeCommandRecords } from '../utils/command';
 
 export function command({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {
 	if(!incoming) {
@@ -10,40 +9,41 @@ export function command({ current, incoming }: { current: string | undefined; in
 		return incoming;
 	}
 
+	const trueAndMatch = /^true\s*&&\s*(.+)$/.exec(incoming);
+	const currentSegments = new Set(current.split(/;|&&|\|\|/).map((s) => s.trim()).filter(Boolean));
+
+	if(currentSegments.has(incoming)) {
+		return current;
+	}
+
+	if(trueAndMatch) {
+		const incomingCommand = trueAndMatch[1].trim();
+
+		return currentSegments.has(incomingCommand) ? current : `${current} && ${incomingCommand}`;
+	}
+
+	const mixed = mergeWithSemicolonMix(current, incoming);
+	if(mixed) {
+		return mixed;
+	}
+
+	const andMerged = mergeAndChains(current, incoming);
+	if(andMerged) {
+		return andMerged;
+	}
+
+	if(incoming.includes('||')) {
+		return mergeOrSegments(current, incoming);
+	}
+
+	if(incoming.includes(';')) {
+		return mergeSemicolonSegments(current, incoming);
+	}
+
 	const currentCommand = splitCommand(current);
 	const incomingCommand = splitCommand(incoming);
 
-	const result: Record<string, Command[]> = {};
+	const merged = mergeCommandRecords(currentCommand, incomingCommand, current);
 
-	for(const [name, instances] of Object.entries(incomingCommand)) {
-		if(currentCommand[name]) {
-			result[name] = [];
-
-			for(const [index, instance] of instances.entries()) {
-				if(currentCommand[name][index]) {
-					const currentInstance = currentCommand[name][index];
-
-					result[name].push({
-						args: listConcat({
-							current: currentInstance.args,
-							incoming: instance.args,
-						}) as string[],
-						env: listConcat({
-							current: currentInstance.env,
-							incoming: instance.env,
-						}) as string[],
-						separator: instance.separator ?? currentInstance.separator,
-					});
-				}
-				else {
-					result[name].push(instance);
-				}
-			}
-		}
-		else {
-			result[name] = instances;
-		}
-	}
-
-	return joinCommand(result);
+	return joinCommand(merged);
 }

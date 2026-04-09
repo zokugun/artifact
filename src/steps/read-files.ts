@@ -16,6 +16,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 	for(const file of files) {
 		const filePath = path.join(cwd, file);
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 		if(isText(file) || getEncoding(await readBuffer(filePath, 24)) === 'utf8') {
 			const data = await fse.readFile(filePath, 'utf-8');
 			const finalNewLine = data.endsWith('\n');

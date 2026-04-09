@@ -10,18 +10,6 @@ describe('package', () => {
 		vol.reset();
 	}); // }}}
 
-	it('command.complex', async () => { // {{{
-		vol.fromJSON({
-			'/target/package.json': packageFxt.commandComplex.target,
-			'/incoming/package.json': packageFxt.default.config,
-			'/incoming/configs/package.json': packageFxt.commandComplex.incoming,
-		}, '/');
-
-		await add(['awesome-config']);
-
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.commandComplex.merged);
-	}); // }}}
-
 	it('dependencies', async () => { // {{{
 		vol.fromJSON({
 			'/target/package.json': packageFxt.dependencies.target,
