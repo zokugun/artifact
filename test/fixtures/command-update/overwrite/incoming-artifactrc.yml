@@ -1,0 +1,3 @@
+update:
+  src/*:
+    overwrite: true

@@ -19,6 +19,7 @@ const { mainFlow } = composeSteps(
 		steps.readIncomingConfig,
 		steps.configureBranches,
 		steps.configureUpdateFileActions,
+		steps.renameFiles,
 		steps.readFiles,
 		steps.readEditorConfig,
 		steps.replaceTemplates,

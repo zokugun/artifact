@@ -15,6 +15,7 @@ import { readFiles } from './read-files.js';
 import { readIncomingConfig } from './read-incoming-config.js';
 import { readIncomingPackage } from './read-incoming-package.js';
 import { removeFiles } from './remove-files.js';
+import { renameFiles } from './rename-files.js';
 import { replaceTemplates } from './replace-templates.js';
 import { validateNewerPackage } from './validate-newer-package.js';
 import { validateNotPresentPackage } from './validate-not-present-package.js';
@@ -35,6 +36,7 @@ export const steps = {
 	readIncomingConfig,
 	readIncomingPackage,
 	removeFiles,
+	renameFiles,
 	replaceTemplates,
 	validateNewerPackage,
 	validateNotPresentPackage,
@@ -44,24 +46,25 @@ export const steps = {
 export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow: MainFlow;	commonFlow: CommonFlow } {
 	const mainFlow: MainFlow = async (targetPath, incomingPath, request, config, options) => {
 		const context: Context = {
-			packagePath: incomingPath,
-			request,
-			targetPath,
+			binaryFiles: [],
+			blocks: [],
+			commonFlow,
+			config,
+			filters: () => undefined,
+			formats: [],
 			incomingPath,
 			incomingVariant: request.variant,
+			mergedTextFiles: [],
 			onExisting: () => 'merge',
 			onMissing: () => 'continue',
-			filters: () => undefined,
-			routes: () => undefined,
-			binaryFiles: [],
-			textFiles: [],
-			mergedTextFiles: [],
-			removedPatterns: [],
-			formats: [],
-			config,
 			options,
-			commonFlow,
-			blocks: [],
+			packagePath: incomingPath,
+			removedPatterns: [],
+			renamedPatterns: [],
+			request,
+			routes: () => undefined,
+			targetPath,
+			textFiles: [],
 		};
 
 		let skipped = false;

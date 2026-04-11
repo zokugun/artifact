@@ -184,4 +184,95 @@ describe('command.update', () => {
 		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
 		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.update.targetSrc);
 	}); // }}}
+
+	it('overwrite.no', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.newerYes.target,
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/.artifactrc': commandFxt.overwrite.incomingArtifactrc,
+			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
+			'/incoming/configs/src/index.ts': commandFxt.overwrite.incomingSrc,
+		}, '/');
+
+		await update();
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.overwrite.incomingSrc);
+	}); // }}}
+
+	it('overwrite.yes', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.newerYes.target,
+			'/target/package.json': packageFxt.default.project,
+			'/target/src/index.ts': commandFxt.update.targetSrc,
+			'/incoming/.artifactrc': commandFxt.overwrite.incomingArtifactrc,
+			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
+			'/incoming/configs/src/index.ts': commandFxt.overwrite.incomingSrc,
+		}, '/');
+
+		await update();
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.overwrite.incomingSrc);
+	}); // }}}
+
+	it('remove.no', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.newerYes.target,
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/.artifactrc': commandFxt.remove.incomingArtifactrc,
+			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
+		}, '/');
+
+		await update();
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		await expect(vol.promises.readFile('/target/src/index.ts', 'utf8')).to.be.rejectedWith('ENOENT: no such file or directory, open \'/target/src/index.ts\'');
+	}); // }}}
+
+	it('remove.yes', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.newerYes.target,
+			'/target/package.json': packageFxt.default.project,
+			'/target/src/index.ts': commandFxt.update.targetSrc,
+			'/incoming/.artifactrc': commandFxt.remove.incomingArtifactrc,
+			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
+		}, '/');
+
+		await update();
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		await expect(vol.promises.readFile('/target/src/index.ts', 'utf8')).to.be.rejectedWith('ENOENT: no such file or directory, open \'/target/src/index.ts\'');
+	}); // }}}
+
+	it('rename.no', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.newerYes.target,
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/.artifactrc': commandFxt.rename.incomingArtifactrc,
+			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
+			'/incoming/configs/workflows/ci-pr.yml': commandFxt.rename.incomingYml,
+		}, '/');
+
+		await update();
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/workflows/ci-pr.yml', 'utf8')).to.eql(commandFxt.rename.incomingYml);
+	}); // }}}
+
+	it('rename.yes', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.newerYes.target,
+			'/target/package.json': packageFxt.default.project,
+			'/target/workflows/check-pr.yml': commandFxt.rename.targetYml,
+			'/incoming/.artifactrc': commandFxt.rename.incomingArtifactrc,
+			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
+			'/incoming/configs/workflows/ci-pr.yml': commandFxt.rename.incomingYml,
+		}, '/');
+
+		await update();
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/workflows/ci-pr.yml', 'utf8')).to.eql(commandFxt.rename.mergedYml);
+	}); // }}}
 });

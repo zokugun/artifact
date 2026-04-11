@@ -4,10 +4,17 @@ import { type Format } from './format.js';
 import { type TextFile } from './text-file.js';
 import { type Journey } from './travel.js';
 
+export type ExistingAction = 'merge' | 'overwrite' | 'skip';
+export type MissingAction = 'continue' | 'skip';
+export type RenameAction = {
+	from: string;
+	to: string;
+};
+
 export type Context = {
-	packagePath: string;
-	request: Request;
 	binaryFiles: BinaryFile[];
+	blocks: Block[];
+	commonFlow: CommonFlow;
 	config: InstallConfig;
 	filters: (file: string) => string[] | undefined;
 	formats: Format[];
@@ -19,16 +26,17 @@ export type Context = {
 	incomingPackage?: PackageManifest;
 	incomingPath: string;
 	mergedTextFiles: TextFile[];
-	onExisting: (file: string) => 'merge' | 'overwrite' | 'skip';
-	onMissing: (file: string) => 'continue' | 'skip';
+	onExisting: (file: string) => ExistingAction;
+	onMissing: (file: string) => MissingAction;
 	options: Options;
+	packagePath: string;
 	removedPatterns: string[];
+	renamedPatterns: RenameAction[];
+	request: Request;
+	result?: ArtifactResult;
 	routes: (file: string) => Journey | undefined;
 	targetPath: string;
 	textFiles: TextFile[];
-	commonFlow: CommonFlow;
-	blocks: Block[];
-	result?: ArtifactResult;
 };
 
 export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, options: Options) => Promise<Context | undefined>;

@@ -51,6 +51,8 @@ export type FileUpdate = {
 	filter?: string[];
 	missing?: boolean;
 	overwrite?: boolean;
+	remove?: boolean;
+	rename?: string;
 	route?: Record<string, any>;
 	update?: boolean;
 };

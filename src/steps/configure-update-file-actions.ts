@@ -1,9 +1,9 @@
 import { isEmpty, isPlainObject } from 'lodash-es';
-import mm from 'micromatch';
+import { isMatch } from 'micromatch';
 import { type ForkParameter } from '../compositors/fork.js';
 import { compose, fork, json, mapSort, rc, yaml } from '../compositors/index.js';
 import { command, linesConcat, listConcat, mapConcat, overwrite, primitive } from '../routes/index.js';
-import { type Context } from '../types/context.js';
+import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey, type Route } from '../types/travel.js';
 
 function buildRoute(route: any): Route<any> { // {{{
@@ -102,24 +102,39 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		}
 	}
 	else if(isPlainObject(update)) {
-		const overwriteExistings: string[] = [];
-		const skipExistings: string[] = [];
+		const existingActions: Record<Exclude<ExistingAction, 'merge'>, string[]> = {
+			overwrite: [],
+			skip: [],
+		};
 		const skipMissings: string[] = [];
 		const filters: Record<string, string[]> = {};
 		const routes: Record<string, Journey> = {};
 
 		for(const [file, fileUpdate] of Object.entries(update)) {
-			const { missing, update, overwrite, filter, route } = fileUpdate;
+			const { filter, missing, overwrite, remove, rename, route, update } = fileUpdate;
 
 			if(missing === false) {
 				skipMissings.push(file);
 			}
 
 			if(update === false) {
-				skipExistings.push(file);
+				existingActions.skip.push(file);
 			}
 			else if(overwrite) {
-				overwriteExistings.push(file);
+				existingActions.overwrite.push(file);
+			}
+			else if(remove) {
+				context.removedPatterns.push(file);
+
+				continue;
+			}
+			else if(rename) {
+				context.renamedPatterns.push({
+					from: file,
+					to: rename,
+				});
+
+				continue;
 			}
 
 			if(filter) {
@@ -144,17 +159,25 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		}
 
 		if(skipMissings.length > 0) {
-			context.onMissing = (file) => mm.isMatch(file, skipMissings) ? 'skip' : 'continue';
+			context.onMissing = (file) => isMatch(file, skipMissings) ? 'skip' : 'continue';
 		}
 
-		if(skipExistings.length > 0 || overwriteExistings.length > 0) {
-			context.onExisting = (file) => mm.isMatch(file, skipExistings) ? 'skip' : (mm.isMatch(file, overwriteExistings) ? 'overwrite' : 'merge');
+		if(existingActions.overwrite.length > 0 || existingActions.skip.length > 0) {
+			context.onExisting = (file) => {
+				for(const [action, files] of Object.entries(existingActions)) {
+					if(isMatch(file, files)) {
+						return action as ExistingAction;
+					}
+				}
+
+				return 'merge';
+			};
 		}
 
 		if(!isEmpty(filters)) {
 			context.filters = (file) => {
 				for(const [pattern, value] of Object.entries(filters)) {
-					if(mm.isMatch(file, pattern)) {
+					if(isMatch(file, pattern)) {
 						return value;
 					}
 				}
@@ -166,7 +189,7 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		if(!isEmpty(routes)) {
 			context.routes = (file) => {
 				for(const [pattern, route] of Object.entries(routes)) {
-					if(mm.isMatch(file, pattern)) {
+					if(isMatch(file, pattern)) {
 						return route;
 					}
 				}
