@@ -1,6 +1,5 @@
 import process from 'process';
 import c from 'ansi-colors';
-import npm from 'npm';
 import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
@@ -33,10 +32,7 @@ const { mainFlow } = composeSteps(
 );
 
 export async function add(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
-	await npm.load();
-
-	const registry = npm.config.get('registry') as string;
-	const targetPath = process.env.INIT_CWD!;
+	const targetPath = process.cwd();
 
 	const options = {
 		force: inputOptions?.force ?? false,
@@ -52,7 +48,7 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 		const spinner = ora(`${c.cyan.bold(request.name)}`).start();
 
 		const dir = tempy.directory();
-		const pkgResult = await pacote.extract(request.name, dir, { registry });
+		const pkgResult = await pacote.extract(request.name, dir);
 
 		if(!pkgResult.resolved) {
 			if(options.force || options.skip) {

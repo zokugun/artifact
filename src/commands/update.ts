@@ -1,14 +1,12 @@
 import process from 'process';
 import c from 'ansi-colors';
 import { last } from 'lodash-es';
-import npm from 'npm';
 import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
-import { createDevNull as createDevelopmentNull } from '../utils/create-dev-null.js';
 
 const { mainFlow } = composeSteps(
 	[
@@ -35,13 +33,7 @@ const { mainFlow } = composeSteps(
 );
 
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
-	// @ts-expect-error log property isn't exposed
-	npm.log.stream = createDevelopmentNull();
-
-	await npm.load();
-
-	const registry = npm.config.get('registry') as string;
-	const targetPath = process.env.INIT_CWD!;
+	const targetPath = process.cwd();
 
 	const options = {
 		force: inputOptions?.force ?? false,
@@ -56,7 +48,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 		const spinner = ora(`${c.cyan.bold(name)}`).start();
 
 		const dir = tempy.directory();
-		const pkgResult = await pacote.extract(name, dir, { registry });
+		const pkgResult = await pacote.extract(name, dir);
 
 		if(!pkgResult.resolved) {
 			if(options.force) {
