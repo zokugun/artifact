@@ -2,7 +2,7 @@ import path from 'path';
 import { isArray, isNumber, isRecord, isString } from '@zokugun/is-it-type';
 import fse from 'fs-extra';
 import yaml from 'yaml';
-import { type FileInstall, type FileUpdate, type FileUpsert, type PackageConfig } from '../../types/config.js';
+import { type FileUninstall, type FileInstall, type FileUpdate, type FileUpsert, type PackageConfig } from '../../types/config.js';
 
 const places = [
 	{
@@ -64,6 +64,7 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 	let xtends: string | undefined;
 	const install: Record<string, FileInstall> = {};
 	let orphan: boolean = false;
+	const uninstall: Record<string, FileUninstall> = {};
 	let update: false | Record<string, FileUpdate> = {};
 	let variables: Record<string, string> = {};
 	let variants: Record<string, string> = {};
@@ -74,6 +75,7 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 			extends: xtends,
 			install,
 			orphan,
+			uninstall,
 			update,
 			variables,
 			variants,
@@ -137,6 +139,16 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 		}
 	}
 
+	if(isRecord(data.uninstall)) {
+		for(const [key, value] of Object.entries(data.uninstall)) {
+			const normalizedValue = normalizeUninstall(value);
+
+			if(normalizedValue) {
+				uninstall[key] = normalizedValue;
+			}
+		}
+	}
+
 	if(data.update === false) {
 		update = false;
 	}
@@ -159,9 +171,55 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 		extends: xtends,
 		install,
 		orphan,
+		uninstall,
 		update,
 		variables,
 		variants,
+	};
+} // }}}
+
+function normalizeUninstall(data: unknown): FileUninstall | undefined { // {{{
+	if(!isRecord(data)) {
+		throw new Error('"uninstall" must be an object.');
+	}
+
+	let remove: boolean = false;
+
+	if(data.remove === true) {
+		remove = true;
+	}
+
+	return {
+		remove,
+	};
+} // }}}
+
+function normalizeUpdate(data: unknown): FileUpdate | undefined { // {{{
+	if(!isRecord(data)) {
+		throw new Error('"update" must be an object.');
+	}
+
+	const upsert = normalizeUpsert(data, 'update');
+
+	if(!upsert) {
+		return upsert;
+	}
+
+	let missing: boolean = true;
+	let update: boolean = true;
+
+	if(data.missing === false) {
+		missing = false;
+	}
+
+	if(data.update === false) {
+		update = false;
+	}
+
+	return {
+		...upsert,
+		missing,
+		update,
 	};
 } // }}}
 
@@ -202,34 +260,5 @@ function normalizeUpsert(data: unknown, name: string): FileUpsert | undefined { 
 		remove,
 		rename,
 		route,
-	};
-} // }}}
-
-function normalizeUpdate(data: unknown): FileUpdate | undefined { // {{{
-	if(!isRecord(data)) {
-		throw new Error('"update" must be an object.');
-	}
-
-	const upsert = normalizeUpsert(data, 'update');
-
-	if(!upsert) {
-		return upsert;
-	}
-
-	let missing: boolean = true;
-	let update: boolean = true;
-
-	if(data.missing === false) {
-		missing = false;
-	}
-
-	if(data.update === false) {
-		update = false;
-	}
-
-	return {
-		...upsert,
-		missing,
-		update,
 	};
 } // }}}

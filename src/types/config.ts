@@ -13,6 +13,7 @@ export type PackageConfig = {
 	extends?: string;
 	install: Record<string, FileInstall>;
 	orphan: boolean;
+	uninstall: Record<string, FileUninstall>;
 	update: false | Record<string, FileUpdate>;
 	variables: Record<string, string>;
 	variants: Record<string, string>;
@@ -49,6 +50,10 @@ export type FileUpsert = {
 };
 
 export type FileInstall = FileUpsert & {
+};
+
+export type FileUninstall = {
+	remove: boolean;
 };
 
 export type FileUpdate = FileUpsert & {

@@ -1,6 +1,6 @@
 import { Command } from '@zokugun/cli-utils/commander';
 import pkg from '../package.json';
-import { add, list, update } from './commands/index.js';
+import { add, list, remove, update } from './commands/index.js';
 
 const program = new Command();
 
@@ -23,6 +23,15 @@ program
 	.option('-v, --verbose', 'output more details')
 	.alias('up')
 	.action(update);
+
+program
+	.command('remove')
+	.description('remove an artifact from the current project')
+	.option('-d, --dry-run', 'fake uninstall')
+	.option('-v, --verbose', 'output more details')
+	.argument('<artifacts...>')
+	.alias('rm')
+	.action(remove);
 
 program
 	.command('list')

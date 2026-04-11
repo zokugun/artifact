@@ -41,6 +41,7 @@ rewiremock.enable();
 
 /* eslint-disable import/first */
 import { add } from '../../src/commands/add.js';
+import { remove } from '../../src/commands/remove.js';
 import { update } from '../../src/commands/update.js';
 /* eslint-enable import/first */
 
@@ -49,6 +50,7 @@ rewiremock.disable();
 /* eslint-disable unicorn/prefer-export-from */
 export {
 	add,
+	remove,
 	update,
 };
 /* eslint-enable unicorn/prefer-export-from */

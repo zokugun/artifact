@@ -4,6 +4,7 @@ import { type Step } from '../types/step.js';
 import { applyFormatting } from './apply-formatting.js';
 import { configureBranches } from './configure-branches.js';
 import { configureInstallFileActions } from './configure-install-file-actions.js';
+import { configureUninstallFileActions } from './configure-uninstall-file-actions.js';
 import { configureUpdateFileActions } from './configure-update-file-actions.js';
 import { copyBinaryFiles } from './copy-binary-files.js';
 import { executeFirstBlock } from './execute-first-block.js';
@@ -19,12 +20,14 @@ import { renameFiles } from './rename-files.js';
 import { replaceTemplates } from './replace-templates.js';
 import { validateNewerPackage } from './validate-newer-package.js';
 import { validateNotPresentPackage } from './validate-not-present-package.js';
+import { validatePresentPackage } from './validate-present-package.js';
 import { writeTextFiles } from './write-text-files.js';
 
 export const steps = {
 	applyFormatting,
 	configureBranches,
 	configureInstallFileActions,
+	configureUninstallFileActions,
 	configureUpdateFileActions,
 	copyBinaryFiles,
 	executeFirstBlock,
@@ -40,6 +43,7 @@ export const steps = {
 	replaceTemplates,
 	validateNewerPackage,
 	validateNotPresentPackage,
+	validatePresentPackage,
 	writeTextFiles,
 };
 
