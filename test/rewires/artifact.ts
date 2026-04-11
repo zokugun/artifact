@@ -1,6 +1,6 @@
 import rewiremock from 'rewiremock';
 // eslint-disable-next-line import/order
-import { fs } from '../mocks/fs';
+import { fs } from '../mocks/fs.js';
 
 rewiremock('fs').with(fs);
 rewiremock('fs/promises').with(fs.promises);
@@ -33,7 +33,7 @@ rewiremock('process').with({
 rewiremock('tempy').with({
 	directory: () => '/incoming',
 });
-rewiremock('../utils/dev-null').with({
+rewiremock('../utils/create-dev-null').with({
 	createDevNull: () => null,
 });
 
@@ -44,8 +44,8 @@ delete require.cache[name];
 rewiremock.enable();
 
 /* eslint-disable import/first */
-import { add } from '../../src/commands/add';
-import { update } from '../../src/commands/update';
+import { add } from '../../src/commands/add.js';
+import { update } from '../../src/commands/update.js';
 /* eslint-enable import/first */
 
 rewiremock.disable();

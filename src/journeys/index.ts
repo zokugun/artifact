@@ -1,15 +1,15 @@
 import path from 'path';
-import { Journey } from '../types/travel';
-import commitlintJourney from './commitlint';
-import configTSJourney from './config.ts';
-import defaultJourney from './default';
-import fixpackJourney from './fixpack';
-import gitignoreJourney from './gitignore';
-import ignoreJourney from './ignore';
-import npmignoreJourney from './npmignore';
-import packageJourney from './package';
-import rcJourney from './rc';
-import tsConfigJourney from './tsconfig';
+import { type Journey } from '../types/travel.js';
+import commitlintJourney from './commitlint/index.js';
+import configTSJourney from './config.ts/index.js';
+import defaultJourney from './default/index.js';
+import fixpackJourney from './fixpack/index.js';
+import gitignoreJourney from './gitignore/index.js';
+import ignoreJourney from './ignore/index.js';
+import npmignoreJourney from './npmignore/index.js';
+import packageJourney from './package/index.js';
+import rcJourney from './rc/index.js';
+import tsConfigJourney from './tsconfig/index.js';
 
 const plans = [
 	commitlintJourney,

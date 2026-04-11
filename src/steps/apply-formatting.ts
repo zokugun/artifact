@@ -1,7 +1,7 @@
 import detectIndent from 'detect-indent';
 import minimatch from 'editorconfig/src/lib/fnmatch';
-import { Format, IndentStyle } from '../types/format';
-import { TextFile } from '../types/text-file';
+import { type Format, IndentStyle } from '../types/format.js';
+import { type TextFile } from '../types/text-file.js';
 
 function applyFormat(file: TextFile, format: Format): void { // {{{
 	if(format.indentStyle === IndentStyle.SPACE) {
@@ -33,17 +33,17 @@ function indentWithSpace(data: string, size: number): string { // {{{
 			return data;
 		}
 		else {
-			data = data.replace(new RegExp(indent, 'gm'), '\t');
+			data = data.replaceAll(new RegExp(indent, 'gm'), '\t');
 
 			const newIndent = ' '.repeat(size);
 
-			return data.replace(/\t/gm, newIndent);
+			return data.replaceAll(/\t/gm, newIndent);
 		}
 	}
 	else if(type === 'tab') {
 		const newIndent = ' '.repeat(size);
 
-		return data.replace(new RegExp(indent, 'gm'), newIndent);
+		return data.replaceAll(new RegExp(indent, 'gm'), newIndent);
 	}
 	else {
 		return data;
@@ -54,7 +54,7 @@ function indentWithTab(data: string): string { // {{{
 	const { type, indent, amount } = detectIndent(data);
 
 	if(type === 'space' && amount > 1) {
-		return data.replace(new RegExp(indent, 'gm'), '\t');
+		return data.replaceAll(new RegExp(indent, 'gm'), '\t');
 	}
 	else {
 		return data;

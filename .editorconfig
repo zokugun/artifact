@@ -16,6 +16,11 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
+[*.patch]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
 [test/fixtures/json/format/space2.json]
 indent_style = space
 indent_size = 2

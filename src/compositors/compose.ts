@@ -1,5 +1,5 @@
-import { has, isNil, without } from 'lodash';
-import { Route } from '../types/travel';
+import { has, isNil, without } from 'lodash-es';
+import { type Route } from '../types/travel.js';
 
 function apply(map: ComposeMap, keys: string[], current: Record<string, any>, incoming: Record<string, any>, result: Record<string, any>): void {
 	if(keys.length === 0) {
@@ -30,11 +30,11 @@ function apply(map: ComposeMap, keys: string[], current: Record<string, any>, in
 	}
 }
 
-interface ComposeMap {
+type ComposeMap = {
 	[key: string]: Route<any> | string[] | undefined;
 
 	$$ignore?: string[];
-}
+};
 
 export function compose(map: ComposeMap): Route<Record<string, any>> {
 	return ({ current, incoming, filters }) => {

@@ -1,8 +1,8 @@
 import path from 'path';
 import fse from 'fs-extra';
-import { isNil, isPlainObject } from 'lodash';
-import { PackageManifest } from '../types/config';
-import { Context } from '../types/context';
+import { isNil, isPlainObject } from 'lodash-es';
+import { type PackageManifest } from '../types/config.js';
+import { type Context } from '../types/context.js';
 
 export async function readIncomingPackage(context: Context): Promise<void> {
 	const filePath = path.resolve(context.incomingPath, './package.json');

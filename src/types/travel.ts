@@ -4,7 +4,7 @@ export type Route<T> = (args: Args<T>) => T;
 
 export type TravelPlan = (basename: string) => Route<string> | undefined;
 
-export interface Journey {
+export type Journey = {
 	alias?: string;
 	travel: Route<string>;
-}
+};

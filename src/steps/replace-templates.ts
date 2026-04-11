@@ -1,5 +1,5 @@
-import { Context } from '../types/context';
-import { TemplateEngine } from '../utils/template';
+import { type Context } from '../types/context.js';
+import { TemplateEngine } from '../utils/template.js';
 
 export async function replaceTemplates({ textFiles, binaryFiles, targetPath, config, incomingConfig }: Context): Promise<void> {
 	const variables = {

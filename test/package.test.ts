@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('package', () => {
 	const packageFxt = fixtures('package');
@@ -19,7 +19,7 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.dependencies.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.dependencies.merged);
 	}); // }}}
 
 	it('homepage', async () => { // {{{
@@ -31,7 +31,7 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.homepage.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.homepage.merged);
 	}); // }}}
 
 	it('keywords', async () => { // {{{
@@ -43,7 +43,7 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.keywords.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.keywords.merged);
 	}); // }}}
 
 	it('license.object', async () => { // {{{
@@ -55,7 +55,7 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.licenseObject.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.licenseObject.merged);
 	}); // }}}
 
 	it('license.string', async () => { // {{{
@@ -67,7 +67,7 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.licenseString.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.licenseString.merged);
 	}); // }}}
 
 	it('name', async () => { // {{{
@@ -79,7 +79,7 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.name.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.name.merged);
 	}); // }}}
 
 	it('none', async () => { // {{{
@@ -91,6 +91,6 @@ describe('package', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.none.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.none.merged);
 	}); // }}}
 });

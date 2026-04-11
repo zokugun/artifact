@@ -1,13 +1,13 @@
 export function splitPrefixAndFlags(command: string): { prefix: string; flags: string[] } {
 	const tokens = command.split(/\s+/).filter(Boolean);
 
-	let idx = tokens.findIndex((t) => t.startsWith('-'));
-	if(idx === -1) {
-		idx = tokens.length;
+	let index = tokens.findIndex((t) => t.startsWith('-'));
+	if(index === -1) {
+		index = tokens.length;
 	}
 
-	const prefix = tokens.slice(0, idx).join(' ');
-	const rest = tokens.slice(idx);
+	const prefix = tokens.slice(0, index).join(' ');
+	const rest = tokens.slice(index);
 	const flags: string[] = [];
 
 	for(let i = 0; i < rest.length; i++) {

@@ -1,24 +1,24 @@
-import { bgBlue } from 'ansi-colors';
-import { CommonFlow, Context, MainFlow } from '../types/context';
-import { Step } from '../types/step';
-import { applyFormatting } from './apply-formatting';
-import { configureBranches } from './configure-branches';
-import { configureInstallFileActions } from './configure-install-file-actions';
-import { configureUpdateFileActions } from './configure-update-file-actions';
-import { copyBinaryFiles } from './copy-binary-files';
-import { executeFirstBlock } from './execute-first-block';
-import { executeNextBlock } from './execute-next-block';
-import { insertFinalNewLine } from './insert-final-new-line';
-import { mergeTextFiles } from './merge-text-files';
-import { readEditorConfig } from './read-editor-config';
-import { readFiles } from './read-files';
-import { readIncomingConfig } from './read-incoming-config';
-import { readIncomingPackage } from './read-incoming-package';
-import { removeFiles } from './remove-files';
-import { replaceTemplates } from './replace-templates';
-import { validateNewerPackage } from './validate-newer-package';
-import { validateNotPresentPackage } from './validate-not-present-package';
-import { writeTextFiles } from './write-text-files';
+import c from 'ansi-colors';
+import { type CommonFlow, type Context, type MainFlow } from '../types/context.js';
+import { type Step } from '../types/step.js';
+import { applyFormatting } from './apply-formatting.js';
+import { configureBranches } from './configure-branches.js';
+import { configureInstallFileActions } from './configure-install-file-actions.js';
+import { configureUpdateFileActions } from './configure-update-file-actions.js';
+import { copyBinaryFiles } from './copy-binary-files.js';
+import { executeFirstBlock } from './execute-first-block.js';
+import { executeNextBlock } from './execute-next-block.js';
+import { insertFinalNewLine } from './insert-final-new-line.js';
+import { mergeTextFiles } from './merge-text-files.js';
+import { readEditorConfig } from './read-editor-config.js';
+import { readFiles } from './read-files.js';
+import { readIncomingConfig } from './read-incoming-config.js';
+import { readIncomingPackage } from './read-incoming-package.js';
+import { removeFiles } from './remove-files.js';
+import { replaceTemplates } from './replace-templates.js';
+import { validateNewerPackage } from './validate-newer-package.js';
+import { validateNotPresentPackage } from './validate-not-present-package.js';
+import { writeTextFiles } from './write-text-files.js';
 
 export const steps = {
 	applyFormatting,
@@ -89,7 +89,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 				message += ` branch=${branch}`;
 			}
 
-			console.log(bgBlue(`\n=== ${message} ===\n`));
+			console.log(c.bgBlue(`\n=== ${message} ===\n`));
 		}
 
 		const context: Context = {

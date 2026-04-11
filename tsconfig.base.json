@@ -1,14 +1,14 @@
 {
 	"compilerOptions": {
 		/* Language and Environment */
-		"target": "ES2021",								/* Specify ECMAScript target version. */
+		"target": "ES2022",								/* Specify ECMAScript target version. */
 		"lib": [										/* Specify library files to be included in the compilation. */
 			"ES2021",
+			"ES2022"
 		],
 
 		/* Modules */
 		"module": "nodenext",							/* Specify what module code is generated. */
-
 		/* Basic Options */
 		// "allowJs": false,							/* Allow javascript files to be compiled. */
 		// "checkJs": false,							/* Report errors in '.js' files. */
@@ -27,6 +27,7 @@
 		// "importHelpers": false,						/* Allow importing helper functions from tslib once per project, instead of including them per-file. */
 		// "downlevelIteration": false,					/* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
 		// "isolatedModules": false,					/* Ensure that each file can be safely transpiled without relying on other imports. */
+
 
 		/* Strict Type-Checking Options */
 		"strict": true,									/* Enable all strict type-checking options. */
@@ -56,20 +57,11 @@
 		// "types": [],									/* Specify type package names to be included without being referenced in a source file. */
 		"esModuleInterop": true,						/* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
 		"allowSyntheticDefaultImports": true,			/* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
-		// "preserveSymlinks": false,					/* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
-		// "allowUmdGlobalAccess": false,				/* Allow accessing UMD globals from modules. */
-		// "resolveJsonModule": false,					/* Enable importing .json files */
-
-		/* Source Map Options */
-		// "sourceMap": false,							/* Create source map files for emitted JavaScript files. */
-		// "sourceRoot": "",							/* Specify the root path for debuggers to find the reference source code. */
-		// "mapRoot": "",								/* Specify the location where debugger should locate map files instead of generated locations. */
-		// "inlineSourceMap": false,					/* Include sourcemap files inside the emitted JavaScript. */
-		// "inlineSources": false,						/* Include source code in the sourcemaps inside the emitted JavaScript. */
-
 		/* Experimental Options */
 		// "experimentalDecorators": false,				/* Enables experimental support for ES7 decorators. */
 		// "emitDecoratorMetadata": false,				/* Emit design-type metadata for decorated declarations in source files. */
+
+
 
 		/* Advanced Options */
 		"skipLibCheck": true,							/* Skip type checking all .d.ts files. */

@@ -1,7 +1,7 @@
-export { command } from './command';
-export { mapConcat } from './map-concat';
-export { linesConcat } from './lines-concat';
-export { listConcat } from './list-concat';
-export { listSortConcat } from './list-sort-concat';
-export { overwrite } from './overwrite';
-export { primitive } from './primitive';
+export { command } from './command.js';
+export { mapConcat } from './map-concat.js';
+export { linesConcat } from './lines-concat.js';
+export { listConcat } from './list-concat.js';
+export { listSortConcat } from './list-sort-concat.js';
+export { overwrite } from './overwrite.js';
+export { primitive } from './primitive.js';

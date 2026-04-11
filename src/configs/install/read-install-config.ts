@@ -1,7 +1,7 @@
 import path from 'path';
 import fse from 'fs-extra';
 import yaml from 'yaml';
-import { InstallConfig, InstallConfigStats, OldInstallConfig } from '../../types/config';
+import { type InstallConfig, type InstallConfigStats, type OldInstallConfig } from '../../types/config.js';
 
 const places = [
 	{
@@ -28,7 +28,7 @@ export async function readInstallConfig(targetPath: string): Promise<{ config: I
 
 	for(const place of places) {
 		try {
-			content = await fse.readFile(path.join(targetPath, place.name), 'utf-8');
+			content = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 
 			name = place.name;
 			type = place.type;
@@ -74,11 +74,11 @@ export async function readInstallConfig(targetPath: string): Promise<{ config: I
 		}
 	}
 
-	if(typeof data.artifacts === 'undefined') {
+	if(data.artifacts === undefined) {
 		data.artifacts = {};
 	}
 
-	if(typeof data.update === 'undefined') {
+	if(data.update === undefined) {
 		data.update = {};
 	}
 

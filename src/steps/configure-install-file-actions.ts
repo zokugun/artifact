@@ -1,10 +1,10 @@
-import { isEmpty, isPlainObject } from 'lodash';
-import { isMatch } from 'micromatch';
-import { compose, fork, json, mapSort, rc, yaml } from '../compositors';
-import { ForkParameter } from '../compositors/fork';
-import { command, linesConcat, listConcat, mapConcat, overwrite, primitive } from '../routes';
-import { Context } from '../types/context';
-import { Journey, Route } from '../types/travel';
+import { isEmpty, isPlainObject } from 'lodash-es';
+import mm from 'micromatch';
+import { type ForkParameter } from '../compositors/fork.js';
+import { compose, fork, json, mapSort, rc, yaml } from '../compositors/index.js';
+import { command, linesConcat, listConcat, mapConcat, overwrite, primitive } from '../routes/index.js';
+import { type Context } from '../types/context.js';
+import { type Journey, type Route } from '../types/travel.js';
 
 function buildRoute(route: any): Route<any> { // {{{
 	if(Array.isArray(route) && route.length > 0) {
@@ -138,13 +138,13 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 	}
 
 	if(overwrites.length > 0) {
-		context.onExisting = (file) => isMatch(file, overwrites) ? 'overwrite' : 'merge';
+		context.onExisting = (file) => mm.isMatch(file, overwrites) ? 'overwrite' : 'merge';
 	}
 
 	if(!isEmpty(filters)) {
 		context.filters = (file) => {
 			for(const [pattern, value] of Object.entries(filters)) {
-				if(isMatch(file, pattern)) {
+				if(mm.isMatch(file, pattern)) {
 					return value;
 				}
 			}
@@ -156,7 +156,7 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 	if(!isEmpty(routes)) {
 		context.routes = (file) => {
 			for(const [pattern, route] of Object.entries(routes)) {
-				if(isMatch(file, pattern)) {
+				if(mm.isMatch(file, pattern)) {
 					return route;
 				}
 			}

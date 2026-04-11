@@ -1,8 +1,8 @@
-import { flow, isPlainObject } from 'lodash';
-import * as JSON from '../parsers/json';
-import * as YAML from '../parsers/yaml';
-import { Route } from '../types/travel';
-import { tryJson } from '../utils/try-json';
+import { flow, isPlainObject } from 'lodash-es';
+import * as JSON from '../parsers/json.js';
+import * as YAML from '../parsers/yaml.js';
+import { type Route } from '../types/travel.js';
+import { tryJson } from '../utils/try-json.js';
 
 export function rc(...routes: Array<Route<Record<string, any>>>): Route<string> {
 	return ({ current, incoming, filters, ignores }) => {

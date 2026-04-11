@@ -1,8 +1,8 @@
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 use(chaiAsPromised);
 
@@ -23,7 +23,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc.json', 'utf-8')).to.eql(commandFxt.addJson.merged);
+		expect(vol.readFileSync('/target/.artifactrc.json', 'utf8')).to.eql(commandFxt.addJson.merged);
 	}); // }}}
 
 	it('add.yaml', async () => { // {{{
@@ -35,7 +35,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yaml', 'utf-8')).to.eql(commandFxt.addYaml.merged);
+		expect(vol.readFileSync('/target/.artifactrc.yaml', 'utf8')).to.eql(commandFxt.addYaml.merged);
 	}); // }}}
 
 	it('add.yml', async () => { // {{{
@@ -47,7 +47,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(commandFxt.addYaml.merged);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(commandFxt.addYaml.merged);
 	}); // }}}
 
 	it('add.noext.json', async () => { // {{{
@@ -59,7 +59,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.addJson.merged);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.addJson.merged);
 	}); // }}}
 
 	it('add.noext.yaml', async () => { // {{{
@@ -71,7 +71,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.addYaml.merged);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.addYaml.merged);
 	}); // }}}
 
 	it('new', async () => { // {{{
@@ -82,7 +82,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(commandFxt.default.merged);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(commandFxt.default.merged);
 	}); // }}}
 
 	it('readd.default', async () => { // {{{
@@ -104,7 +104,7 @@ describe('command.add', () => {
 
 		await add(['awesome-config'], { force: true });
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(commandFxt.readd.merged);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(commandFxt.readd.merged);
 	}); // }}}
 
 	it('readd.skip', async () => { // {{{
@@ -116,6 +116,6 @@ describe('command.add', () => {
 
 		await add(['awesome-config'], { skip: true });
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(commandFxt.readd.target);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(commandFxt.readd.target);
 	}); // }}}
 });

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('npmignore', () => {
 	const ignoreFxt = fixtures('ignore');
@@ -20,7 +20,7 @@ describe('npmignore', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.npmignore', 'utf-8')).to.eql(ignoreFxt.default.merged);
+		expect(vol.readFileSync('/target/.npmignore', 'utf8')).to.eql(ignoreFxt.default.merged);
 	}); // }}}
 
 	it('merge', async () => { // {{{
@@ -33,6 +33,6 @@ describe('npmignore', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.npmignore', 'utf-8')).to.eql(ignoreFxt.merge.merged);
+		expect(vol.readFileSync('/target/.npmignore', 'utf8')).to.eql(ignoreFxt.merge.merged);
 	}); // }}}
 });

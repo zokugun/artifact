@@ -1,5 +1,5 @@
 import { gt } from 'semver';
-import { Context } from '../types/context';
+import { type Context } from '../types/context.js';
 
 export async function validateNewerPackage({ incomingPackage, config, options }: Context): Promise<boolean | void> {
 	if(options.force) {

@@ -1,8 +1,8 @@
-import { mergeFlagTokens } from './merge-flag-tokens';
-import { splitPrefixAndFlags } from './split-prefix-and-flags';
+import { mergeFlagTokens } from './merge-flag-tokens.js';
+import { splitPrefixAndFlags } from './split-prefix-and-flags.js';
 
 export function mergePartsByPrefix(currentParts: string[], incomingParts: string[]): string[] {
-	const result = currentParts.slice();
+	const result = [...currentParts];
 	for(const incomingPart of incomingParts) {
 		const incomingPrefix = splitPrefixAndFlags(incomingPart);
 		let merged = false;

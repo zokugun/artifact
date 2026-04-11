@@ -1,5 +1,5 @@
-import { mergeFlagTokens } from './merge-flag-tokens';
-import { splitPrefixAndFlags } from './split-prefix-and-flags';
+import { mergeFlagTokens } from './merge-flag-tokens.js';
+import { splitPrefixAndFlags } from './split-prefix-and-flags.js';
 
 export function mergeFlagsAsString(current: string, incoming: { prefix: string; flags: string[] }): string {
 	const currentPrefix = splitPrefixAndFlags(current);

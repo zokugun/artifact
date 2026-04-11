@@ -1,8 +1,8 @@
-import { BinaryFile } from './binary-file';
-import { Request, InstallConfig, PackageConfig, ArtifactResult, PackageManifest } from './config';
-import { Format } from './format';
-import { TextFile } from './text-file';
-import { Journey } from './travel';
+import { type BinaryFile } from './binary-file.js';
+import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest } from './config.js';
+import { type Format } from './format.js';
+import { type TextFile } from './text-file.js';
+import { type Journey } from './travel.js';
 
 export type Context = {
 	packagePath: string;

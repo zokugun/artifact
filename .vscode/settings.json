@@ -3,8 +3,9 @@
 		"yarn.lock": true,
 		"lib/**": true,
 		".test/**": true,
+		"package-lock.json": true,
 	},
 	"taskExplorer.exclude": [
-		".husky"
-	]
+		".husky",
+	],
 }

@@ -1,10 +1,10 @@
-import { isEmpty, isPlainObject } from 'lodash';
-import { isMatch } from 'micromatch';
-import { compose, fork, json, mapSort, rc, yaml } from '../compositors';
-import { ForkParameter } from '../compositors/fork';
-import { command, linesConcat, listConcat, mapConcat, overwrite, primitive } from '../routes';
-import { Context } from '../types/context';
-import { Journey, Route } from '../types/travel';
+import { isEmpty, isPlainObject } from 'lodash-es';
+import mm from 'micromatch';
+import { type ForkParameter } from '../compositors/fork.js';
+import { compose, fork, json, mapSort, rc, yaml } from '../compositors/index.js';
+import { command, linesConcat, listConcat, mapConcat, overwrite, primitive } from '../routes/index.js';
+import { type Context } from '../types/context.js';
+import { type Journey, type Route } from '../types/travel.js';
 
 function buildRoute(route: any): Route<any> { // {{{
 	if(Array.isArray(route) && route.length > 0) {
@@ -144,17 +144,17 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		}
 
 		if(skipMissings.length > 0) {
-			context.onMissing = (file) => isMatch(file, skipMissings) ? 'skip' : 'continue';
+			context.onMissing = (file) => mm.isMatch(file, skipMissings) ? 'skip' : 'continue';
 		}
 
 		if(skipExistings.length > 0 || overwriteExistings.length > 0) {
-			context.onExisting = (file) => isMatch(file, skipExistings) ? 'skip' : (isMatch(file, overwriteExistings) ? 'overwrite' : 'merge');
+			context.onExisting = (file) => mm.isMatch(file, skipExistings) ? 'skip' : (mm.isMatch(file, overwriteExistings) ? 'overwrite' : 'merge');
 		}
 
 		if(!isEmpty(filters)) {
 			context.filters = (file) => {
 				for(const [pattern, value] of Object.entries(filters)) {
-					if(isMatch(file, pattern)) {
+					if(mm.isMatch(file, pattern)) {
 						return value;
 					}
 				}
@@ -166,7 +166,7 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		if(!isEmpty(routes)) {
 			context.routes = (file) => {
 				for(const [pattern, route] of Object.entries(routes)) {
-					if(isMatch(file, pattern)) {
+					if(mm.isMatch(file, pattern)) {
 						return route;
 					}
 				}

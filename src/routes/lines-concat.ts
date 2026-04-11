@@ -1,6 +1,6 @@
-import { toLines } from '../utils/to-lines';
-import { trimFinalNewLine } from '../utils/trim-final-newline';
-import { listConcat } from './list-concat';
+import { toLines } from '../utils/to-lines.js';
+import { trimFinalNewLine } from '../utils/trim-final-newline.js';
+import { listConcat } from './list-concat.js';
 
 export function linesConcat({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {
 	if(!incoming) {

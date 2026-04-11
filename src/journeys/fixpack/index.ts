@@ -1,8 +1,8 @@
-import { isPlainObject } from 'lodash';
-import { compose, fork, json, rc, yaml } from '../../compositors';
-import { listConcat, listSortConcat, mapConcat, primitive } from '../../routes';
-import { buildJourneyPlan } from '../../utils/build-journey-plan';
-import { buildTravelPlan } from '../../utils/build-travel-plan';
+import { isPlainObject } from 'lodash-es';
+import { compose, fork, json, rc, yaml } from '../../compositors/index.js';
+import { listConcat, listSortConcat, mapConcat, primitive } from '../../routes/index.js';
+import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
+import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 
 const mainRoute = compose({
 	sortToTop: listSortConcat,

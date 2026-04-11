@@ -1,8 +1,8 @@
-import isPlainObject from 'lodash/isPlainObject';
-import { compose, fork, json, yaml } from '../../compositors';
-import { listConcat, mapConcat, primitive } from '../../routes';
-import { buildJourneyPlan } from '../../utils/build-journey-plan';
-import { buildTravelPlan } from '../../utils/build-travel-plan';
+import { isPlainObject } from 'lodash-es';
+import { compose, fork, json, yaml } from '../../compositors/index.js';
+import { listConcat, mapConcat, primitive } from '../../routes/index.js';
+import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
+import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 
 const mainRoute = compose({
 	$$default: fork(

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('template', () => {
 	const templateFxt = fixtures('template');
@@ -19,7 +19,7 @@ describe('template', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/LICENSE', 'utf-8')).to.eql(templateFxt.license.merged);
+		expect(vol.readFileSync('/target/LICENSE', 'utf8')).to.eql(templateFxt.license.merged);
 	}); // }}}
 
 	it('package.name', async () => { // {{{
@@ -31,7 +31,7 @@ describe('template', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(packageFxt.templateName.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(packageFxt.templateName.merged);
 	}); // }}}
 
 	it('vars.artifact-noscope', async () => { // {{{
@@ -44,7 +44,7 @@ describe('template', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(templateFxt.varsArtifactNoscope.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(templateFxt.varsArtifactNoscope.merged);
 	}); // }}}
 
 	it('vars.artifact-scoped', async () => { // {{{
@@ -57,7 +57,7 @@ describe('template', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(templateFxt.varsArtifactScoped.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(templateFxt.varsArtifactScoped.merged);
 	}); // }}}
 
 	it('vars.project', async () => { // {{{
@@ -71,6 +71,6 @@ describe('template', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(templateFxt.varsProject.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(templateFxt.varsProject.merged);
 	}); // }}}
 });

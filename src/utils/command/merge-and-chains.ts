@@ -1,10 +1,10 @@
-import { dedupeStrings } from './dedupe-strings';
-import { mergeFlagsAsString } from './merge-flags-as-string';
-import { mergePartsByPrefix } from './merge-parts-by-prefix';
-import { prefixOfCommand } from './prefix-of-command';
-import { splitChain } from './split-chain';
-import { splitPrefixAndFlags } from './split-prefix-and-flags';
-import { splitSegments } from './split-segments';
+import { dedupeStrings } from './dedupe-strings.js';
+import { mergeFlagsAsString } from './merge-flags-as-string.js';
+import { mergePartsByPrefix } from './merge-parts-by-prefix.js';
+import { prefixOfCommand } from './prefix-of-command.js';
+import { splitChain } from './split-chain.js';
+import { splitPrefixAndFlags } from './split-prefix-and-flags.js';
+import { splitSegments } from './split-segments.js';
 
 export function mergeAndChains(current: string, incoming: string): string | undefined {
 	if(!(incoming.includes('&&') && current.includes('&&'))) {

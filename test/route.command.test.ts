@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { command } from '../src/routes/command';
+import { command } from '../src/routes/command.js';
 
 describe('route.command', () => {
 	it('flags.add', async () => { // {{{

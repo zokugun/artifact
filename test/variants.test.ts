@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('variants', () => {
 	const editorConfigFxt = fixtures('editorconfig');
@@ -23,8 +23,8 @@ describe('variants', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.default);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.default);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
 	}); // }}}
 
 	it('root:14', async () => { // {{{
@@ -36,8 +36,8 @@ describe('variants', () => {
 
 		await add(['awesome-config:14']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.v14);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.v14);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
 	}); // }}}
 
 	it('v20-14', async () => { // {{{
@@ -51,9 +51,9 @@ describe('variants', () => {
 
 		await add(['awesome-config:20']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.v20);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v20);
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.incoming);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.v20);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v20);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.yaml.incoming);
 	}); // }}}
 
 	it('v20-orphan', async () => { // {{{
@@ -68,8 +68,8 @@ describe('variants', () => {
 
 		await add(['awesome-config:20']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.v20);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v20);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.v20);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v20);
 		expect(vol.existsSync('/target/.fixpackrc')).to.eql(false);
 	}); // }}}
 
@@ -85,9 +85,9 @@ describe('variants', () => {
 
 		await add(['awesome-config:20']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.e20);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v20);
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.incoming);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.e20);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v20);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.yaml.incoming);
 	}); // }}}
 
 	it('v20-extends-root', async () => { // {{{
@@ -102,9 +102,9 @@ describe('variants', () => {
 
 		await add(['awesome-config:20']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.e20);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v20);
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.incoming);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.e20);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v20);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.yaml.incoming);
 	}); // }}}
 
 	it('v24-extends-v20', async () => { // {{{
@@ -122,9 +122,9 @@ describe('variants', () => {
 
 		await add(['awesome-config:24']);
 
-		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf-8')).to.eql(variantsFxt.iconfig.e24);
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v24);
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.incoming);
-		expect(vol.readFileSync('/target/.editorconfig', 'utf-8')).to.eql(editorConfigFxt.yaml.tab);
+		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(variantsFxt.iconfig.e24);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v24);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.yaml.incoming);
+		expect(vol.readFileSync('/target/.editorconfig', 'utf8')).to.eql(editorConfigFxt.yaml.tab);
 	}); // }}}
 });

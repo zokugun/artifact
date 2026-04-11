@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('editorconfig', () => {
 	const editorConfigFxt = fixtures('editorconfig');
@@ -20,7 +20,7 @@ describe('editorconfig', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.editorconfig', 'utf-8')).to.eql(editorConfigFxt.default.space2);
+		expect(vol.readFileSync('/target/.editorconfig', 'utf8')).to.eql(editorConfigFxt.default.space2);
 	}); // }}}
 
 	it('overwrite', async () => { // {{{
@@ -33,6 +33,6 @@ describe('editorconfig', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.editorconfig', 'utf-8')).to.eql(editorConfigFxt.yaml.tab);
+		expect(vol.readFileSync('/target/.editorconfig', 'utf8')).to.eql(editorConfigFxt.yaml.tab);
 	}); // }}}
 });

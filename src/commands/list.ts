@@ -1,7 +1,7 @@
 import process from 'process';
-import { last } from 'lodash';
-import { readInstallConfig } from '../configs';
-import { Artifact } from '../types/config';
+import { last } from 'lodash-es';
+import { readInstallConfig } from '../configs/index.js';
+import { type Artifact } from '../types/config.js';
 
 function formatVariant(artifact: Artifact): string {
 	const variant = Array.isArray(artifact.requires) ? last(artifact.requires) ?? '' : '';

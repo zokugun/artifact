@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('commitlint', () => {
 	const commitlintFxt = fixtures('commitlint');
@@ -20,7 +20,7 @@ describe('commitlint', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.commitlintrc.json', 'utf-8')).to.eql(commitlintFxt.json.merged);
+		expect(vol.readFileSync('/target/.commitlintrc.json', 'utf8')).to.eql(commitlintFxt.json.merged);
 	}); // }}}
 
 	it('rc.json', async () => { // {{{
@@ -32,7 +32,7 @@ describe('commitlint', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.commitlintrc', 'utf-8')).to.eql(commitlintFxt.json.merged);
+		expect(vol.readFileSync('/target/.commitlintrc', 'utf8')).to.eql(commitlintFxt.json.merged);
 	}); // }}}
 
 	it('rc.yaml', async () => { // {{{
@@ -44,7 +44,7 @@ describe('commitlint', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.commitlintrc', 'utf-8')).to.eql(commitlintFxt.yaml.merged);
+		expect(vol.readFileSync('/target/.commitlintrc', 'utf8')).to.eql(commitlintFxt.yaml.merged);
 	}); // }}}
 
 	it('yaml', async () => { // {{{
@@ -56,7 +56,7 @@ describe('commitlint', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.commitlintrc.yaml', 'utf-8')).to.eql(commitlintFxt.yaml.merged);
+		expect(vol.readFileSync('/target/.commitlintrc.yaml', 'utf8')).to.eql(commitlintFxt.yaml.merged);
 	}); // }}}
 
 	it('yml', async () => { // {{{
@@ -68,6 +68,6 @@ describe('commitlint', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.commitlintrc.yml', 'utf-8')).to.eql(commitlintFxt.yaml.merged);
+		expect(vol.readFileSync('/target/.commitlintrc.yml', 'utf8')).to.eql(commitlintFxt.yaml.merged);
 	}); // }}}
 });

@@ -1,5 +1,5 @@
 import { visit, ParseErrorCode } from 'jsonc-parser';
-import { Transform } from './transform';
+import { type Transform } from './transform.js';
 
 type Comment = { text: string[]; line: number };
 type Value = any[] | Record<string, any>;
@@ -159,9 +159,7 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 		},
 		onSeparator(_character: string, offset: number, length: number, _startLine: number, _startCharacter: number) {
 			// console.log('onSeparator', _character, _startLine, _startCharacter)
-			if(lastOffset) {
-				lastOffset = offset + length;
-			}
+			lastOffset &&= offset + length;
 		},
 		onComment(offset: number, length: number, startLine: number, _startCharacter: number) {
 			// console.log('onComment', startLine, _startCharacter)
@@ -208,7 +206,7 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 				};
 			}
 		},
-		onError(error: number, _offset: number, _length: number, _startLine: number, _startCharacter: number) {
+		onError(error: ParseErrorCode, _offset: number, _length: number, _startLine: number, _startCharacter: number) {
 			// console.log('onError', error, _startLine, _startCharacter)
 			if((error === ParseErrorCode.PropertyNameExpected || error === ParseErrorCode.ValueExpected) && lastKid) {
 				lastKid.separator = true;

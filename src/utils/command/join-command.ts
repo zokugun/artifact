@@ -1,4 +1,4 @@
-import { Command } from '../../types/command';
+import { type Command } from '../../types/command.js';
 
 export function joinCommand(commands: Record<string, Command[]>): string {
 	const subcommands = [] as string[];

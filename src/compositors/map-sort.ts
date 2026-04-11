@@ -1,4 +1,4 @@
-import { Route } from '../types/travel';
+import { type Route } from '../types/travel.js';
 
 const { compare } = new Intl.Collator('en');
 

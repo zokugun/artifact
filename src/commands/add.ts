@@ -1,12 +1,12 @@
 import process from 'process';
-import { cyan } from 'ansi-colors';
+import c from 'ansi-colors';
 import npm from 'npm';
 import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
-import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs';
-import { composeSteps, steps } from '../steps';
-import { resolveRequest } from '../utils/resolve-request';
+import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
+import { composeSteps, steps } from '../steps/index.js';
+import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
 	[
@@ -49,7 +49,7 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 
 	for(const spec of specs) {
 		const request = resolveRequest(spec);
-		const spinner = ora(`${cyan.bold(request.name)}`).start();
+		const spinner = ora(`${c.cyan.bold(request.name)}`).start();
 
 		const dir = tempy.directory();
 		const pkgResult = await pacote.extract(request.name, dir, { registry });
@@ -71,7 +71,7 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 
 		const flowResult = await mainFlow(targetPath, dir, request, config, options);
 
-		if(!flowResult || !flowResult.result) {
+		if(!flowResult?.result) {
 			spinner.succeed();
 
 			continue;

@@ -1,5 +1,5 @@
 export function mergeFlagTokens(currentFlags: string[], incomingFlags: string[]): string[] {
-	const mergedFlags = currentFlags.slice();
+	const mergedFlags = [...currentFlags];
 
 	for(const flag of incomingFlags) {
 		const name = flag.split(/\s+/)[0];

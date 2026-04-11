@@ -1,2 +1,2 @@
-export * from './install';
-export * from './package';
+export * from './install/index.js';
+export * from './package/index.js';

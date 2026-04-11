@@ -1,7 +1,7 @@
 import path from 'path';
 import fse from 'fs-extra';
-import { getJourney } from '../journeys';
-import { Context } from '../types/context';
+import { getJourney } from '../journeys/index.js';
+import { type Context } from '../types/context.js';
 
 export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, options }: Context): Promise<void> {
 	for(const file of textFiles) {
@@ -21,20 +21,28 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 
 			if(exists) {
 				switch(onExisting(file.name)) {
-					case 'merge':
+					case 'merge': {
 						break;
-					case 'overwrite':
+					}
+
+					case 'overwrite': {
 						break;
-					case 'skip':
+					}
+
+					case 'skip': {
 						continue;
+					}
 				}
 			}
 			else {
 				switch(onMissing(file.name)) {
-					case 'continue':
+					case 'continue': {
 						break;
-					case 'skip':
+					}
+
+					case 'skip': {
 						continue;
+					}
 				}
 			}
 
@@ -58,12 +66,12 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 		if(exists) {
 			switch(onExisting(file.name)) {
 				case 'merge': {
-					const currentData = await fse.readFile(filePath, 'utf-8');
+					const currentData = await fse.readFile(filePath, 'utf8');
 					const data = journey.travel({
 						current: currentData,
 						incoming: file.data,
 						filters: filters(file.name),
-					})!;
+					});
 
 					mergedTextFiles.push({
 						name: fileName,
@@ -79,7 +87,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					break;
 				}
 
-				case 'overwrite':
+				case 'overwrite': {
 					mergedTextFiles.push(file);
 
 					if(options.verbose) {
@@ -87,13 +95,16 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					}
 
 					continue;
-				case 'skip':
+				}
+
+				case 'skip': {
 					continue;
+				}
 			}
 		}
 		else {
 			switch(onMissing(file.name)) {
-				case 'continue':
+				case 'continue': {
 					mergedTextFiles.push({
 						...file,
 						name: fileName,
@@ -104,8 +115,11 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					}
 
 					continue;
-				case 'skip':
+				}
+
+				case 'skip': {
 					continue;
+				}
 			}
 		}
 	}

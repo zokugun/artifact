@@ -1,4 +1,4 @@
-import { TextFile } from '../types/text-file';
+import { type TextFile } from '../types/text-file.js';
 
 export async function insertFinalNewLine({ mergedTextFiles }: { mergedTextFiles: TextFile[] }): Promise<void> {
 	for(const file of mergedTextFiles) {

@@ -1,14 +1,14 @@
 import process from 'process';
-import { cyan } from 'ansi-colors';
-import { last } from 'lodash';
+import c from 'ansi-colors';
+import { last } from 'lodash-es';
 import npm from 'npm';
 import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
-import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs';
-import { composeSteps, steps } from '../steps';
-import { Request } from '../types/config';
-import { createDevNull } from '../utils/dev-null';
+import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
+import { composeSteps, steps } from '../steps/index.js';
+import { type Request } from '../types/config.js';
+import { createDevNull as createDevelopmentNull } from '../utils/create-dev-null.js';
 
 const { mainFlow } = composeSteps(
 	[
@@ -36,7 +36,7 @@ const { mainFlow } = composeSteps(
 
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
 	// @ts-expect-error log property isn't exposed
-	npm.log.stream = createDevNull();
+	npm.log.stream = createDevelopmentNull();
 
 	await npm.load();
 
@@ -53,7 +53,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 	const { config, configStats } = await readInstallConfig(targetPath);
 
 	for(const [name, artifact] of Object.entries(config.artifacts)) {
-		const spinner = ora(`${cyan.bold(name)}`).start();
+		const spinner = ora(`${c.cyan.bold(name)}`).start();
 
 		const dir = tempy.directory();
 		const pkgResult = await pacote.extract(name, dir, { registry });
@@ -77,7 +77,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 
 		const flowResult = await mainFlow(targetPath, dir, request, config, options);
 
-		if(!flowResult || !flowResult.result) {
+		if(!flowResult?.result) {
 			spinner.succeed();
 
 			continue;

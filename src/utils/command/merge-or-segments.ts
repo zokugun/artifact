@@ -1,26 +1,26 @@
-import { dedupeStrings } from './dedupe-strings';
-import { mergeFlagsAsString } from './merge-flags-as-string';
-import { mergeSemicolonSegments } from './merge-semicolon-segments';
-import { prefixOfCommand } from './prefix-of-command';
-import { splitChain } from './split-chain';
-import { splitPrefixAndFlags } from './split-prefix-and-flags';
-import { splitSegments } from './split-segments';
+import { dedupeStrings } from './dedupe-strings.js';
+import { mergeFlagsAsString } from './merge-flags-as-string.js';
+import { mergeSemicolonSegments } from './merge-semicolon-segments.js';
+import { prefixOfCommand } from './prefix-of-command.js';
+import { splitChain } from './split-chain.js';
+import { splitPrefixAndFlags } from './split-prefix-and-flags.js';
+import { splitSegments } from './split-segments.js';
 
 export function mergeOrSegments(current: string, incoming: string): string {
 	const currentSegments = splitSegments(current);
 	const incomingSegments = splitSegments(incoming);
 
-	const currentOrIdx = currentSegments.findIndex((s) => s.includes('||'));
-	const incomingOrIdx = incomingSegments.findIndex((s) => s.includes('||'));
+	const currentOrIndex = currentSegments.findIndex((s) => s.includes('||'));
+	const incomingOrIndex = incomingSegments.findIndex((s) => s.includes('||'));
 
-	if(currentOrIdx === -1 || incomingOrIdx === -1) {
+	if(currentOrIndex === -1 || incomingOrIndex === -1) {
 		return mergeSemicolonSegments(current, incoming);
 	}
 
-	const currentParts = splitChain(currentSegments[currentOrIdx], '||');
-	const incomingParts = splitChain(incomingSegments[incomingOrIdx], '||');
-	const currentTail = currentSegments.filter((_, idx) => idx !== currentOrIdx);
-	const incomingTail = incomingSegments.filter((_, idx) => idx !== incomingOrIdx);
+	const currentParts = splitChain(currentSegments[currentOrIndex], '||');
+	const incomingParts = splitChain(incomingSegments[incomingOrIndex], '||');
+	const currentTail = currentSegments.filter((_, index) => index !== currentOrIndex);
+	const incomingTail = incomingSegments.filter((_, index) => index !== incomingOrIndex);
 
 	const maxLength = Math.max(currentParts.length, incomingParts.length);
 	const chainResult: string[] = [];
@@ -71,20 +71,20 @@ export function mergeOrSegments(current: string, incoming: string): string {
 
 	const chainParts = new Set(dedupedChain);
 	const rawTail = [...currentTail, ...movedToTail, ...incomingTail];
-	const filteredTail = rawTail.filter((tail, idx) => {
+	const filteredTail = rawTail.filter((tail, index) => {
 		if(chainParts.has(tail)) {
 			return false;
 		}
 
 		// Keep only the most specific tail when two tails share a prefix.
-		return !rawTail.some((other, otherIdx) => otherIdx !== idx && other.startsWith(`${tail} `));
+		return !rawTail.some((other, otherIndex) => otherIndex !== index && other.startsWith(`${tail} `));
 	});
 
 	const mergedChain = dedupedChain.join(' || ');
 	const chainPrefixes = new Set(dedupedChain.map(prefixOfCommand).filter(Boolean));
 	const mergedSegs = currentSegments
-		.map((seg, idx) => (idx === currentOrIdx ? mergedChain : seg))
-		.filter((seg, idx) => idx === currentOrIdx || !chainPrefixes.has(prefixOfCommand(seg)));
+		.map((seg, index) => (index === currentOrIndex ? mergedChain : seg))
+		.filter((seg, index) => index === currentOrIndex || !chainPrefixes.has(prefixOfCommand(seg)));
 
 	for(const tail of dedupeStrings(filteredTail)) {
 		if(!mergedSegs.includes(tail)) {

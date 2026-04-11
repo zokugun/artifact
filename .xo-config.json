@@ -1,6 +1,8 @@
 {
 	"ignores": [
-		"test/fixtures"
+		"test/fixtures",
+		"*.config.js",
+		"*.config.ts"
 	],
 	"plugins": [
 		"chai-friendly"
@@ -46,12 +48,28 @@
 			"error",
 			{
 				"selector": "variable",
-				"modifiers": ["const", "global"],
-				"format": ["camelCase", "UPPER_CASE"]
+				"modifiers": [
+					"const",
+					"global"
+				],
+				"format": [
+					"camelCase",
+					"UPPER_CASE"
+				],
+				"filter": {
+					"regex": "^(__filename|__dirname)$",
+					"match": false
+				}
 			},
 			{
 				"selector": "variable",
-				"format": ["camelCase"]
+				"format": [
+					"camelCase"
+				],
+				"filter": {
+					"regex": "^(__filename|__dirname)$",
+					"match": false
+				}
 			}
 		],
 		"@typescript-eslint/no-confusing-void-expression": "off",
@@ -69,7 +87,7 @@
 		"capitalized-comments": "off",
 		"complexity": "off",
 		"default-case": "off",
-		"import/extensions":  [
+		"import/extensions": [
 			"error",
 			"never"
 		],
@@ -112,6 +130,54 @@
 		"unicorn/prefer-module": "off",
 		"unicorn/prefer-node-protocol": "off",
 		"unicorn/prefer-switch": "off",
-		"unicorn/prefer-ternary": "off"
+		"unicorn/prefer-ternary": "off",
+		"@typescript-eslint/ban-types": "off",
+		"@typescript-eslint/member-ordering": [
+			"error",
+			{
+				"default": [
+					"field",
+					"constructor",
+					"get",
+					"set",
+					"method"
+				]
+			}
+		],
+		"@typescript-eslint/no-empty-function": [
+			"error",
+			{
+				"allow": [
+					"arrowFunctions"
+				]
+			}
+		],
+		"@typescript-eslint/parameter-properties": "off",
+		"@typescript-eslint/prefer-promise-reject-errors": "off",
+		"@typescript-eslint/return-await": "off",
+		"object-curly-newline": "off",
+		"object-shorthand": "off",
+		"unicorn/no-length-as-slice-end": "off",
+		"unicorn/no-object-as-default-parameter": "off",
+		"unicorn/prefer-json-parse-buffer": "off",
+		"unicorn/prevent-abbreviations": [
+			"error",
+			{
+				"replacements": {
+					"arg": false,
+					"args": false,
+					"dir": false,
+					"err": false,
+					"fn": false,
+					"func": false,
+					"i": false,
+					"j": false,
+					"mod": false,
+					"num": false,
+					"pkg": false,
+					"str": false
+				}
+			}
+		]
 	}
 }

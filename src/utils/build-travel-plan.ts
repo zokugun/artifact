@@ -1,4 +1,4 @@
-import { Route, TravelPlan } from '../types/travel';
+import { type Route, type TravelPlan } from '../types/travel.js';
 
 export function buildTravelPlan(...mappers: Array<[RegExp | string, Route<string>]>): TravelPlan {
 	return (basename) => {

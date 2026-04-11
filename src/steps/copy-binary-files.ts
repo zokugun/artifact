@@ -1,6 +1,6 @@
 import path from 'path';
 import fse from 'fs-extra';
-import { Context } from '../types/context';
+import { type Context } from '../types/context.js';
 
 export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, onExisting, onMissing, options }: Context): Promise<void> {
 	const cwd = path.join(incomingPath, 'configs');
@@ -13,20 +13,28 @@ export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, o
 
 		if(exists) {
 			switch(onExisting(file.source)) {
-				case 'merge':
+				case 'merge': {
 					break;
-				case 'overwrite':
+				}
+
+				case 'overwrite': {
 					break;
-				case 'skip':
+				}
+
+				case 'skip': {
 					continue;
+				}
 			}
 		}
 		else {
 			switch(onMissing(file.source)) {
-				case 'continue':
+				case 'continue': {
 					break;
-				case 'skip':
+				}
+
+				case 'skip': {
 					continue;
+				}
 			}
 		}
 

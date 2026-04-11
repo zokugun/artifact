@@ -1,5 +1,5 @@
 export function overwrite({ current, incoming }: { current: unknown | undefined; incoming: unknown | undefined }): unknown {
-	if(typeof incoming === 'undefined') {
+	if(incoming === undefined) {
 		return current ?? [];
 	}
 	else {

@@ -1,5 +1,4 @@
-import isEqual from 'lodash/isEqual';
-import uniqWith from 'lodash/uniqWith';
+import { isEqual, uniqWith } from 'lodash-es';
 
 export function listConcat({ current, incoming }: { current: unknown[] | undefined; incoming: unknown[] | undefined }): any[] {
 	if(!incoming) {

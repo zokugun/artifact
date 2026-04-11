@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('tsconfig', () => {
 	const tsconfigFxt = fixtures('tsconfig');
@@ -20,7 +20,7 @@ describe('tsconfig', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.addAdvanced.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf8')).to.eql(tsconfigFxt.addAdvanced.merged);
 	}); // }}}
 
 	it('add.basic', async () => { // {{{
@@ -32,7 +32,7 @@ describe('tsconfig', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.addBasic.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf8')).to.eql(tsconfigFxt.addBasic.merged);
 	}); // }}}
 
 	it('merge.basic', async () => { // {{{
@@ -45,7 +45,7 @@ describe('tsconfig', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.mergeBasic.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf8')).to.eql(tsconfigFxt.mergeBasic.merged);
 	}); // }}}
 
 	it('merge.dom', async () => { // {{{
@@ -58,6 +58,6 @@ describe('tsconfig', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/tsconfig.json', 'utf-8')).to.eql(tsconfigFxt.mergeDom.merged);
+		expect(vol.readFileSync('/target/tsconfig.json', 'utf8')).to.eql(tsconfigFxt.mergeDom.merged);
 	}); // }}}
 });

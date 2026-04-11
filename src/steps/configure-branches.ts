@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fse from 'fs-extra';
 import globby from 'globby';
-import { Block, Context } from '../types/context';
+import { type Block, type Context } from '../types/context.js';
 
 export async function configureBranches(context: Context): Promise<void> {
 	const cwd = path.join(context.incomingPath, 'branches');
@@ -19,7 +19,7 @@ export async function configureBranches(context: Context): Promise<void> {
 
 			if(match) {
 				const [branch, name, variant] = match;
-				const packageName = name.replace(/:(artifact-)?/g, '/artifact-');
+				const packageName = name.replaceAll(/:(artifact-)?/g, '/artifact-');
 				const artifact = context.config.artifacts[packageName];
 				let found = false;
 

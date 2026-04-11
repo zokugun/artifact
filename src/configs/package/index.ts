@@ -1,1 +1,1 @@
-export { readPackageConfig } from './read-package-config';
+export { readPackageConfig } from './read-package-config.js';

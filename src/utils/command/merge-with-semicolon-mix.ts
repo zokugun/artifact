@@ -1,6 +1,6 @@
-import { mergeFlagsAsString } from './merge-flags-as-string';
-import { splitChain } from './split-chain';
-import { splitPrefixAndFlags } from './split-prefix-and-flags';
+import { mergeFlagsAsString } from './merge-flags-as-string.js';
+import { splitChain } from './split-chain.js';
+import { splitPrefixAndFlags } from './split-prefix-and-flags.js';
 
 export function mergeWithSemicolonMix(current: string, incoming: string): string | undefined {
 	if(!(incoming.includes('&&') && current.includes(';'))) {
@@ -14,7 +14,7 @@ export function mergeWithSemicolonMix(current: string, incoming: string): string
 	const tail = allSegments.slice(chainCount);
 	const incomingAnd = splitChain(incoming, '&&');
 
-	const chainResult = currentChain.slice();
+	const chainResult = [...currentChain];
 	const appendedTailIdxs: number[] = [];
 
 	for(const incomingSegment of incomingAnd) {
@@ -25,8 +25,8 @@ export function mergeWithSemicolonMix(current: string, incoming: string): string
 			if(currentParts.prefix && incomingParts.prefix && currentParts.prefix === incomingParts.prefix) {
 				if(i < chainCount) {
 					// merge into existing chain position
-					const idx = i;
-					chainResult[idx] = mergeFlagsAsString(chainResult[idx], incomingParts);
+					const index = i;
+					chainResult[index] = mergeFlagsAsString(chainResult[index], incomingParts);
 				}
 				else {
 					// append matching tail segment into chain if not already appended
@@ -47,6 +47,6 @@ export function mergeWithSemicolonMix(current: string, incoming: string): string
 	}
 
 	// Build remaining tail excluding appended indices
-	const remainingTail = tail.filter((_, idx) => !appendedTailIdxs.includes(chainCount + idx));
+	const remainingTail = tail.filter((_, index) => !appendedTailIdxs.includes(chainCount + index));
 	return chainResult.join(' && ') + (remainingTail.length > 0 ? '; ' + remainingTail.join('; ') : '');
 }

@@ -1,0 +1,15 @@
+artifacts:
+  "@daiyam/artifact-lang-js":
+    version: 0.10.11
+    requires:
+      - "20"
+  "@daiyam/artifact-lang-ts":
+    version: 0.7.4
+  "@daiyam/artifact-npm":
+    version: 0.7.6
+  "@daiyam/artifact-npm-ts":
+    version: 0.5.0
+  "@daiyam/artifact-npm-cli-ts":
+    version: 0.7.1
+  "@daiyam/artifact-gh-issuehub":
+    version: 0.5.2

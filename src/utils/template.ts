@@ -2,9 +2,9 @@ import path from 'path';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import fse from 'fs-extra';
-import { isNil, isPlainObject } from 'lodash';
-import * as YAML from '../parsers/yaml';
-import { tryJson } from './try-json';
+import { isNil, isPlainObject } from 'lodash-es';
+import * as YAML from '../parsers/yaml.js';
+import { tryJson } from './try-json.js';
 
 dayjs.extend(utc);
 
@@ -32,13 +32,13 @@ export class TemplateEngine {
 	public render(template: string): string { // {{{
 		const pattern = /#\[\[(.*?)]]/g;
 
-		return template.replace(pattern, (_, placeholder: string) => this.resolveExpression(placeholder));
+		return template.replaceAll(pattern, (_, placeholder: string) => this.resolveExpression(placeholder));
 	} // }}}
 
 	private getValueByPath(values: Record<string, any>, propertyPath: string): any { // {{{
 		let currentPath = propertyPath;
 		let currentValue: unknown = values;
-		// eslint-disable-next-line @typescript-eslint/ban-types
+
 		let match: RegExpExecArray | null;
 
 		while((match = NEXT_PROPERTY_REGEX.exec(currentPath))) {
@@ -66,7 +66,7 @@ export class TemplateEngine {
 	} // }}}
 
 	private parseFile(filename: string): Record<string, any> { // {{{
-		let content;
+		let content: string;
 
 		try {
 			content = fse.readFileSync(filename, 'utf8');
@@ -75,13 +75,13 @@ export class TemplateEngine {
 			throw new TemplateError(`File not found: ${filename}`);
 		}
 
-		const ext = path.extname(filename).toLowerCase();
+		const extension = path.extname(filename).toLowerCase();
 
 		try {
-			if(ext === '.json') {
+			if(extension === '.json') {
 				return JSON.parse(content) as Record<string, any>;
 			}
-			else if(ext === '.yaml' || ext === '.yml') {
+			else if(extension === '.yaml' || extension === '.yml') {
 				return YAML.parse(content);
 			}
 			else {
@@ -177,5 +177,5 @@ export class TemplateEngine {
 }
 
 export function unescapeCode(code: string): string {
-	return code.replace(/\\('|\\)/g, '$1').replace(/[\r\t\n]/g, ' ');
+	return code.replaceAll(/\\('|\\)/g, '$1').replaceAll(/[\r\t\n]/g, ' ');
 }

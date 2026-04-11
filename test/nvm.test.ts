@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('nvm', () => {
 	const nvmrcFxt = fixtures('nvm');
@@ -20,6 +20,6 @@ describe('nvm', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
 	}); // }}}
 });

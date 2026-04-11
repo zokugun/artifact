@@ -1,7 +1,7 @@
 import path from 'node:path';
-import { isNil } from 'lodash';
-import { readPackageConfig } from '../configs';
-import { Context } from '../types/context';
+import { isNil } from 'lodash-es';
+import { readPackageConfig } from '../configs/index.js';
+import { type Context } from '../types/context.js';
 
 export async function executeFirstBlock(context: Context): Promise<boolean | void> {
 	const { name, version } = context.incomingPackage!;

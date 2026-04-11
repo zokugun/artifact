@@ -1,8 +1,8 @@
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { vol } from 'memfs';
-import { update } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { update } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 use(chaiAsPromised);
 
@@ -27,8 +27,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/.gitignore', 'utf-8')).to.eql(ignoreFxt.merge.target);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/.gitignore', 'utf8')).to.eql(ignoreFxt.merge.target);
 	}); // }}}
 
 	it('filter', async () => { // {{{
@@ -42,8 +42,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/package.json', 'utf-8')).to.eql(commandFxt.filter.mergedPackage);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(commandFxt.filter.mergedPackage);
 	}); // }}}
 
 	it('missing.no', async () => { // {{{
@@ -58,8 +58,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/src/index.ts', 'utf-8')).to.eql(commandFxt.missing.incomingSrc);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.missing.incomingSrc);
 	}); // }}}
 
 	it('missing.yes', async () => { // {{{
@@ -73,7 +73,7 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
 		expect(vol.existsSync('/target/src/index.ts')).to.eql(false);
 	}); // }}}
 
@@ -88,8 +88,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerNo.target);
-		expect(vol.readFileSync('/target/.gitignore', 'utf-8')).to.eql(ignoreFxt.merge.target);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerNo.target);
+		expect(vol.readFileSync('/target/.gitignore', 'utf8')).to.eql(ignoreFxt.merge.target);
 	}); // }}}
 
 	it('newer.yes', async () => { // {{{
@@ -103,8 +103,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/.gitignore', 'utf-8')).to.eql(ignoreFxt.merge.merged);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/.gitignore', 'utf8')).to.eql(ignoreFxt.merge.merged);
 	}); // }}}
 
 	it('route', async () => { // {{{
@@ -119,8 +119,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/.xo-config.json', 'utf-8')).to.eql(commandFxt.route.mergedXoConfig);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/.xo-config.json', 'utf8')).to.eql(commandFxt.route.mergedXoConfig);
 	}); // }}}
 
 	it('strict.no', async () => { // {{{
@@ -134,7 +134,7 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
 		expect(vol.existsSync('/target/src/index.ts')).to.eql(false);
 	}); // }}}
 
@@ -150,8 +150,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/src/index.ts', 'utf-8')).to.eql(commandFxt.strict.targetSrc);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.strict.targetSrc);
 	}); // }}}
 
 	it('update.no', async () => { // {{{
@@ -165,8 +165,8 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/src/index.ts', 'utf-8')).to.eql(commandFxt.update.incomingSrc);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.update.incomingSrc);
 	}); // }}}
 
 	it('update.yes', async () => { // {{{
@@ -181,7 +181,7 @@ describe('command.update', () => {
 
 		await update();
 
-		expect(vol.readFileSync('/target/.artifactrc', 'utf-8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/src/index.ts', 'utf-8')).to.eql(commandFxt.update.targetSrc);
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.update.targetSrc);
 	}); // }}}
 });

@@ -1,11 +1,11 @@
-import { flow, isPlainObject } from 'lodash';
-import * as JSON from '../parsers/json';
-import * as JSONC from '../parsers/jsonc';
-import { Transform } from '../parsers/jsonc/transform';
-import { listConcat, primitive } from '../routes';
-import { Route } from '../types/travel';
-import { compose } from './compose';
-import { fork } from './fork';
+import { flow, isPlainObject } from 'lodash-es';
+import * as JSON from '../parsers/json.js';
+import * as JSONC from '../parsers/jsonc/index.js';
+import { type Transform } from '../parsers/jsonc/transform.js';
+import { listConcat, primitive } from '../routes/index.js';
+import { type Route } from '../types/travel.js';
+import { compose } from './compose.js';
+import { fork } from './fork.js';
 
 function tryJson(value: string): Record<string, any> | undefined {
 	try {

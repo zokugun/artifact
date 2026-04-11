@@ -1,5 +1,5 @@
-import { head, identity, last, trim } from 'lodash';
-import { Command } from '../../types/command';
+import { head, identity, last, trim } from 'lodash-es';
+import { type Command } from '../../types/command.js';
 
 export function splitCommand(command: string): Record<string, Command[]> {
 	const result: Record<string, Command[]> = {};
@@ -14,11 +14,11 @@ export function splitCommand(command: string): Record<string, Command[]> {
 			const subcommandWithArgs = last(splittedSubcommand)!.split(' ');
 			const subcommand = head(subcommandWithArgs)!.trim();
 			const args = subcommandWithArgs.slice(1);
-			const env = splittedSubcommand.slice(0, -1);
+			const environment = splittedSubcommand.slice(0, -1);
 
 			const parsedSubcommand: Command = {
 				args: args.map(trim),
-				env: env.map(trim),
+				env: environment.map(trim),
 				separator: splitted[i + 1],
 			};
 

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('branches', () => {
 	const branchesFxt = fixtures('branches');
@@ -23,7 +23,7 @@ describe('branches', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
 	}); // }}}
 
 	it('v20', async () => { // {{{
@@ -36,7 +36,7 @@ describe('branches', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v20);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v20);
 	}); // }}}
 
 	it('default', async () => { // {{{
@@ -49,7 +49,7 @@ describe('branches', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
 	}); // }}}
 
 	it('both', async () => { // {{{
@@ -63,7 +63,7 @@ describe('branches', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.nvmrc', 'utf-8')).to.eql(nvmrcFxt.default.v14);
-		expect(vol.readFileSync('/target/.editorconfig', 'utf-8')).to.eql(editorConfigFxt.default.space2);
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
+		expect(vol.readFileSync('/target/.editorconfig', 'utf8')).to.eql(editorConfigFxt.default.space2);
 	}); // }}}
 });

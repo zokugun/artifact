@@ -1,5 +1,5 @@
-import { isNil } from 'lodash';
-import { Context } from '../types/context';
+import { isNil } from 'lodash-es';
+import { type Context } from '../types/context.js';
 
 export async function executeNextBlock(context: Context): Promise<void> {
 	const block = context.blocks.shift();

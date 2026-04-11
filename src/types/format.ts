@@ -3,9 +3,9 @@ export enum IndentStyle {
 	TAB = 'tab',
 }
 
-export interface Format {
+export type Format = {
 	glob: string;
 	indentStyle: IndentStyle;
 	indentSize: number;
 	insertFinalNewline: boolean;
-}
+};

@@ -1,33 +1,38 @@
 {
 	"required": [
-        "version"
-    ],
+		"dependencies"
+	],
 	"sortToTop": [
-        "name",
+		"name",
 		"displayName",
-        "description",
-        "version",
+		"description",
+		"version",
 		"private",
-        "author",
+		"author",
 		"publisher",
 		"license",
 		"homepage",
 		"repository",
 		"bugs",
 		"engines",
+		"type",
 		"bin",
+		"exports",
 		"main",
+		"module",
 		"types",
+		"typesVersions",
 		"scripts",
 		"dependencies",
 		"devDependencies",
 		"optionalDependencies",
+		"overrides",
 		"activationEvents",
 		"contributes",
 		"icon",
 		"galleryBanner",
 		"categories",
 		"keywords"
-    ],
+	],
 	"finalNewLine": true
 }

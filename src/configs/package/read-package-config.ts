@@ -1,7 +1,7 @@
 import path from 'path';
 import fse from 'fs-extra';
 import yaml from 'yaml';
-import { PackageConfig } from '../../types/config';
+import { type PackageConfig } from '../../types/config.js';
 
 const places = [
 	{
@@ -27,7 +27,7 @@ export async function readPackageConfig(targetPath: string): Promise<PackageConf
 
 	for(const place of places) {
 		try {
-			content = await fse.readFile(path.join(targetPath, place.name), 'utf-8');
+			content = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 			type = place.type;
 
 			break;
@@ -61,7 +61,7 @@ export async function readPackageConfig(targetPath: string): Promise<PackageConf
 		}
 	}
 
-	if(typeof config.update === 'undefined') {
+	if(config.update === undefined) {
 		config.update = {};
 	}
 

@@ -1,10 +1,10 @@
-import { mergeFlagTokens } from './merge-flag-tokens';
-import { mergeFlagsAsString } from './merge-flags-as-string';
-import { mergePartsByPrefix } from './merge-parts-by-prefix';
-import { prefixOfCommand } from './prefix-of-command';
-import { splitChain } from './split-chain';
-import { splitPrefixAndFlags } from './split-prefix-and-flags';
-import { splitSegments } from './split-segments';
+import { mergeFlagTokens } from './merge-flag-tokens.js';
+import { mergeFlagsAsString } from './merge-flags-as-string.js';
+import { mergePartsByPrefix } from './merge-parts-by-prefix.js';
+import { prefixOfCommand } from './prefix-of-command.js';
+import { splitChain } from './split-chain.js';
+import { splitPrefixAndFlags } from './split-prefix-and-flags.js';
+import { splitSegments } from './split-segments.js';
 
 export function mergeSemicolonSegments(current: string, incoming: string): string {
 	let currentSegments = splitSegments(current);
@@ -21,8 +21,8 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 					const newParts = mergePartsByPrefix(currentParts, incomingParts);
 					currentSegments[j] = newParts.join(' || ');
 					// remove duplicates that were absorbed
-					currentSegments = currentSegments.filter((s, idx) => {
-						if(idx === j) {
+					currentSegments = currentSegments.filter((s, index) => {
+						if(index === j) {
 							return true;
 						}
 
@@ -57,25 +57,25 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 					if(currentParts.length > 0 && incomingParts.length > 0 && prefixOfCommand(currentParts[0]) === prefixOfCommand(incomingParts[0])) {
 						const maxLength = Math.max(currentParts.length, incomingParts.length);
 						for(let i = 0; i < maxLength; i++) {
-							const curPart = currentParts[i];
+							const currentPart = currentParts[i];
 							const incPart = incomingParts[i];
-							if(curPart && incPart) {
-								const curP = splitPrefixAndFlags(curPart);
+							if(currentPart && incPart) {
+								const currentP = splitPrefixAndFlags(currentPart);
 								const incP = splitPrefixAndFlags(incPart);
-								if(curP.prefix && incP.prefix && curP.prefix === incP.prefix) {
+								if(currentP.prefix && incP.prefix && currentP.prefix === incP.prefix) {
 									// keep current flags first, then append incoming flags if missing
-									const mergedFlags = mergeFlagTokens(curP.flags, incP.flags);
+									const mergedFlags = mergeFlagTokens(currentP.flags, incP.flags);
 
-									newParts.push(curP.prefix + (mergedFlags.length > 0 ? ' ' + mergedFlags.join(' ') : ''));
+									newParts.push(currentP.prefix + (mergedFlags.length > 0 ? ' ' + mergedFlags.join(' ') : ''));
 									continue;
 								}
 							}
 
-							if(curPart) {
-								newParts.push(curPart);
+							if(currentPart) {
+								newParts.push(currentPart);
 							}
 
-							if(!curPart && incPart) {
+							if(!currentPart && incPart) {
 								newParts.push(incPart);
 							}
 						}
@@ -89,8 +89,8 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 
 					// remove duplicates that were absorbed — compare by prefix to avoid formatting mismatches
 					const newPrefixes = new Set(newParts.map(prefixOfCommand).filter(Boolean));
-					currentSegments = currentSegments.filter((s, idx) => {
-						if(idx === j) {
+					currentSegments = currentSegments.filter((s, index) => {
+						if(index === j) {
 							return true;
 						}
 

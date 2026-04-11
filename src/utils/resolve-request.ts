@@ -1,5 +1,5 @@
 import untildify from 'untildify';
-import { Request } from '../types/config';
+import { type Request } from '../types/config.js';
 
 export function resolveRequest(spec: string): Request { // {{{
 	if(spec.startsWith('~')) {

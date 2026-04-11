@@ -1,13 +1,13 @@
-import { isPlainObject } from 'lodash';
-import { Transform } from './transform';
+import { isPlainObject } from 'lodash-es';
+import { type Transform } from './transform.js';
 
-export function stringify(data: any, transform: Transform = {}): string {
+export function stringify(data: unknown, transform: Transform = {}): string {
 	const result = format(data, '', transform);
 
 	return result;
 }
 
-function format(data: any, indentValue: string, transform: Transform, separator: boolean = false): string {
+function format(data: unknown, indentValue: string, transform: Transform, separator: boolean = false): string {
 	let result: string;
 
 	if(Array.isArray(data)) {
@@ -18,7 +18,7 @@ function format(data: any, indentValue: string, transform: Transform, separator:
 		}
 	}
 	else if(isPlainObject(data)) {
-		result = formatObject(data, indentValue, transform);
+		result = formatObject(data as Record<string, any>, indentValue, transform);
 
 		if(separator) {
 			result += ',';

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('json', () => {
 	const editorConfigFxt = fixtures('editorconfig');
@@ -21,7 +21,7 @@ describe('json', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.space2);
+		expect(vol.readFileSync('/target/default.json', 'utf8')).to.eql(jsonFxt.format.space2);
 	}); // }}}
 
 	it('format.default.tab', async () => { // {{{
@@ -33,7 +33,7 @@ describe('json', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
+		expect(vol.readFileSync('/target/default.json', 'utf8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
 
 	it('format.space22tab.incoming', async () => { // {{{
@@ -46,7 +46,7 @@ describe('json', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
+		expect(vol.readFileSync('/target/default.json', 'utf8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
 
 	it('format.space22tab.target', async () => { // {{{
@@ -59,7 +59,7 @@ describe('json', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.format.tab);
+		expect(vol.readFileSync('/target/default.json', 'utf8')).to.eql(jsonFxt.format.tab);
 	}); // }}}
 
 	it('merge', async () => { // {{{
@@ -72,6 +72,6 @@ describe('json', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/default.json', 'utf-8')).to.eql(jsonFxt.merge.merged);
+		expect(vol.readFileSync('/target/default.json', 'utf8')).to.eql(jsonFxt.merge.merged);
 	}); // }}}
 });

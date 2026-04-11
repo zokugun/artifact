@@ -1,12 +1,12 @@
 import path from 'path';
 import fse from 'fs-extra';
-import { isEmpty, isPlainObject } from 'lodash';
+import { isEmpty, isPlainObject } from 'lodash-es';
 import yaml from 'yaml';
-import { applyFormatting } from '../../steps/apply-formatting';
-import { insertFinalNewLine } from '../../steps/insert-final-new-line';
-import { Artifact, FileUpdate, InstallConfig, InstallConfigStats } from '../../types/config';
-import { Options } from '../../types/context';
-import { Format } from '../../types/format';
+import { applyFormatting } from '../../steps/apply-formatting.js';
+import { insertFinalNewLine } from '../../steps/insert-final-new-line.js';
+import { type Artifact, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { type Options } from '../../types/context.js';
+import { type Format } from '../../types/format.js';
 
 export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): Promise<void> {
 	const exported: {
@@ -32,7 +32,7 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 	if(!options.dryRun) {
 		const filePath = path.join(targetPath, name);
 
-		await fse.outputFile(filePath, file.data, 'utf-8');
+		await fse.outputFile(filePath, file.data, 'utf8');
 	}
 
 	if(options.verbose) {

@@ -1,7 +1,7 @@
-import { compose, json, rc, yaml } from '../../compositors';
-import { listConcat, overwrite, primitive } from '../../routes';
-import { buildJourneyPlan } from '../../utils/build-journey-plan';
-import { buildTravelPlan } from '../../utils/build-travel-plan';
+import { compose, json, rc, yaml } from '../../compositors/index.js';
+import { listConcat, overwrite, primitive } from '../../routes/index.js';
+import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
+import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 
 const mainRoute = compose({
 	extends: listConcat,

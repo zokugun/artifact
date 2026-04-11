@@ -1,4 +1,4 @@
-import { splitCommand, joinCommand, mergeWithSemicolonMix, mergeAndChains, mergeOrSegments, mergeSemicolonSegments, mergeCommandRecords } from '../utils/command';
+import { splitCommand, joinCommand, mergeWithSemicolonMix, mergeAndChains, mergeOrSegments, mergeSemicolonSegments, mergeCommandRecords } from '../utils/command/index.js';
 
 export function command({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {
 	if(!incoming) {

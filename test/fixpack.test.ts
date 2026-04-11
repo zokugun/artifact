@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { vol } from 'memfs';
-import { add } from './rewires/artifact';
-import { fixtures } from './utils/fixtures';
+import { add } from './rewires/artifact.js';
+import { fixtures } from './utils/fixtures.js';
 
 describe('fixpack', () => {
 	const fixpackFxt = fixtures('fixpack');
@@ -20,7 +20,7 @@ describe('fixpack', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.json.merged);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.json.merged);
 	}); // }}}
 
 	it('rc.yaml', async () => { // {{{
@@ -32,7 +32,7 @@ describe('fixpack', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.yaml.merged);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.yaml.merged);
 	}); // }}}
 
 	it('sort', async () => { // {{{
@@ -44,6 +44,6 @@ describe('fixpack', () => {
 
 		await add(['awesome-config']);
 
-		expect(vol.readFileSync('/target/.fixpackrc', 'utf-8')).to.eql(fixpackFxt.sort.merged);
+		expect(vol.readFileSync('/target/.fixpackrc', 'utf8')).to.eql(fixpackFxt.sort.merged);
 	}); // }}}
 });

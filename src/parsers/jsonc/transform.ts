@@ -1,4 +1,4 @@
-export interface Transform {
+export type Transform = {
 	children?: Record<string, Transform>;
 	comments?: {
 		bottom?: string[];
@@ -7,4 +7,4 @@ export interface Transform {
 	};
 	emptyLines?: number;
 	separator?: boolean;
-}
+};

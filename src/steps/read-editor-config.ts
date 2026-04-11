@@ -1,32 +1,37 @@
 import path from 'path';
 import * as editorconfig from 'editorconfig';
 import fse from 'fs-extra';
-import { Context } from '../types/context';
-import { IndentStyle } from '../types/format';
+import { type Context } from '../types/context.js';
+import { IndentStyle } from '../types/format.js';
 
 function buildFullGlob(glob: string) { // {{{
 	switch(glob.indexOf('/')) {
-		case -1:
+		case -1: {
 			glob = '**/' + glob;
 			break;
-		case 0:
+		}
+
+		case 0: {
 			glob = glob.slice(1);
 			break;
-		default:
+		}
+
+		default: {
 			break;
+		}
 	}
 
-	return glob.replace(/\*\*/g, '{*,**/**/**}');
+	return glob.replaceAll('**', '{*,**/**/**}');
 } // }}}
 
 export async function readEditorConfig({ incomingPath, targetPath, formats }: Context): Promise<void> {
-	let data;
+	let data: string | undefined;
 
 	try {
 		const dir = path.join(incomingPath, 'configs');
 		const file = path.join(dir, '.editorconfig');
 
-		data = await fse.readFile(file, 'utf-8');
+		data = await fse.readFile(file, 'utf8');
 	}
 	catch {
 	}
@@ -35,7 +40,7 @@ export async function readEditorConfig({ incomingPath, targetPath, formats }: Co
 		try {
 			const file = path.join(targetPath, '.editorconfig');
 
-			data = await fse.readFile(file, 'utf-8');
+			data = await fse.readFile(file, 'utf8');
 		}
 		catch {
 		}
@@ -54,7 +59,7 @@ export async function readEditorConfig({ incomingPath, targetPath, formats }: Co
 
 		const indentStyle = (rule.indent_style || 'space') as IndentStyle;
 		const indentSize = (rule.indent_size && Number.parseInt(rule.indent_size, 10)) || 2;
-		const insertFinalNewline = typeof rule.insert_final_newline === 'undefined' ? true : rule.insert_final_newline === 'true';
+		const insertFinalNewline = rule.insert_final_newline === undefined ? true : rule.insert_final_newline === 'true';
 
 		formats.push({
 			glob: buildFullGlob(glob),

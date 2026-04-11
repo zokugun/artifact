@@ -1,8 +1,8 @@
 import path from 'path';
 import fse from 'fs-extra';
 import globby from 'globby';
-import { isMatch } from 'micromatch';
-import { Context } from '../types/context';
+import mm from 'micromatch';
+import { type Context } from '../types/context.js';
 
 export async function removeFiles({ removedPatterns, targetPath, options }: Context): Promise<void> {
 	if(removedPatterns.length === 0) {
@@ -17,7 +17,7 @@ export async function removeFiles({ removedPatterns, targetPath, options }: Cont
 	});
 
 	for(const file of files) {
-		if(isMatch(file, removedPatterns)) {
+		if(mm.isMatch(file, removedPatterns)) {
 			if(!options.dryRun) {
 				const filePath = path.join(cwd, file);
 
