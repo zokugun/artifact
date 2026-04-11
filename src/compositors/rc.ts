@@ -2,12 +2,12 @@ import { flow, isPlainObject } from 'lodash-es';
 import * as JSON from '../parsers/json.js';
 import * as YAML from '../parsers/yaml.js';
 import { type Route } from '../types/travel.js';
-import { tryJson } from '../utils/try-json.js';
+import { tryJSON } from '../utils/try-json.js';
 
 export function rc(...routes: Array<Route<Record<string, any>>>): Route<string> {
 	return ({ current, incoming, filters, ignores }) => {
-		const currentData = current && (tryJson(current) ?? YAML.parse(current));
-		const incomingData = incoming && tryJson(incoming);
+		const currentData = current && (tryJSON(current) ?? YAML.parse(current));
+		const incomingData = incoming && tryJSON(incoming);
 
 		if(incomingData) {
 			return flow(...routes, JSON.stringify)({ current: currentData, incoming: incomingData, filters, ignores }) as string;

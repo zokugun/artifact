@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc';
 import fse from 'fs-extra';
 import { isNil, isPlainObject } from 'lodash-es';
 import * as YAML from '../parsers/yaml.js';
-import { tryJson } from './try-json.js';
+import { tryJSON } from './try-json.js';
 
 dayjs.extend(utc);
 
@@ -85,7 +85,7 @@ export class TemplateEngine {
 				return YAML.parse(content);
 			}
 			else {
-				return tryJson(content) ?? YAML.parse(content);
+				return tryJSON(content) ?? YAML.parse(content);
 			}
 		}
 		catch (parseError: unknown) {

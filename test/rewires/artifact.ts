@@ -26,15 +26,11 @@ rewiremock('pacote').with({
 	extract: () => ({ resolved: true }),
 });
 rewiremock('process').with({
-	env: {
-		INIT_CWD: '/target',
-	},
+	cwd: () => '/target',
+	env: {},
 });
 rewiremock('tempy').with({
 	directory: () => '/incoming',
-});
-rewiremock('../utils/create-dev-null').with({
-	createDevNull: () => null,
 });
 
 // unload to it can use mocked's fs

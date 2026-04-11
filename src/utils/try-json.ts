@@ -1,6 +1,6 @@
-export function tryJson(value: string): Record<string, any> | undefined {
+export function tryJSON(value: string): Record<string, unknown> | undefined {
 	try {
-		return JSON.parse(value) as Record<string, any>;
+		return JSON.parse(value) as Record<string, unknown>;
 	}
 	catch {
 		return undefined;
