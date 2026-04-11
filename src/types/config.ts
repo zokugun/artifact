@@ -9,13 +9,13 @@ export type PackageManifest = {
 };
 
 export type PackageConfig = {
-	constants?: Record<string, string>;
-	extends?: string | number;
+	constants: Record<string, string>;
+	extends?: string;
 	install: Record<string, FileInstall>;
-	orphan?: boolean;
-	update: boolean | Record<string, FileUpdate>;
-	variables?: Record<string, string>;
-	variants?: Record<string, unknown>;
+	orphan: boolean;
+	update: false | Record<string, FileUpdate>;
+	variables: Record<string, string>;
+	variants: Record<string, string>;
 };
 
 export type Artifact = {
@@ -40,21 +40,20 @@ export type OldInstallConfig = {
 	update: boolean | Record<string, FileUpdate>;
 };
 
-export type FileInstall = {
+export type FileUpsert = {
 	filter?: string[];
-	overwrite?: boolean;
-	remove?: boolean;
+	overwrite: boolean;
+	remove: boolean;
+	rename?: string;
 	route?: Record<string, any>;
 };
 
-export type FileUpdate = {
-	filter?: string[];
-	missing?: boolean;
-	overwrite?: boolean;
-	remove?: boolean;
-	rename?: string;
-	route?: Record<string, any>;
-	update?: boolean;
+export type FileInstall = FileUpsert & {
+};
+
+export type FileUpdate = FileUpsert & {
+	missing: boolean;
+	update: boolean;
 };
 
 export type InstallConfigStats = {

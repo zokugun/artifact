@@ -204,7 +204,7 @@ describe('command.update', () => {
 		vol.fromJSON({
 			'/target/.artifactrc': commandFxt.newerYes.target,
 			'/target/package.json': packageFxt.default.project,
-			'/target/src/index.ts': commandFxt.update.targetSrc,
+			'/target/src/index.ts': commandFxt.overwrite.targetSrc,
 			'/incoming/.artifactrc': commandFxt.overwrite.incomingArtifactrc,
 			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
 			'/incoming/configs/src/index.ts': commandFxt.overwrite.incomingSrc,
@@ -234,7 +234,7 @@ describe('command.update', () => {
 		vol.fromJSON({
 			'/target/.artifactrc': commandFxt.newerYes.target,
 			'/target/package.json': packageFxt.default.project,
-			'/target/src/index.ts': commandFxt.update.targetSrc,
+			'/target/src/index.ts': commandFxt.remove.targetSrc,
 			'/incoming/.artifactrc': commandFxt.remove.incomingArtifactrc,
 			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
 		}, '/');

@@ -11,12 +11,12 @@ export async function executeFirstBlock(context: Context): Promise<boolean | voi
 		let variant: string;
 		let alias: boolean;
 
-		if(isNil(context.incomingConfig!.variants![context.incomingVariant])) {
+		if(isNil(context.incomingConfig!.variants[context.incomingVariant])) {
 			variant = context.incomingVariant;
 			alias = false;
 		}
 		else {
-			variant = String(context.incomingConfig!.variants![context.incomingVariant]);
+			variant = context.incomingConfig!.variants[context.incomingVariant];
 			alias = true;
 		}
 
@@ -40,7 +40,7 @@ export async function executeFirstBlock(context: Context): Promise<boolean | voi
 
 			pushToResult(name, version, variant, alias, context);
 
-			const extend = String(context.incomingConfig!.variants![variantConfig.extends] ?? variantConfig.extends);
+			const extend = context.incomingConfig!.variants[variantConfig.extends] ?? variantConfig.extends;
 
 			context.incomingVariant = extend;
 
@@ -59,7 +59,7 @@ export async function executeFirstBlock(context: Context): Promise<boolean | voi
 				await context.commonFlow(name, version, variant, undefined, variantPath, context);
 			}
 			else {
-				const variant = String(context.incomingConfig!.variants![context.request.variant!] ?? context.request.variant);
+				const variant = context.incomingConfig!.variants[context.request.variant!] ?? context.request.variant;
 
 				context.blocks.unshift({
 					name,

@@ -118,4 +118,83 @@ describe('command.add', () => {
 
 		expect(vol.readFileSync('/target/.artifactrc.yml', 'utf8')).to.eql(commandFxt.readd.target);
 	}); // }}}
+
+	it('overwrite.no', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/.artifactrc': commandFxt.overwrite.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/src/index.ts': commandFxt.overwrite.incomingSrc,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.overwrite.incomingSrc);
+	}); // }}}
+
+	it('overwrite.yes', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.default.project,
+			'/target/src/index.ts': commandFxt.overwrite.targetSrc,
+			'/incoming/.artifactrc': commandFxt.overwrite.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/src/index.ts': commandFxt.overwrite.incomingSrc,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.overwrite.incomingSrc);
+	}); // }}}
+
+	it('remove.no', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/.artifactrc': commandFxt.remove.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		await expect(vol.promises.readFile('/target/src/index.ts', 'utf8')).to.be.rejectedWith('ENOENT: no such file or directory, open \'/target/src/index.ts\'');
+	}); // }}}
+
+	it('remove.yes', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.default.project,
+			'/target/src/index.ts': commandFxt.remove.targetSrc,
+			'/incoming/.artifactrc': commandFxt.remove.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		await expect(vol.promises.readFile('/target/src/index.ts', 'utf8')).to.be.rejectedWith('ENOENT: no such file or directory, open \'/target/src/index.ts\'');
+	}); // }}}
+
+	it('rename.no', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.default.project,
+			'/incoming/.artifactrc': commandFxt.rename.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/workflows/ci-pr.yml': commandFxt.rename.incomingYml,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/workflows/ci-pr.yml', 'utf8')).to.eql(commandFxt.rename.incomingYml);
+	}); // }}}
+
+	it('rename.yes', async () => { // {{{
+		vol.fromJSON({
+			'/target/package.json': packageFxt.default.project,
+			'/target/workflows/check-pr.yml': commandFxt.rename.targetYml,
+			'/incoming/.artifactrc': commandFxt.rename.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/workflows/ci-pr.yml': commandFxt.rename.incomingYml,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/workflows/ci-pr.yml', 'utf8')).to.eql(commandFxt.rename.mergedYml);
+	}); // }}}
 });

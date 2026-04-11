@@ -1,4 +1,4 @@
-import { isEmpty, isPlainObject } from 'lodash-es';
+import { isNonEmptyRecord, isRecord } from '@zokugun/is-it-type';
 import { isMatch } from 'micromatch';
 import { type ForkParameter } from '../compositors/fork.js';
 import { compose, fork, json, mapSort, rc, yaml } from '../compositors/index.js';
@@ -21,7 +21,7 @@ function buildRoute(route: any): Route<any> { // {{{
 
 		return result;
 	}
-	else if(isPlainObject(route)) {
+	else if(isRecord(route)) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const { compose: rtCompose, fork: rtFork, mapSort: rtMapSort } = route as { compose?: Record<string, any>; fork?: Record<string, any>; mapSort?: any };
 
@@ -42,7 +42,7 @@ function buildRoute(route: any): Route<any> { // {{{
 			}
 
 			if(rtFork.object) {
-				map.push([isPlainObject, buildRoute(rtFork.object)]);
+				map.push([isRecord, buildRoute(rtFork.object)]);
 			}
 
 			if(rtFork.default) {
@@ -104,16 +104,23 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 	const routes: Record<string, Journey> = {};
 
 	for(const [file, fileUpdate] of Object.entries(install)) {
-		const { overwrite, remove, filter, route } = fileUpdate;
+		const { filter, overwrite, remove, rename, route } = fileUpdate;
 
-		if(remove) {
+		if(overwrite) {
+			overwrites.push(file);
+		}
+		else if(remove) {
 			context.removedPatterns.push(file);
 
 			continue;
 		}
+		else if(rename) {
+			context.renamedPatterns.push({
+				from: file,
+				to: rename,
+			});
 
-		if(overwrite) {
-			overwrites.push(file);
+			continue;
 		}
 
 		if(filter) {
@@ -141,7 +148,7 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 		context.onExisting = (file) => isMatch(file, overwrites) ? 'overwrite' : 'merge';
 	}
 
-	if(!isEmpty(filters)) {
+	if(isNonEmptyRecord(filters)) {
 		context.filters = (file) => {
 			for(const [pattern, value] of Object.entries(filters)) {
 				if(isMatch(file, pattern)) {
@@ -153,7 +160,7 @@ export async function configureInstallFileActions(context: Context): Promise<voi
 		};
 	}
 
-	if(!isEmpty(routes)) {
+	if(isNonEmptyRecord(routes)) {
 		context.routes = (file) => {
 			for(const [pattern, route] of Object.entries(routes)) {
 				if(isMatch(file, pattern)) {

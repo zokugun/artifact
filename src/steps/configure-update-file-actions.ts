@@ -1,4 +1,4 @@
-import { isEmpty, isPlainObject } from 'lodash-es';
+import { isNonEmptyRecord, isRecord } from '@zokugun/is-it-type';
 import { isMatch } from 'micromatch';
 import { type ForkParameter } from '../compositors/fork.js';
 import { compose, fork, json, mapSort, rc, yaml } from '../compositors/index.js';
@@ -21,7 +21,7 @@ function buildRoute(route: any): Route<any> { // {{{
 
 		return result;
 	}
-	else if(isPlainObject(route)) {
+	else if(isRecord(route)) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const { compose: rtCompose, fork: rtFork, mapSort: rtMapSort } = route as { compose?: Record<string, any>; fork?: Record<string, any>; mapSort?: any };
 
@@ -42,7 +42,7 @@ function buildRoute(route: any): Route<any> { // {{{
 			}
 
 			if(rtFork.object) {
-				map.push([isPlainObject, buildRoute(rtFork.object)]);
+				map.push([isRecord, buildRoute(rtFork.object)]);
 			}
 
 			if(rtFork.default) {
@@ -95,13 +95,11 @@ function buildTravel(route: Record<string, any>): Route<string> { // {{{
 export async function configureUpdateFileActions(context: Context): Promise<void> {
 	const { update } = context.incomingConfig!;
 
-	if(typeof update === 'boolean') {
-		if(!update) {
-			context.onExisting = () => 'skip';
-			context.onMissing = () => 'skip';
-		}
+	if(update === false) {
+		context.onExisting = () => 'skip';
+		context.onMissing = () => 'skip';
 	}
-	else if(isPlainObject(update)) {
+	else {
 		const existingActions: Record<Exclude<ExistingAction, 'merge'>, string[]> = {
 			overwrite: [],
 			skip: [],
@@ -113,11 +111,11 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 		for(const [file, fileUpdate] of Object.entries(update)) {
 			const { filter, missing, overwrite, remove, rename, route, update } = fileUpdate;
 
-			if(missing === false) {
+			if(!missing) {
 				skipMissings.push(file);
 			}
 
-			if(update === false) {
+			if(!update) {
 				existingActions.skip.push(file);
 			}
 			else if(overwrite) {
@@ -174,7 +172,7 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 			};
 		}
 
-		if(!isEmpty(filters)) {
+		if(isNonEmptyRecord(filters)) {
 			context.filters = (file) => {
 				for(const [pattern, value] of Object.entries(filters)) {
 					if(isMatch(file, pattern)) {
@@ -186,7 +184,7 @@ export async function configureUpdateFileActions(context: Context): Promise<void
 			};
 		}
 
-		if(!isEmpty(routes)) {
+		if(isNonEmptyRecord(routes)) {
 			context.routes = (file) => {
 				for(const [pattern, route] of Object.entries(routes)) {
 					if(isMatch(file, pattern)) {
