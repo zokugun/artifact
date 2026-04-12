@@ -59,6 +59,20 @@ export function mergeCommandRecords(currentCommand: Record<string, Command[]>, i
 								// nothing to do, keep current ordering
 								result[name][index] = currentInstance;
 							}
+							else if(!hasFlags(currentInstance.args)
+								&& !hasFlags(instance.args)
+								&& currentInstance.env.length === 0
+								&& instance.env.length === 0
+								&& currentPrefix !== incomingPrefix) {
+								// Different singleton-like invocations of the same command should not be interleaved.
+								const lastIndex = result[name].length - 1;
+								const last = result[name][lastIndex];
+								if(last && !last.separator) {
+									last.separator = currentString.includes('&&') ? '&&' : ';';
+								}
+
+								result[name].push(instance);
+							}
 							else {
 								// insert incoming as separate after current
 								const currentWithSeparator = { ...currentInstance, separator: currentInstance.separator ?? (currentString.includes('&&') ? '&&' : ';') };
@@ -75,6 +89,19 @@ export function mergeCommandRecords(currentCommand: Record<string, Command[]>, i
 		}
 		else {
 			// incoming-only: append
+			const previousNames = Object.keys(result);
+			const previousName = previousNames.at(-1);
+			const isPlainSequence = !currentString.includes('&&') && !currentString.includes('||') && !currentString.includes(';');
+
+			if(isPlainSequence && previousName) {
+				const previousInstances = result[previousName];
+				const lastPrevious = previousInstances.at(-1);
+
+				if(lastPrevious && !lastPrevious.separator) {
+					lastPrevious.separator = ';';
+				}
+			}
+
 			result[name] = [...instances];
 		}
 	}

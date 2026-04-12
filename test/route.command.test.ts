@@ -218,4 +218,18 @@ describe('route.command', () => {
 			incoming: 'fixpack && npm audit && npm run ci:lint',
 		})).to.eql('fixpack && npm audit && npm run ci:lint && npm run lint');
 	}); // }}}
+
+	it('nosharing.singletons', async () => { // {{{
+		expect(command({
+			current: 'vitest',
+			incoming: 'tsc-watch -p test',
+		})).to.eql('vitest; tsc-watch -p test');
+	}); // }}}
+
+	it('nosharing.same-command-instances', async () => { // {{{
+		expect(command({
+			current: 'rimraf lib; rimraf .test',
+			incoming: 'rimraf .src',
+		})).to.eql('rimraf lib; rimraf .test; rimraf .src');
+	}); // }}}
 });
