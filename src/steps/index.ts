@@ -1,4 +1,4 @@
-import c from 'ansi-colors';
+import { c, logger } from '@zokugun/cli-utils';
 import { type CommonFlow, type Context, type MainFlow } from '../types/context.js';
 import { type Step } from '../types/step.js';
 import { applyFormatting } from './apply-formatting.js';
@@ -96,7 +96,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 				message += ` branch=${branch}`;
 			}
 
-			console.log(c.bgBlue(`\n=== ${message} ===\n`));
+			logger.info(c.bgBlue(`\n=== ${message} ===\n`));
 		}
 
 		const context: Context = {

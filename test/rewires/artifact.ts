@@ -13,14 +13,20 @@ rewiremock('npm').with({
 	},
 	log: {},
 });
-rewiremock('ora').with(() => {
-	const ora = {
-		fail: () => null,
-		start: () => ora,
-		succeed: () => null,
-	};
-
-	return ora;
+rewiremock('@zokugun/cli-utils').with({
+	c: {
+		cyan: {
+			bold: () => {},
+		},
+	},
+	logger: {
+		beginTimer: () => {},
+		createSpinner: () => ({
+			fail: () => {},
+			succeed: () => {},
+		}),
+		finishTimer: () => {},
+	},
 });
 rewiremock('pacote').with({
 	extract: () => ({ resolved: true }),

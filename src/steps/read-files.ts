@@ -1,4 +1,5 @@
 import path from 'path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import globby from 'globby';
 import { getEncoding, isText } from 'istextorbinary';
@@ -33,7 +34,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 				});
 
 				if(options.verbose) {
-					console.log(`${file} is a shebang file`);
+					logger.debug(`${file} is a shebang file`);
 				}
 			}
 			else {
@@ -44,7 +45,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 				});
 
 				if(options.verbose) {
-					console.log(`${file} is a text file`);
+					logger.debug(`${file} is a text file`);
 				}
 			}
 		}
@@ -55,7 +56,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 			});
 
 			if(options.verbose) {
-				console.log(`${file} is a binary file`);
+				logger.debug(`${file} is a binary file`);
 			}
 		}
 	}

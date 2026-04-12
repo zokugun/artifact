@@ -1,7 +1,6 @@
 import process from 'process';
-import c from 'ansi-colors';
+import { c, logger } from '@zokugun/cli-utils';
 import { last } from 'lodash-es';
-import ora from 'ora';
 import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
@@ -34,6 +33,8 @@ const { mainFlow } = composeSteps(
 );
 
 export async function update(inputOptions?: { force?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
+	logger.beginTimer();
+
 	const targetPath = process.cwd();
 
 	const options = {
@@ -46,8 +47,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 	const { config, configStats } = await readInstallConfig(targetPath);
 
 	for(const [name, artifact] of Object.entries(config.artifacts)) {
-		const spinner = ora(`${c.cyan.bold(name)}`).start();
-
+		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
 		const dir = tempy.directory();
 		const pkgResult = await pacote.extract(name, dir);
 
@@ -56,7 +56,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 				spinner.fail();
 
 				if(options.verbose) {
-					console.log(`The artifact '${name}' couldn't be found, skipping...`);
+					logger.debug(`The artifact '${name}' couldn't be found, skipping...`);
 				}
 
 				continue;
@@ -82,4 +82,6 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 
 		spinner.succeed();
 	}
+
+	logger.finishTimer();
 }

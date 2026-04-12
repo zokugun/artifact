@@ -1,4 +1,5 @@
 import path from 'path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import { type Context } from '../types/context.js';
 
@@ -6,7 +7,7 @@ export async function writeTextFiles({ mergedTextFiles, targetPath, options }: C
 	if(options.dryRun) {
 		if(options.verbose) {
 			for(const file of mergedTextFiles) {
-				console.log(`${file.name} has been written as a text file`);
+				logger.debug(`${file.name} has been written as a text file`);
 			}
 		}
 	}
@@ -21,7 +22,7 @@ export async function writeTextFiles({ mergedTextFiles, targetPath, options }: C
 			}
 
 			if(options.verbose) {
-				console.log(`${file.name} has been written as a text file`);
+				logger.debug(`${file.name} has been written as a text file`);
 			}
 		}
 	}

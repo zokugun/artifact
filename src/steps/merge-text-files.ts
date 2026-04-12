@@ -1,4 +1,5 @@
 import path from 'path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import { getJourney } from '../journeys/index.js';
 import { type Context } from '../types/context.js';
@@ -6,14 +7,14 @@ import { type Context } from '../types/context.js';
 export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, options }: Context): Promise<void> {
 	for(const file of textFiles) {
 		if(options.verbose) {
-			console.log(`${file.name} is going to be merged`);
+			logger.debug(`${file.name} is going to be merged`);
 		}
 
 		const journey = routes(file.name) ?? getJourney(file.name);
 
 		if(!journey) {
 			if(options.verbose) {
-				console.log(`${file.name}, no merger has been found`);
+				logger.debug(`${file.name}, no merger has been found`);
 			}
 
 			const filePath = path.join(targetPath, file.name);
@@ -49,14 +50,14 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 			mergedTextFiles.push(file);
 
 			if(options.verbose) {
-				console.log(`${file.name} has been copied`);
+				logger.debug(`${file.name} has been copied`);
 			}
 
 			continue;
 		}
 
 		if(options.verbose) {
-			console.log(`${file.name}, a merger has been found`);
+			logger.debug(`${file.name}, a merger has been found`);
 		}
 
 		const fileName = journey.alias ? path.join(path.dirname(file.name), journey.alias) : file.name;
@@ -81,7 +82,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					});
 
 					if(options.verbose) {
-						console.log(`${file.name} has been merged`);
+						logger.debug(`${file.name} has been merged`);
 					}
 
 					break;
@@ -91,7 +92,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					mergedTextFiles.push(file);
 
 					if(options.verbose) {
-						console.log(`${file.name} has been overwritten`);
+						logger.debug(`${file.name} has been overwritten`);
 					}
 
 					continue;
@@ -111,7 +112,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					});
 
 					if(options.verbose) {
-						console.log(`${file.name} has been copied`);
+						logger.debug(`${file.name} has been copied`);
 					}
 
 					continue;

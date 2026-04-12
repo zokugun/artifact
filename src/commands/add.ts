@@ -1,6 +1,5 @@
 import process from 'process';
-import c from 'ansi-colors';
-import ora from 'ora';
+import { logger, c } from '@zokugun/cli-utils';
 import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
@@ -33,6 +32,8 @@ const { mainFlow } = composeSteps(
 );
 
 export async function add(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
+	logger.beginTimer();
+
 	const targetPath = process.cwd();
 
 	const options = {
@@ -46,8 +47,7 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 
 	for(const spec of specs) {
 		const request = resolveRequest(spec);
-		const spinner = ora(`${c.cyan.bold(request.name)}`).start();
-
+		const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
 		const dir = tempy.directory();
 		const pkgResult = await pacote.extract(request.name, dir);
 
@@ -56,7 +56,7 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 				spinner.fail();
 
 				if(options.verbose) {
-					console.log(`The artifact '${spec}' couldn't be found, skipping...`);
+					logger.warn(`The artifact '${spec}' couldn't be found, skipping...`);
 				}
 
 				continue;
@@ -80,4 +80,6 @@ export async function add(specs: string[], inputOptions?: { force?: boolean; ski
 
 		spinner.succeed();
 	}
+
+	logger.finishTimer();
 }

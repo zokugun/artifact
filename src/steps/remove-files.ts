@@ -1,4 +1,5 @@
 import path from 'path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import globby from 'globby';
 import { isMatch } from 'micromatch';
@@ -25,7 +26,7 @@ export async function removeFiles({ removedPatterns, targetPath, options }: Cont
 			}
 
 			if(options.verbose) {
-				console.log(`${file} has been removed`);
+				logger.debug(`${file} has been removed`);
 			}
 		}
 	}

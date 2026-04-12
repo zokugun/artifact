@@ -1,4 +1,5 @@
 import path from 'path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import { isEmpty, isPlainObject } from 'lodash-es';
 import yaml from 'yaml';
@@ -36,6 +37,6 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 	}
 
 	if(options.verbose) {
-		console.log(`${name} has been written`);
+		logger.debug(`${name} has been written`);
 	}
 }

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import globby from 'globby';
 import { type Block, type Context } from '../types/context.js';
@@ -46,7 +47,7 @@ export async function configureBranches(context: Context): Promise<void> {
 
 				if(found) {
 					if(context.options.verbose) {
-						console.log(`- branch: ${name}${variant ? `:${variant}` : ''} has been matched`);
+						logger.debug(`- branch: ${name}${variant ? `:${variant}` : ''} has been matched`);
 					}
 
 					bucket.push({
@@ -59,7 +60,7 @@ export async function configureBranches(context: Context): Promise<void> {
 				}
 				else {
 					if(context.options.verbose) {
-						console.log(`- branch: ${name}${variant ? `:${variant}` : ''} hasn't been matched (${artifact ? 'variant' : 'artifact'} not found)`);
+						logger.debug(`- branch: ${name}${variant ? `:${variant}` : ''} hasn't been matched (${artifact ? 'variant' : 'artifact'} not found)`);
 					}
 				}
 			}

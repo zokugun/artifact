@@ -1,4 +1,5 @@
 import path from 'path';
+import { logger } from '@zokugun/cli-utils';
 import fse from 'fs-extra';
 import { type Context } from '../types/context.js';
 
@@ -45,7 +46,7 @@ export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, o
 		}
 
 		if(options.verbose) {
-			console.log(`${file.target} has been written as a binary file`);
+			logger.debug(`${file.target} has been written as a binary file`);
 		}
 	}
 }

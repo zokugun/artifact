@@ -25,7 +25,6 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 
 	visit(text, {
 		onObjectBegin(offset: number, length: number, startLine: number, _startCharacter: number) {
-			// console.log('onObjectBegin', startLine)
 			if(current) {
 				stack.unshift(current);
 			}
@@ -56,11 +55,9 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 			lastOffset = offset + length;
 		},
 		onObjectProperty(name: string, _offset: number, _length: number, _startLine: number, _startCharacter: number) {
-			// console.log('onObjectProperty', name, _startLine, _startCharacter)
 			property = name;
 		},
 		onObjectEnd(offset: number, length: number, startLine: number, _startCharacter: number) {
-			// console.log('onObjectEnd', startLine, startCharacter)
 			if(stack.length > 0) {
 				lastKid = transform;
 
@@ -72,7 +69,6 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 			lastOffset = offset + length;
 		},
 		onArrayBegin(offset: number, length: number, startLine: number, _startCharacter: number) {
-			// console.log('onArrayBegin', startLine, _startCharacter)
 			if(current) {
 				stack.unshift(current);
 			}
@@ -103,7 +99,6 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 			lastOffset = offset + length;
 		},
 		onArrayEnd(offset: number, length: number, startLine: number, _startCharacter: number) {
-			// console.log('onArrayEnd', startLine, _startCharacter)
 			if(stack.length > 0) {
 				lastKid = transform;
 
@@ -115,7 +110,6 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 			lastOffset = offset + length;
 		},
 		onLiteralValue(value: unknown, offset: number, length: number, startLine: number, _startCharacter: number) {
-			// console.log('onLiteralValue', startLine, _startCharacter)
 			if(current) {
 				if(Array.isArray(current)) {
 					lastKid = {};
@@ -158,11 +152,9 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 			lastOffset = offset + length;
 		},
 		onSeparator(_character: string, offset: number, length: number, _startLine: number, _startCharacter: number) {
-			// console.log('onSeparator', _character, _startLine, _startCharacter)
 			lastOffset &&= offset + length;
 		},
 		onComment(offset: number, length: number, startLine: number, _startCharacter: number) {
-			// console.log('onComment', startLine, _startCharacter)
 			let line = text.slice(offset, offset + length);
 
 			if(startLine === lastLine && lastKid) {
@@ -207,14 +199,11 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 			}
 		},
 		onError(error: ParseErrorCode, _offset: number, _length: number, _startLine: number, _startCharacter: number) {
-			// console.log('onError', error, _startLine, _startCharacter)
 			if((error === ParseErrorCode.PropertyNameExpected || error === ParseErrorCode.ValueExpected) && lastKid) {
 				lastKid.separator = true;
 			}
 		},
 	});
-
-	// console.log(JSON.stringify(transform, null, 2))
 
 	return {
 		data: current,

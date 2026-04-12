@@ -1,3 +1,4 @@
+import { logger } from '@zokugun/cli-utils';
 import { type Context } from '../types/context.js';
 
 export async function validateNotPresentPackage({ incomingPackage, config, options }: Context): Promise<boolean | void> {
@@ -12,7 +13,7 @@ export async function validateNotPresentPackage({ incomingPackage, config, optio
 	if(artifact) {
 		if(options.skip) {
 			if(options.verbose) {
-				console.log('The incoming artifact is already present, skipping...');
+				logger.debug('The incoming artifact is already present, skipping...');
 			}
 
 			return true;

@@ -1,4 +1,5 @@
 import process from 'process';
+import { logger } from '@zokugun/cli-utils';
 import { last } from 'lodash-es';
 import { readInstallConfig } from '../configs/index.js';
 import { type Artifact } from '../types/config.js';
@@ -20,17 +21,17 @@ export async function list(): Promise<void> {
 	const artifacts = Object.entries(config.artifacts);
 
 	if(artifacts.length === 0) {
-		console.log('No artifacts have been installed.');
+		logger.info('No artifacts have been installed.');
 	}
 	else {
-		console.log(`List of installed artifacts (${configStats.name}):\n`);
+		logger.info(`List of installed artifacts (${configStats.name}):\n`);
 
 		for(const [name, artifact] of artifacts) {
 			const version = artifact.version ? `@${artifact.version}` : '';
 
-			console.log(`- ${name}${version}${formatVariant(artifact)}`);
+			logger.info(`- ${name}${version}${formatVariant(artifact)}`);
 		}
 	}
 
-	console.log();
+	logger.newLine();
 }
