@@ -1,7 +1,10 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
+import { isArray, isRecord, isString } from '@zokugun/is-it-type';
+import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
-import { type InstallConfig, type InstallConfigStats, type OldInstallConfig } from '../../types/config.js';
+import { type Artifact, type FileInstall, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
 
 const places = [
 	{
@@ -21,9 +24,9 @@ const places = [
 	},
 ];
 
-export async function readInstallConfig(targetPath: string): Promise<{ config: InstallConfig; configStats: InstallConfigStats }> {
+export async function readInstallConfig(targetPath: string): AsyncDResult<{ config: InstallConfig; configStats: InstallConfigStats }> {
 	let content: string | undefined;
-	let name: string;
+	let name: string | undefined;
 	let type: string | undefined;
 
 	for(const place of places) {
@@ -35,83 +38,140 @@ export async function readInstallConfig(targetPath: string): Promise<{ config: I
 		}
 	}
 
-	if(!content) {
-		return {
-			config: {
-				artifacts: {},
-				install: {},
-				update: {},
-			},
-			configStats: {
-				name: '.artifactrc.yml',
-				type: 'yaml',
-				finalNewLine: true,
-			},
-		};
+	if(!content || !name) {
+		return normalizeConfig(content, {
+			name: '.artifactrc.yml',
+			type: 'yaml',
+			finalNewLine: true,
+		});
 	}
 
 	const finalNewLine = content.endsWith('\n');
 
-	let data: InstallConfig | OldInstallConfig;
 	if(type === 'json') {
-		data = JSON.parse(content) as InstallConfig | OldInstallConfig;
+		return normalizeConfig(JSON.parse(content), {
+			name,
+			type: 'json',
+			finalNewLine,
+		});
 	}
 	else if(type === 'yaml') {
-		data = yaml.parse(content) as InstallConfig | OldInstallConfig;
+		return normalizeConfig(yaml.parse(content), {
+			name,
+			type: 'yaml',
+			finalNewLine,
+		});
 	}
 	else {
 		try {
-			data = JSON.parse(content) as InstallConfig | OldInstallConfig;
-			type = 'json';
+			return normalizeConfig(JSON.parse(content), {
+				name,
+				type: 'json',
+				finalNewLine,
+			});
 		}
 		catch {
-			data = yaml.parse(content) as InstallConfig | OldInstallConfig;
-			type = 'yaml';
-		}
-	}
-
-	if(data.artifacts === undefined) {
-		data.artifacts = {};
-	}
-
-	if(data.update === undefined) {
-		data.update = {};
-	}
-
-	if(isOldInstallConfig(data)) {
-		const config = {
-			artifacts: {},
-			install: data.install,
-			update: data.update,
-		};
-
-		for(const { name, version } of data.artifacts) {
-			config.artifacts[name] = {
-				version,
-			};
-		}
-
-		return {
-			config,
-			configStats: {
-				name: name!,
-				type,
+			return normalizeConfig(yaml.parse(content), {
+				name,
+				type: 'yaml',
 				finalNewLine,
-			},
-		};
-	}
-	else {
-		return {
-			config: data,
-			configStats: {
-				name: name!,
-				type,
-				finalNewLine,
-			},
-		};
+			});
+		}
 	}
 }
 
-function isOldInstallConfig(config: InstallConfig | OldInstallConfig): config is OldInstallConfig {
-	return Array.isArray(config.artifacts);
+function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResult<{ config: InstallConfig; configStats: InstallConfigStats }> { // {{{
+	const artifacts: Record<string, Artifact> = {};
+	let constants: Record<string, string> = {};
+	const install: Record<string, FileInstall> = {};
+	let update: boolean | Record<string, FileUpdate> = {};
+	let variables: Record<string, string> = {};
+
+	if(!data) {
+		return ok({
+			config: {
+				artifacts,
+				constants,
+				install,
+				update,
+				variables,
+			},
+			configStats,
+		});
+	}
+
+	if(!isRecord(data)) {
+		return err(`Config file ${configStats.name} must export an object.`);
+	}
+
+	if(isArray(data.artifacts)) {
+		for(const artifact of data.artifacts) {
+			if(isRecord(artifact) && isString(artifact.name) && isString(artifact.version)) {
+				const normalized: Artifact = {
+					version: artifact.version,
+				};
+
+				if(isString(artifact.variant)) {
+					normalized.requires = [artifact.variant];
+				}
+
+				artifacts[artifact.name] = normalized;
+			}
+		}
+	}
+	else if(isRecord(data.artifacts)) {
+		for(const [key, artifact] of Object.entries(data.artifacts)) {
+			if(isRecord(artifact) && isString(artifact.version)) {
+				const normalized: Artifact = {
+					version: artifact.version,
+				};
+
+				if(isArray<string>(artifact.requires, isString)) {
+					normalized.requires = artifact.requires;
+				}
+				else if(isArray<string>(artifact.provides, isString)) {
+					normalized.requires = artifact.provides;
+				}
+
+				artifacts[key] = normalized;
+			}
+		}
+	}
+
+	if(isRecord<string>(data.constants, (_key, value) => isString(value))) {
+		constants = data.constants;
+	}
+
+	if(data.update === false) {
+		update = false;
+	}
+	else if(isRecord(data.update)) {
+		for(const [key, value] of Object.entries(data.update)) {
+			const normalized = normalizeFileUpdate(value);
+			if(normalized.fails) {
+				return normalized;
+			}
+
+			if(update[key]) {
+				return err(`Conflict with the "${key}" key on "update".`);
+			}
+
+			update[key] = normalized.value;
+		}
+	}
+
+	if(isRecord<string>(data.variables, (_key, value) => isString(value))) {
+		variables = data.variables;
+	}
+
+	return ok({
+		config: {
+			artifacts,
+			constants,
+			install,
+			update,
+			variables,
+		},
+		configStats,
+	});
 }

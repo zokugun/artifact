@@ -17,7 +17,14 @@ function formatVariant(artifact: Artifact): string {
 
 export async function list(): Promise<void> {
 	const targetPath = process.env.INIT_CWD!;
-	const { config, configStats } = await readInstallConfig(targetPath);
+
+	const configResult = await readInstallConfig(targetPath);
+	if(configResult.fails) {
+		logger.fatal(configResult.error);
+	}
+
+	const { config, configStats } = configResult.value;
+
 	const artifacts = Object.entries(config.artifacts);
 
 	if(artifacts.length === 0) {

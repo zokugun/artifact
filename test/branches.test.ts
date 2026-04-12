@@ -66,4 +66,17 @@ describe('branches', () => {
 		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
 		expect(vol.readFileSync('/target/.editorconfig', 'utf8')).to.eql(editorConfigFxt.default.space2);
 	}); // }}}
+
+	it('old.provides', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc.yml': branchesFxt.iconfig.provides,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/branches/[lang-js:14]/configs/.nvmrc': nvmrcFxt.default.v14,
+			'/incoming/branches/[lang-js:20]/configs/.nvmrc': nvmrcFxt.default.v20,
+		}, '/');
+
+		await add(['awesome-config']);
+
+		expect(vol.readFileSync('/target/.nvmrc', 'utf8')).to.eql(nvmrcFxt.default.v14);
+	}); // }}}
 });

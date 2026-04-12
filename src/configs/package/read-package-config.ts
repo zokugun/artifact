@@ -1,9 +1,12 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
-import { isArray, isNumber, isRecord, isString } from '@zokugun/is-it-type';
+import { isNumber, isRecord, isString } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
-import { type FileUninstall, type FileInstall, type FileUpdate, type FileUpsert, type PackageConfig } from '../../types/config.js';
+import { type FileUninstall, type FileInstall, type FileUpdate, type PackageConfig } from '../../types/config.js';
+import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
+import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
+import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 
 const places = [
 	{
@@ -110,7 +113,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 	if(isRecord(data.upsert)) {
 		for(const [key, value] of Object.entries(data.upsert)) {
-			const normalized = normalizeUpsert(value, 'upsert');
+			const normalized = normalizeFileUpsert(value, 'upsert');
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -127,7 +130,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 	if(isRecord(data.install)) {
 		for(const [key, value] of Object.entries(data.install)) {
-			const normalized = normalizeUpsert(value, 'install');
+			const normalized = normalizeFileUpsert(value, 'install');
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -142,7 +145,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 	if(isRecord(data.uninstall)) {
 		for(const [key, value] of Object.entries(data.uninstall)) {
-			const normalized = normalizeUninstall(value);
+			const normalized = normalizeFileUninstall(value);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -156,7 +159,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeUpdate(value);
+			const normalized = normalizeFileUpdate(value);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -178,90 +181,5 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 		update,
 		variables,
 		variants,
-	});
-} // }}}
-
-function normalizeUninstall(data: unknown): DResult<FileUninstall> { // {{{
-	if(!isRecord(data)) {
-		return err('"uninstall" must be an object.');
-	}
-
-	let remove: boolean = false;
-
-	if(data.remove === true) {
-		remove = true;
-	}
-
-	return ok({
-		remove,
-	});
-} // }}}
-
-function normalizeUpdate(data: unknown): DResult<FileUpdate> { // {{{
-	if(!isRecord(data)) {
-		return err('"update" must be an object.');
-	}
-
-	const upsert = normalizeUpsert(data, 'update');
-
-	if(upsert.fails) {
-		return upsert;
-	}
-
-	let missing: boolean = true;
-	let update: boolean = true;
-
-	if(data.missing === false) {
-		missing = false;
-	}
-
-	if(data.update === false) {
-		update = false;
-	}
-
-	return ok({
-		...upsert.value,
-		missing,
-		update,
-	});
-} // }}}
-
-function normalizeUpsert(data: unknown, name: string): DResult<FileUpsert> { // {{{
-	if(!isRecord(data)) {
-		return err(`"${name}" must be an object.`);
-	}
-
-	let filter: string[] | undefined;
-	let overwrite: boolean = false;
-	let remove: boolean = false;
-	let rename: string | undefined;
-	let route: Record<string, any> | undefined;
-
-	if(isArray<string>(data.filter, isString)) {
-		filter = data.filter;
-	}
-
-	if(data.overwrite === true) {
-		overwrite = true;
-	}
-
-	if(data.remove === true) {
-		remove = true;
-	}
-
-	if(isString(data.rename)) {
-		rename = data.rename;
-	}
-
-	if(isRecord(data.route)) {
-		route = data.route;
-	}
-
-	return ok({
-		filter,
-		overwrite,
-		remove,
-		rename,
-		route,
 	});
 } // }}}

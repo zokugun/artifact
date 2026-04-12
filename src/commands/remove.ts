@@ -34,7 +34,12 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 		dryRun: inputOptions?.dryRun ?? false,
 	};
 
-	const { config, configStats } = await readInstallConfig(targetPath);
+	const configResult = await readInstallConfig(targetPath);
+	if(configResult.fails) {
+		logger.fatal(configResult.error);
+	}
+
+	const { config, configStats } = configResult.value;
 
 	for(const spec of specs) {
 		const requestResult = resolveRequest(spec);

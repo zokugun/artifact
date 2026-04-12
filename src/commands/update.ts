@@ -44,7 +44,12 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 		dryRun: inputOptions?.dryRun ?? false,
 	};
 
-	const { config, configStats } = await readInstallConfig(targetPath);
+	const configResult = await readInstallConfig(targetPath);
+	if(configResult.fails) {
+		logger.fatal(configResult.error);
+	}
+
+	const { config, configStats } = configResult.value;
 
 	for(const [name, artifact] of Object.entries(config.artifacts)) {
 		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);

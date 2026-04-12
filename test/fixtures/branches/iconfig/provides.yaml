@@ -1,5 +1,5 @@
 artifacts:
-  awesome-config:
+  lang-js:
     version: 1.0.0
-    requires:
+    provides:
       - "14"

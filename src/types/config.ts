@@ -29,16 +29,10 @@ export type ArtifactResult = Artifact & { name: string };
 
 export type InstallConfig = {
 	artifacts: Record<string, Artifact>;
-	constants?: Record<string, string>;
+	constants: Record<string, string>;
 	install: Record<string, FileInstall>;
-	update: boolean | Record<string, FileUpdate>;
-	variables?: Record<string, string>;
-};
-
-export type OldInstallConfig = {
-	artifacts: Array<{ name: string; version: string }>;
-	install: Record<string, FileInstall>;
-	update: boolean | Record<string, FileUpdate>;
+	update: false | Record<string, FileUpdate>;
+	variables: Record<string, string>;
 };
 
 export type FileUpsert = {
