@@ -1,10 +1,11 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { getJourney } from '../journeys/index.js';
 import { type Context } from '../types/context.js';
 
-export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, options }: Context): Promise<void> {
+export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, options }: Context): AsyncDResult {
 	for(const file of textFiles) {
 		if(options.verbose) {
 			logger.debug(`${file.name} is going to be merged`);
@@ -18,9 +19,8 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 			}
 
 			const filePath = path.join(targetPath, file.name);
-			const exists = await fse.pathExists(filePath);
 
-			if(exists) {
+			if(await fse.isExisting(filePath)) {
 				switch(onExisting(file.name)) {
 					case 'merge': {
 						break;
@@ -62,14 +62,17 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 
 		const fileName = journey.alias ? path.join(path.dirname(file.name), journey.alias) : file.name;
 		const filePath = path.join(targetPath, fileName);
-		const exists = await fse.pathExists(filePath);
 
-		if(exists) {
+		if(await fse.isExisting(filePath)) {
 			switch(onExisting(file.name)) {
 				case 'merge': {
-					const currentData = await fse.readFile(filePath, 'utf8');
+					const current = await fse.readFile(filePath, 'utf8');
+					if(current.fails) {
+						return err(stringifyError(current.error));
+					}
+
 					const data = journey.travel({
-						current: currentData,
+						current: current.value,
 						incoming: file.data,
 						filters: filters(file.name),
 					});
@@ -124,4 +127,6 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 			}
 		}
 	}
+
+	return OK;
 }

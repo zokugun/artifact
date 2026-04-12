@@ -1,9 +1,10 @@
 import { logger } from '@zokugun/cli-utils';
+import { type AsyncDResult, err, OK, OK_TRUE } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
-export async function validatePresentPackage({ incomingPackage, config, options }: Context): Promise<boolean | void> {
+export async function validatePresentPackage({ incomingPackage, config, options }: Context): AsyncDResult<boolean | void> {
 	if(options.force) {
-		return;
+		return OK;
 	}
 
 	const { name } = incomingPackage as { name: string };
@@ -16,10 +17,12 @@ export async function validatePresentPackage({ incomingPackage, config, options 
 				logger.debug('The outgoing artifact is already absent, skipping...');
 			}
 
-			return true;
+			return OK_TRUE;
 		}
 		else {
-			throw new Error('The outgoing artifact has already been removed.');
+			return err('The outgoing artifact has already been removed.');
 		}
 	}
+
+	return OK;
 }

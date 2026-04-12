@@ -1,9 +1,10 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
-export async function writeTextFiles({ mergedTextFiles, targetPath, options }: Context): Promise<void> {
+export async function writeTextFiles({ mergedTextFiles, targetPath, options }: Context): AsyncDResult {
 	if(options.dryRun) {
 		if(options.verbose) {
 			for(const file of mergedTextFiles) {
@@ -15,10 +16,16 @@ export async function writeTextFiles({ mergedTextFiles, targetPath, options }: C
 		for(const file of mergedTextFiles) {
 			const filePath = path.join(targetPath, file.name);
 
-			await fse.outputFile(filePath, file.data, 'utf8');
+			const result = await fse.outputFile(filePath, file.data, 'utf8');
+			if(result.fails) {
+				return err(stringifyError(result.error));
+			}
 
 			if(file.mode) {
-				await fse.chmod(filePath, file.mode);
+				const result = await fse.chmod(filePath, file.mode);
+				if(result.fails) {
+					return err(stringifyError(result.error));
+				}
 			}
 
 			if(options.verbose) {
@@ -26,4 +33,6 @@ export async function writeTextFiles({ mergedTextFiles, targetPath, options }: C
 			}
 		}
 	}
+
+	return OK;
 }

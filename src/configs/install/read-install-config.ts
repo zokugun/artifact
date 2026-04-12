@@ -1,5 +1,5 @@
 import path from 'path';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
 import yaml from 'yaml';
 import { type InstallConfig, type InstallConfigStats, type OldInstallConfig } from '../../types/config.js';
 
@@ -27,15 +27,11 @@ export async function readInstallConfig(targetPath: string): Promise<{ config: I
 	let type: string | undefined;
 
 	for(const place of places) {
-		try {
-			content = await fse.readFile(path.join(targetPath, place.name), 'utf8');
+		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
+		if(!result.fails) {
+			content = result.value;
 
-			name = place.name;
-			type = place.type;
-
-			break;
-		}
-		catch {
+			({ name, type } = place);
 		}
 	}
 

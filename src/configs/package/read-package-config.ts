@@ -1,6 +1,7 @@
 import path from 'path';
+import fse from '@zokugun/fs-extra-plus/async';
 import { isArray, isNumber, isRecord, isString } from '@zokugun/is-it-type';
-import fse from 'fs-extra';
+import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type FileUninstall, type FileInstall, type FileUpdate, type FileUpsert, type PackageConfig } from '../../types/config.js';
 
@@ -22,20 +23,18 @@ const places = [
 	},
 ];
 
-export async function readPackageConfig(targetPath: string): Promise<PackageConfig> {
+export async function readPackageConfig(targetPath: string): AsyncDResult<PackageConfig> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
 
 	for(const place of places) {
-		try {
-			content = await fse.readFile(path.join(targetPath, place.name), 'utf8');
-			name = place.name;
-			type = place.type;
+		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 
-			break;
-		}
-		catch {
+		if(!result.fails) {
+			content = result.value;
+
+			({ name, type } = place);
 		}
 	}
 
@@ -59,7 +58,7 @@ export async function readPackageConfig(targetPath: string): Promise<PackageConf
 	}
 }
 
-function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
+function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> { // {{{
 	let constants: Record<string, string> = {};
 	let xtends: string | undefined;
 	const install: Record<string, FileInstall> = {};
@@ -70,7 +69,7 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 	let variants: Record<string, string> = {};
 
 	if(!data) {
-		return {
+		return ok({
 			constants,
 			extends: xtends,
 			install,
@@ -79,11 +78,11 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 			update,
 			variables,
 			variants,
-		};
+		});
 	}
 
 	if(!isRecord(data)) {
-		throw new Error(`Config file ${source} must export an object.`);
+		return err(`Config file ${source} must export an object.`);
 	}
 
 	if(isRecord<string>(data.constants, (_key, value) => isString(value))) {
@@ -111,41 +110,44 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 
 	if(isRecord(data.upsert)) {
 		for(const [key, value] of Object.entries(data.upsert)) {
-			const normalizedValue = normalizeUpsert(value, 'upsert');
-
-			if(normalizedValue) {
-				install[key] = normalizedValue;
-
-				update[key] = {
-					...normalizedValue,
-					missing: true,
-					update: true,
-				};
+			const normalized = normalizeUpsert(value, 'upsert');
+			if(normalized.fails) {
+				return normalized;
 			}
+
+			install[key] = normalized.value;
+
+			update[key] = {
+				...normalized.value,
+				missing: true,
+				update: true,
+			};
 		}
 	}
 
 	if(isRecord(data.install)) {
 		for(const [key, value] of Object.entries(data.install)) {
-			const normalizedValue = normalizeUpsert(value, 'install');
-
-			if(normalizedValue) {
-				if(install[key]) {
-					throw new Error(`Conflict with the "${key}" key on "install".`);
-				}
-
-				install[key] = normalizedValue;
+			const normalized = normalizeUpsert(value, 'install');
+			if(normalized.fails) {
+				return normalized;
 			}
+
+			if(install[key]) {
+				return err(`Conflict with the "${key}" key on "install".`);
+			}
+
+			install[key] = normalized.value;
 		}
 	}
 
 	if(isRecord(data.uninstall)) {
 		for(const [key, value] of Object.entries(data.uninstall)) {
-			const normalizedValue = normalizeUninstall(value);
-
-			if(normalizedValue) {
-				uninstall[key] = normalizedValue;
+			const normalized = normalizeUninstall(value);
+			if(normalized.fails) {
+				return normalized;
 			}
+
+			uninstall[key] = normalized.value;
 		}
 	}
 
@@ -154,19 +156,20 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalizedValue = normalizeUpdate(value);
-
-			if(normalizedValue) {
-				if(update[key]) {
-					throw new Error(`Conflict with the "${key}" key on "update".`);
-				}
-
-				update[key] = normalizedValue;
+			const normalized = normalizeUpdate(value);
+			if(normalized.fails) {
+				return normalized;
 			}
+
+			if(update[key]) {
+				return err(`Conflict with the "${key}" key on "update".`);
+			}
+
+			update[key] = normalized.value;
 		}
 	}
 
-	return {
+	return ok({
 		constants,
 		extends: xtends,
 		install,
@@ -175,12 +178,12 @@ function normalizeConfig(data: unknown, source: string): PackageConfig { // {{{
 		update,
 		variables,
 		variants,
-	};
+	});
 } // }}}
 
-function normalizeUninstall(data: unknown): FileUninstall | undefined { // {{{
+function normalizeUninstall(data: unknown): DResult<FileUninstall> { // {{{
 	if(!isRecord(data)) {
-		throw new Error('"uninstall" must be an object.');
+		return err('"uninstall" must be an object.');
 	}
 
 	let remove: boolean = false;
@@ -189,19 +192,19 @@ function normalizeUninstall(data: unknown): FileUninstall | undefined { // {{{
 		remove = true;
 	}
 
-	return {
+	return ok({
 		remove,
-	};
+	});
 } // }}}
 
-function normalizeUpdate(data: unknown): FileUpdate | undefined { // {{{
+function normalizeUpdate(data: unknown): DResult<FileUpdate> { // {{{
 	if(!isRecord(data)) {
-		throw new Error('"update" must be an object.');
+		return err('"update" must be an object.');
 	}
 
 	const upsert = normalizeUpsert(data, 'update');
 
-	if(!upsert) {
+	if(upsert.fails) {
 		return upsert;
 	}
 
@@ -216,16 +219,16 @@ function normalizeUpdate(data: unknown): FileUpdate | undefined { // {{{
 		update = false;
 	}
 
-	return {
-		...upsert,
+	return ok({
+		...upsert.value,
 		missing,
 		update,
-	};
+	});
 } // }}}
 
-function normalizeUpsert(data: unknown, name: string): FileUpsert | undefined { // {{{
+function normalizeUpsert(data: unknown, name: string): DResult<FileUpsert> { // {{{
 	if(!isRecord(data)) {
-		throw new Error(`"${name}" must be an object.`);
+		return err(`"${name}" must be an object.`);
 	}
 
 	let filter: string[] | undefined;
@@ -254,11 +257,11 @@ function normalizeUpsert(data: unknown, name: string): FileUpsert | undefined { 
 		route = data.route;
 	}
 
-	return {
+	return ok({
 		filter,
 		overwrite,
 		remove,
 		rename,
 		route,
-	};
+	});
 } // }}}

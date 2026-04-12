@@ -1,6 +1,7 @@
 import path from 'path';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, OK } from '@zokugun/xtry';
 import * as editorconfig from 'editorconfig';
-import fse from 'fs-extra';
 import { type Context } from '../types/context.js';
 import { IndentStyle } from '../types/format.js';
 
@@ -24,33 +25,22 @@ function buildFullGlob(glob: string) { // {{{
 	return glob.replaceAll('**', '{*,**/**/**}');
 } // }}}
 
-export async function readEditorConfig({ incomingPath, targetPath, formats }: Context): Promise<void> {
-	let data: string | undefined;
+export async function readEditorConfig({ incomingPath, targetPath, formats }: Context): AsyncDResult {
+	const incomingFile = path.join(incomingPath, 'configs', '.editorconfig');
 
-	try {
-		const dir = path.join(incomingPath, 'configs');
-		const file = path.join(dir, '.editorconfig');
+	let readResult = await fse.readFile(incomingFile, 'utf8');
 
-		data = await fse.readFile(file, 'utf8');
-	}
-	catch {
-	}
+	if(readResult.fails) {
+		const targetFile = path.join(targetPath, '.editorconfig');
 
-	if(!data) {
-		try {
-			const file = path.join(targetPath, '.editorconfig');
-
-			data = await fse.readFile(file, 'utf8');
-		}
-		catch {
-		}
+		readResult = await fse.readFile(targetFile, 'utf8');
 	}
 
-	if(!data) {
-		return;
+	if(readResult.fails) {
+		return OK;
 	}
 
-	const rules = editorconfig.parseString(data);
+	const rules = editorconfig.parseString(readResult.value);
 
 	for(const [glob, rule] of rules) {
 		if(!glob) {
@@ -77,4 +67,6 @@ export async function readEditorConfig({ incomingPath, targetPath, formats }: Co
 	});
 
 	formats.reverse();
+
+	return OK;
 }

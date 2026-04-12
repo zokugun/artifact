@@ -1,4 +1,5 @@
 import { c, logger } from '@zokugun/cli-utils';
+import { ok, OK_UNDEFINED } from '@zokugun/xtry';
 import { type CommonFlow, type Context, type MainFlow } from '../types/context.js';
 import { type Step } from '../types/step.js';
 import { applyFormatting } from './apply-formatting.js';
@@ -74,14 +75,19 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 		let skipped = false;
 
 		for(const step of validations) {
-			if(await step(context)) {
+			const result = await step(context);
+			if(result.fails) {
+				return result;
+			}
+
+			if(result.value) {
 				skipped = true;
 
 				break;
 			}
 		}
 
-		return skipped ? undefined : context;
+		return skipped ? OK_UNDEFINED : ok(context);
 	};
 
 	const commonFlow: CommonFlow = async (name, version, variant, branch, incomingPath, mainContext) => {
@@ -120,14 +126,19 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 		let skipped = false;
 
 		for(const step of processes) {
-			if(await step(context)) {
+			const result = await step(context);
+			if(result.fails) {
+				return result;
+			}
+
+			if(result.value) {
 				skipped = true;
 
 				break;
 			}
 		}
 
-		return skipped ? undefined : context;
+		return skipped ? OK_UNDEFINED : ok(context);
 	};
 
 	return { mainFlow, commonFlow };

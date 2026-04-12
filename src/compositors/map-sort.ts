@@ -2,7 +2,7 @@ import { type Route } from '../types/travel.js';
 
 const { compare } = new Intl.Collator('en');
 
-export function mapSort(route: Route<Record<string, any>>): Route<Record<string, any>> {
+export function mapSort(route: Route<Record<string, unknown>>): Route<Record<string, unknown>> {
 	return (args) => {
 		const result = route(args);
 

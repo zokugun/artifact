@@ -1,18 +1,26 @@
 import path from 'path';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { err, OK, stringifyError } from '@zokugun/xtry';
+import { type AsyncDResult } from '@zokugun/xtry/sync';
 import { isNil, isPlainObject } from 'lodash-es';
 import { type PackageManifest } from '../types/config.js';
 import { type Context } from '../types/context.js';
 
-export async function readIncomingPackage(context: Context): Promise<void> {
+export async function readIncomingPackage(context: Context): AsyncDResult {
 	const filePath = path.resolve(context.incomingPath, './package.json');
 
-	const incomingPackage = await fse.readJSON(filePath) as unknown;
-	if(!isPackageManifest(incomingPackage)) {
-		throw new Error('The package of the incoming artifact can\'t be found.');
+	const result = await fse.readJSON(filePath);
+	if(result.fails) {
+		return err(stringifyError(result.error));
 	}
 
-	context.incomingPackage = incomingPackage;
+	if(!isPackageManifest(result.value)) {
+		return err('The package of the incoming artifact can\'t be found.');
+	}
+
+	context.incomingPackage = result.value;
+
+	return OK;
 }
 
 function isPackageManifest(value: unknown): value is PackageManifest {

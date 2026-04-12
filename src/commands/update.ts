@@ -62,23 +62,26 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 				continue;
 			}
 			else {
-				throw new Error(pkgResult.from);
+				logger.fatal(pkgResult.from);
 			}
 		}
 
 		const request: Request = artifact.requires ? { name, variant: last(artifact.requires) } : { name };
 
 		const flowResult = await mainFlow(targetPath, dir, request, config, options);
+		if(flowResult.fails) {
+			logger.fatal(flowResult.error);
+		}
 
-		if(!flowResult?.result) {
+		if(!flowResult.value?.result) {
 			spinner.succeed();
 
 			continue;
 		}
 
-		updateInstallConfig(config, flowResult.result);
+		updateInstallConfig(config, flowResult.value.result);
 
-		await writeInstallConfig(config, configStats, flowResult.formats, targetPath, options);
+		await writeInstallConfig(config, configStats, flowResult.value.formats, targetPath, options);
 
 		spinner.succeed();
 	}

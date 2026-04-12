@@ -1,12 +1,13 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import globby from 'globby';
 import { getEncoding, isText } from 'istextorbinary';
 import { type Context } from '../types/context.js';
 import { readBuffer } from '../utils/read-buffer.js';
 
-export async function readFiles({ incomingPath, textFiles, binaryFiles, options }: Context): Promise<void> {
+export async function readFiles({ incomingPath, textFiles, binaryFiles, options }: Context): AsyncDResult {
 	const cwd = path.join(incomingPath, 'configs');
 
 	const files = await globby(['**/*', '!**/*.lock', '!**/*-lock.*'], {
@@ -19,12 +20,22 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 		if(isText(file) || getEncoding(await readBuffer(filePath, 24)) === 'utf8') {
-			const data = await fse.readFile(filePath, 'utf8');
+			const result = await fse.readFile(filePath, 'utf8');
+			if(result.fails) {
+				return err(stringifyError(result.error));
+			}
+
+			const data = result.value;
 			const finalNewLine = data.endsWith('\n');
 
 			if(data.startsWith('#!')) {
 				// the text file might be executable
-				const { mode } = await fse.stat(filePath);
+				const result = await fse.stat(filePath);
+				if(result.fails) {
+					return err(stringifyError(result.error));
+				}
+
+				const { mode } = result.value;
 
 				textFiles.push({
 					name: file,
@@ -60,4 +71,6 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 			}
 		}
 	}
+
+	return OK;
 }

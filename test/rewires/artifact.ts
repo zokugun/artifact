@@ -4,6 +4,8 @@ import { fs } from '../mocks/fs.js';
 
 rewiremock('fs').with(fs);
 rewiremock('fs/promises').with(fs.promises);
+rewiremock('node:fs').with(fs);
+rewiremock('node:fs/promises').with(fs.promises);
 rewiremock('npm').with({
 	config: {
 		get: () => null,
@@ -25,6 +27,9 @@ rewiremock('@zokugun/cli-utils').with({
 			fail: () => {},
 			succeed: () => {},
 		}),
+		fatal: (message: string) => {
+			throw new Error(message);
+		},
 		finishTimer: () => {},
 	},
 });

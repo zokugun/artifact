@@ -37,7 +37,12 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 	const { config, configStats } = await readInstallConfig(targetPath);
 
 	for(const spec of specs) {
-		const request = resolveRequest(spec);
+		const requestResult = resolveRequest(spec);
+		if(requestResult.fails) {
+			logger.fatal(requestResult.error);
+		}
+
+		const request = requestResult.value;
 		const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
 		const dir = tempy.directory();
 		const pkgResult = await pacote.extract(request.name, dir);
@@ -53,21 +58,24 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 				continue;
 			}
 			else {
-				throw new Error(pkgResult.from);
+				logger.fatal(pkgResult.from);
 			}
 		}
 
 		const flowResult = await mainFlow(targetPath, dir, request, config, options);
+		if(flowResult.fails) {
+			logger.fatal(flowResult.error);
+		}
 
-		if(!flowResult?.result) {
+		if(!flowResult.value?.result) {
 			spinner.succeed();
 
 			continue;
 		}
 
-		updateUninstallConfig(config, flowResult.result);
+		updateUninstallConfig(config, flowResult.value.result);
 
-		await writeInstallConfig(config, configStats, flowResult.formats, targetPath, options);
+		await writeInstallConfig(config, configStats, flowResult.value.formats, targetPath, options);
 
 		spinner.succeed();
 	}

@@ -1,10 +1,11 @@
+import { type AsyncDResult, OK } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
-export async function configureUninstallFileActions(context: Context): Promise<void> {
+export async function configureUninstallFileActions(context: Context): AsyncDResult {
 	const { uninstall } = context.incomingConfig!;
 
 	if(!uninstall) {
-		return;
+		return OK;
 	}
 
 	for(const [file, fileUpdate] of Object.entries(uninstall)) {
@@ -16,4 +17,6 @@ export async function configureUninstallFileActions(context: Context): Promise<v
 			continue;
 		}
 	}
+
+	return OK;
 }

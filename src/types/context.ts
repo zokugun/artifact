@@ -1,3 +1,4 @@
+import { type AsyncDResult } from '@zokugun/xtry';
 import { type BinaryFile } from './binary-file.js';
 import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest } from './config.js';
 import { type Format } from './format.js';
@@ -39,8 +40,8 @@ export type Context = {
 	textFiles: TextFile[];
 };
 
-export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, options: Options) => Promise<Context | undefined>;
-export type CommonFlow = (name: string, version: string, variant: string | undefined, branch: string | undefined, incomingPath: string, commonContext: Context) => Promise<Context | undefined>;
+export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, options: Options) => AsyncDResult<Context | undefined>;
+export type CommonFlow = (name: string, version: string, variant: string | undefined, branch: string | undefined, incomingPath: string, commonContext: Context) => AsyncDResult<Context | undefined>;
 
 export type Options = {
 	force: boolean;

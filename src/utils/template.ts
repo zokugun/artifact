@@ -1,22 +1,17 @@
 import path from 'path';
+import fse from '@zokugun/fs-extra-plus/sync';
+import { type DResult, err, ok } from '@zokugun/xtry';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import fse from 'fs-extra';
 import { isNil, isPlainObject } from 'lodash-es';
 import * as YAML from '../parsers/yaml.js';
 import { tryJSON } from './try-json.js';
 
 dayjs.extend(utc);
 
+const EXPRESSION_REGEX = /#\[\[(.*?)]]/g;
 const NEXT_PROPERTY_REGEX = /^(\w+?)((?=\.|$).*)$/;
 const PLACEHOLDER_REGEX = /^((?:[^/.]+(?:[^/]+\/)*\/)?\.?[^.]+(?:\.(?:json|ya?ml))?)\.(.*)$/;
-
-class TemplateError extends Error {
-	constructor(message: string) { // {{{
-		super(message);
-		this.name = 'TemplateError';
-	} // }}}
-}
 
 export class TemplateEngine {
 	private readonly basePath: string;
@@ -29,13 +24,28 @@ export class TemplateEngine {
 		this.variables = variables ?? {};
 	} // }}}
 
-	public render(template: string): string { // {{{
-		const pattern = /#\[\[(.*?)]]/g;
+	public render(template: string): DResult<string> { // {{{
+		let content = '';
+		let lastIndex = 0;
+		let match: RegExpExecArray | null;
 
-		return template.replaceAll(pattern, (_, placeholder: string) => this.resolveExpression(placeholder));
+		while((match = EXPRESSION_REGEX.exec(template))) {
+			const result = this.resolveExpression(match[1]);
+			if(result.fails) {
+				return result;
+			}
+
+			content += template.slice(lastIndex, match.index) + result.value;
+
+			lastIndex = EXPRESSION_REGEX.lastIndex;
+		}
+
+		content += template.slice(lastIndex);
+
+		return ok(content);
 	} // }}}
 
-	private getValueByPath(values: Record<string, any>, propertyPath: string): any { // {{{
+	private getValueByPath(values: Record<string, unknown>, propertyPath: string): DResult<unknown> { // {{{
 		let currentPath = propertyPath;
 		let currentValue: unknown = values;
 
@@ -43,75 +53,81 @@ export class TemplateEngine {
 
 		while((match = NEXT_PROPERTY_REGEX.exec(currentPath))) {
 			if(!isPlainObject(currentValue)) {
-				throw new TemplateError(`Property path not found: ${propertyPath}`);
+				return err(`Property path not found: ${propertyPath}`);
 			}
 
 			currentValue = (currentValue as Record<string, unknown>)[match[1]];
 
 			if(isNil(currentValue)) {
-				throw new TemplateError(`Property not found: ${propertyPath}`);
+				return err(`Property not found: ${propertyPath}`);
 			}
 
 			currentPath = match[2];
 
 			if(currentPath.length === 0) {
-				return currentValue;
+				return ok(currentValue);
 			}
 		}
 
 		// eslint-disable-next-line no-new-func
 		const fn = new Function('it', `return it${unescapeCode(currentPath)};`);
 
-		return fn(currentValue);
+		return ok(fn(currentValue));
 	} // }}}
 
-	private parseFile(filename: string): Record<string, any> { // {{{
-		let content: string;
-
-		try {
-			content = fse.readFileSync(filename, 'utf8');
-		}
-		catch {
-			throw new TemplateError(`File not found: ${filename}`);
+	private parseFile(filename: string): DResult<Record<string, any>> { // {{{
+		const result = fse.readFile(filename, 'utf8');
+		if(result.fails) {
+			return err(`TemplateError: File not found: ${filename}`);
 		}
 
+		const content = result.value;
 		const extension = path.extname(filename).toLowerCase();
 
 		try {
 			if(extension === '.json') {
-				return JSON.parse(content) as Record<string, any>;
+				return ok(JSON.parse(content) as Record<string, any>);
 			}
 			else if(extension === '.yaml' || extension === '.yml') {
-				return YAML.parse(content);
+				return ok(YAML.parse(content));
 			}
 			else {
-				return tryJSON(content) ?? YAML.parse(content);
+				return ok(tryJSON(content) ?? YAML.parse(content));
 			}
 		}
 		catch (parseError: unknown) {
-			throw new TemplateError(`Failed to parse ${filename}: ${(parseError as Error).message}`);
+			return err(`Failed to parse ${filename}: ${(parseError as Error).message}`);
 		}
 	} // }}}
 
-	private readConfigFile(filename: string): Record<string, any> { // {{{
+	private readConfigFile(filename: string): DResult<Record<string, any>> { // {{{
 		// Check cache first
 		if(this.fileCache.has(filename)) {
-			return this.fileCache.get(filename)!;
+			return ok(this.fileCache.get(filename)!);
 		}
 
 		const filePath = path.resolve(this.basePath, filename);
-		const content = this.parseFile(filePath);
 
-		this.fileCache.set(filename, content);
+		const result = this.parseFile(filePath);
+		if(result.fails) {
+			return result;
+		}
 
-		return content;
+		this.fileCache.set(filename, result.value);
+
+		return result;
 	} // }}}
 
-	private resolveExpression(expression: string): string { // {{{
-		const [name, propertyPath] = this.splitPlaceholder(expression);
+	private resolveExpression(expression: string): DResult<string> { // {{{
+		const result = this.splitPlaceholder(expression);
+		if(result.fails) {
+			return result;
+		}
+
+		const { name, propertyPath } = result.value;
 
 		if(!name || !propertyPath) {
-			throw new TemplateError(`Invalid expression format: ${expression}. Expected format: #[[filename.property]]`);
+			return err(`Invalid expression format: ${expression}. Expected format: #[[filename.property]]`);
 		}
 
 		if(name === 'date') {
@@ -121,57 +137,67 @@ export class TemplateEngine {
 			return this.resolveVariable(propertyPath);
 		}
 		else {
-			const fileContent = this.readConfigFile(name);
-			const value: unknown = this.getValueByPath(fileContent, propertyPath);
-
-			if(isNil(value)) {
-				throw new TemplateError(expression);
+			const readResult = this.readConfigFile(name);
+			if(readResult.fails) {
+				return readResult;
 			}
 
-			return String(value);
+			const getValueResult = this.getValueByPath(readResult.value, propertyPath);
+			if(getValueResult.fails) {
+				return getValueResult;
+			}
+
+			if(isNil(getValueResult.value)) {
+				return err(expression);
+			}
+
+			return ok(String(getValueResult.value));
 		}
 	} // }}}
 
-	private resolveVariable(name: string): string { // {{{
+	private resolveVariable(name: string): DResult<string> { // {{{
 		if(this.variableCache.has(name)) {
-			return this.variableCache.get(name)!;
+			return ok(this.variableCache.get(name)!);
 		}
 
 		const expression = this.variables[name];
 		if(typeof expression !== 'string' || expression.trim().length === 0) {
-			throw new TemplateError(`Invalid variable: ${name}.`);
+			return err(`Invalid variable: ${name}.`);
 		}
 
-		const content = this.resolveExpression(expression);
+		const result = this.resolveExpression(expression);
+		if(result.fails) {
+			return result;
+		}
 
-		this.variableCache.set(name, content);
+		this.variableCache.set(name, result.value);
 
-		return content;
+		return result;
 	} // }}}
 
-	private splitPlaceholder(placeholder: string): [string, string] { // {{{
+	private splitPlaceholder(placeholder: string): DResult<{ name: string; propertyPath: string }> { // {{{
 		const matches = PLACEHOLDER_REGEX.exec(placeholder);
 		if(!matches) {
-			throw new TemplateError(`Invalid expression format: ${placeholder}. Expected format: #[[filename.property]]`);
+			return err(`Invalid expression format: ${placeholder}. Expected format: #[[filename.property]]`);
 		}
 
-		const [, filename, propertyPath] = matches;
+		const [, name, propertyPath] = matches;
 
-		return [filename, propertyPath];
+		return ok({ name, propertyPath });
 	} // }}}
 
-	private toDate(format: string): string { // {{{
+	private toDate(format: string): DResult<string> { // {{{
 		try {
 			const now = dayjs().utc();
 
 			if(format === 'utc') {
-				return now.format('YYYY-MM-DD HH:mm:ss');
+				return ok(now.format('YYYY-MM-DD HH:mm:ss'));
 			}
 
-			return now.format(format);
+			return ok(now.format(format));
 		}
 		catch {
-			throw new TemplateError(`Invalid date format: ${format}`);
+			return err(`Invalid date format: ${format}`);
 		}
 	} // }}}
 }

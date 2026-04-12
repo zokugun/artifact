@@ -1,13 +1,14 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import globby from 'globby';
 import { isMatch } from 'micromatch';
 import { type Context } from '../types/context.js';
 
-export async function removeFiles({ removedPatterns, targetPath, options }: Context): Promise<void> {
+export async function removeFiles({ removedPatterns, targetPath, options }: Context): AsyncDResult {
 	if(removedPatterns.length === 0) {
-		return;
+		return OK;
 	}
 
 	const cwd = path.join(targetPath);
@@ -22,7 +23,10 @@ export async function removeFiles({ removedPatterns, targetPath, options }: Cont
 			if(!options.dryRun) {
 				const filePath = path.join(cwd, file);
 
-				await fse.unlink(filePath);
+				const result = await fse.unlink(filePath);
+				if(result.fails) {
+					return err(stringifyError(result.error));
+				}
 			}
 
 			if(options.verbose) {
@@ -30,4 +34,6 @@ export async function removeFiles({ removedPatterns, targetPath, options }: Cont
 			}
 		}
 	}
+
+	return OK;
 }

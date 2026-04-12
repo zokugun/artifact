@@ -1,7 +1,8 @@
+import { type DResult, err, ok } from '@zokugun/xtry';
 import untildify from 'untildify';
 import { type Request } from '../types/config.js';
 
-export function resolveRequest(spec: string): Request { // {{{
+export function resolveRequest(spec: string): DResult<Request> { // {{{
 	if(spec.startsWith('~')) {
 		spec = untildify(spec);
 	}
@@ -31,12 +32,12 @@ export function resolveRequest(spec: string): Request { // {{{
 		const [name, variant] = spec.split(':');
 
 		if(variant.length === 0) {
-			throw new Error(`Missing variant in "${spec}"`);
+			return err(`Missing variant in "${spec}"`);
 		}
 
-		return { name, variant };
+		return ok({ name, variant });
 	}
 	else {
-		return { name: spec };
+		return ok({ name: spec });
 	}
 } // }}}

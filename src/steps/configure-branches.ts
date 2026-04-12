@@ -1,13 +1,14 @@
 import path from 'node:path';
 import { logger } from '@zokugun/cli-utils';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, OK } from '@zokugun/xtry';
 import globby from 'globby';
 import { type Block, type Context } from '../types/context.js';
 
-export async function configureBranches(context: Context): Promise<void> {
+export async function configureBranches(context: Context): AsyncDResult {
 	const cwd = path.join(context.incomingPath, 'branches');
 
-	if(await fse.pathExists(cwd)) {
+	if(await fse.isExisting(cwd)) {
 		const directories = await globby('*', {
 			cwd,
 			onlyDirectories: true,
@@ -68,4 +69,6 @@ export async function configureBranches(context: Context): Promise<void> {
 
 		context.blocks.unshift(...bucket);
 	}
+
+	return OK;
 }

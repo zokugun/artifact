@@ -1,6 +1,7 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
-import fse from 'fs-extra';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { isEmpty, isPlainObject } from 'lodash-es';
 import yaml from 'yaml';
 import { applyFormatting } from '../../steps/apply-formatting.js';
@@ -9,7 +10,7 @@ import { type Artifact, type FileUpdate, type InstallConfig, type InstallConfigS
 import { type Options } from '../../types/context.js';
 import { type Format } from '../../types/format.js';
 
-export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): Promise<void> {
+export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): AsyncDResult {
 	const exported: {
 		artifacts: Record<string, Artifact>;
 		update?: boolean | Record<string, FileUpdate>;
@@ -33,10 +34,15 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 	if(!options.dryRun) {
 		const filePath = path.join(targetPath, name);
 
-		await fse.outputFile(filePath, file.data, 'utf8');
+		const result = await fse.outputFile(filePath, file.data, 'utf8');
+		if(result.fails) {
+			return err(stringifyError(result.error));
+		}
 	}
 
 	if(options.verbose) {
 		logger.debug(`${name} has been written`);
 	}
+
+	return OK;
 }

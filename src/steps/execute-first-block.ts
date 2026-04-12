@@ -1,9 +1,10 @@
 import path from 'node:path';
+import { type AsyncDResult, err, OK } from '@zokugun/xtry';
 import { isNil } from 'lodash-es';
 import { readPackageConfig } from '../configs/index.js';
 import { type Context } from '../types/context.js';
 
-export async function executeFirstBlock(context: Context): Promise<boolean | void> {
+export async function executeFirstBlock(context: Context): AsyncDResult<boolean | void> {
 	const { name, version } = context.incomingPackage!;
 	const root = String(context.incomingConfig!.variants?.root ?? '');
 
@@ -21,7 +22,12 @@ export async function executeFirstBlock(context: Context): Promise<boolean | voi
 		}
 
 		const variantPath = path.join(context.packagePath, 'variants', variant);
-		const variantConfig = await readPackageConfig(variantPath);
+		const configResult = await readPackageConfig(variantPath);
+		if(configResult.fails) {
+			return configResult;
+		}
+
+		const variantConfig = configResult.value;
 
 		if(variantConfig.orphan) {
 			pushToResult(name, version, variant, alias, context);
@@ -48,7 +54,7 @@ export async function executeFirstBlock(context: Context): Promise<boolean | voi
 		}
 		else {
 			if(root.length === 0) {
-				throw new Error('No root variant has been defined');
+				return err('No root variant has been defined');
 			}
 
 			if(root === variant) {
@@ -96,6 +102,8 @@ export async function executeFirstBlock(context: Context): Promise<boolean | voi
 
 		await context.commonFlow(name, version, undefined, undefined, context.incomingPath, context);
 	}
+
+	return OK;
 }
 
 function pushToResult(name: string, version: string, variant: string, alias: boolean, context: Context): void {
