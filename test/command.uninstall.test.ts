@@ -79,4 +79,34 @@ describe('command.uninstall', () => {
 		await expect(vol.promises.readFile('/target/src/index.ts', 'utf8')).to.be.rejectedWith('ENOENT: no such file or directory, open \'/target/src/index.ts\'');
 		expect(vol.readFileSync('/target/src/index2.ts', 'utf8')).to.eql(commandFxt.removeIndex.targetSrc);
 	}); // }}}
+
+	it('unmerge.json.package', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.unmergeJsonPackage.targetArtifactrc,
+			'/target/package.json': commandFxt.unmergeJsonPackage.targetPackage,
+			'/incoming/.artifactrc': commandFxt.unmergeJsonPackage.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/package.json': commandFxt.unmergeJsonPackage.incomingPackage,
+		}, '/');
+
+		await remove(['awesome-config']);
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.unmergeJsonPackage.mergedArtifactrc);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(commandFxt.unmergeJsonPackage.mergedPackage);
+	}); // }}}
+
+	it('unmerge.json.overrides', async () => { // {{{
+		vol.fromJSON({
+			'/target/.artifactrc': commandFxt.unmergeJsonOverrides.targetArtifactrc,
+			'/target/package.json': commandFxt.unmergeJsonOverrides.targetPackage,
+			'/incoming/.artifactrc': commandFxt.unmergeJsonOverrides.incomingArtifactrc,
+			'/incoming/package.json': packageFxt.default.config,
+			'/incoming/configs/package.json': commandFxt.unmergeJsonOverrides.incomingPackage,
+		}, '/');
+
+		await remove(['awesome-config']);
+
+		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.unmergeJsonOverrides.mergedArtifactrc);
+		expect(vol.readFileSync('/target/package.json', 'utf8')).to.eql(commandFxt.unmergeJsonOverrides.mergedPackage);
+	}); // }}}
 });

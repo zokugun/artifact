@@ -48,6 +48,7 @@ export type FileInstall = FileUpsert & {
 
 export type FileUninstall = {
 	remove: boolean;
+	unmerge: boolean;
 };
 
 export type FileUpdate = FileUpsert & {

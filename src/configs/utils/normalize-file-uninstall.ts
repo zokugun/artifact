@@ -8,12 +8,18 @@ export function normalizeFileUninstall(data: unknown): DResult<FileUninstall> { 
 	}
 
 	let remove: boolean = false;
+	let unmerge: boolean = false;
 
 	if(data.remove === true) {
 		remove = true;
 	}
 
+	if(data.unmerge === true) {
+		unmerge = true;
+	}
+
 	return ok({
 		remove,
+		unmerge,
 	});
 } // }}}

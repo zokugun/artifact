@@ -1,0 +1,10 @@
+{
+	"scripts": {
+		"bundle": "ncc build out/extension --out lib",
+		"vscode:prepublish": "npm run compile && npm run bundle",
+		"watch": "tsc-watch -p src --onSuccess 'npm run bundle'"
+	},
+	"devDependencies": {
+		"@vercel/ncc": "^0.29.0"
+	}
+}

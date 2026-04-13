@@ -19,6 +19,7 @@ import { readIncomingPackage } from './read-incoming-package.js';
 import { removeFiles } from './remove-files.js';
 import { renameFiles } from './rename-files.js';
 import { replaceTemplates } from './replace-templates.js';
+import { unmergeTextFiles } from './unmerge-text-files.js';
 import { validateNewerPackage } from './validate-newer-package.js';
 import { validateNotPresentPackage } from './validate-not-present-package.js';
 import { validatePresentPackage } from './validate-present-package.js';
@@ -42,6 +43,7 @@ export const steps = {
 	removeFiles,
 	renameFiles,
 	replaceTemplates,
+	unmergeTextFiles,
 	validateNewerPackage,
 	validateNotPresentPackage,
 	validatePresentPackage,

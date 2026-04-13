@@ -1,4 +1,6 @@
-import { type AsyncDResult, OK } from '@zokugun/xtry';
+import path from 'node:path';
+import fse from '@zokugun/fs-extra-plus/async';
+import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
 export async function configureUninstallFileActions(context: Context): AsyncDResult {
@@ -8,13 +10,30 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 		return OK;
 	}
 
+	const cwd = path.join(context.incomingPath, 'configs');
+
 	for(const [file, fileUpdate] of Object.entries(uninstall)) {
-		const { remove } = fileUpdate;
+		const { remove, unmerge } = fileUpdate;
 
 		if(remove) {
 			context.removedPatterns.push(file);
+		}
+		else if(unmerge) {
+			const filePath = path.join(cwd, file);
 
-			continue;
+			const result = await fse.readFile(filePath, 'utf8');
+			if(result.fails) {
+				return err(stringifyError(result.error));
+			}
+
+			const data = result.value;
+			const finalNewLine = data.endsWith('\n');
+
+			context.textFiles.push({
+				name: file,
+				data,
+				finalNewLine,
+			});
 		}
 	}
 
