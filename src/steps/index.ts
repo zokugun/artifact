@@ -104,7 +104,7 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 				message += ` branch=${branch}`;
 			}
 
-			logger.info(c.bgBlue(`\n=== ${message} ===\n`));
+			logger.print(c.bgBlue(`\n=== ${message} ===\n`));
 		}
 
 		const context: Context = {
