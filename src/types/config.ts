@@ -35,21 +35,22 @@ export type InstallConfig = {
 	variables: Record<string, string>;
 };
 
-export type FileUpsert = {
+export type FileAlways = {
+	remove: boolean;
+	transforms: FileTransform[];
+};
+
+export type FileUpsert = FileAlways & {
 	filter?: string[];
 	overwrite: boolean;
-	remove: boolean;
 	rename?: string;
 	route?: Record<string, any>;
-	transforms: FileTransform[];
 };
 
 export type FileInstall = FileUpsert & {
 };
 
-export type FileUninstall = {
-	remove: boolean;
-	transforms: FileTransform[];
+export type FileUninstall = FileAlways & {
 	unmerge: boolean;
 };
 

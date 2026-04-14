@@ -4,6 +4,7 @@ import { isNumber, isRecord, isString } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type FileUninstall, type FileInstall, type FileUpdate, type PackageConfig } from '../../types/config.js';
+import { normalizeFileAlways } from '../utils/normalize-file-always.js';
 import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
 import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
@@ -109,6 +110,32 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 	if(isRecord<string | number>(data.variants, (_key, value) => isString(value) || isNumber(value))) {
 		variants = Object.fromEntries(Object.entries(data.variants).map(([key, value]) => [key, isNumber(value) ? String(value) : value]));
+	}
+
+	if(isRecord(data.always)) {
+		for(const [key, value] of Object.entries(data.always)) {
+			const normalized = normalizeFileAlways(value);
+			if(normalized.fails) {
+				return normalized;
+			}
+
+			install[key] = {
+				...normalized.value,
+				overwrite: false,
+			};
+
+			uninstall[key] = {
+				...normalized.value,
+				unmerge: false,
+			};
+
+			update[key] = {
+				...normalized.value,
+				overwrite: false,
+				missing: true,
+				update: true,
+			};
+		}
 	}
 
 	if(isRecord(data.upsert)) {
