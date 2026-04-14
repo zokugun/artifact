@@ -12,9 +12,11 @@ import { type Format } from '../../types/format.js';
 
 export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): AsyncDResult {
 	const exported: {
+		$schema: string;
 		artifacts: Record<string, Artifact>;
 		update?: boolean | Record<string, FileUpdate>;
 	} = {
+		$schema: 'https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v0/install.json',
 		artifacts: config.artifacts,
 	};
 

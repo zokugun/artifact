@@ -6,7 +6,7 @@ import yaml from 'yaml';
 import { type Artifact, type FileInstall, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
 import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
 
-const places = [
+const PLACES = [
 	{
 		name: '.artifactrc.yml',
 		type: 'yaml',
@@ -24,12 +24,14 @@ const places = [
 	},
 ];
 
+const VERSION_REGEX = /https:\/\/raw.githubusercontent.com\/zokugun\/artifact\/v([\d.]+)\/schemas\/v(\d+)\/install.json/;
+
 export async function readInstallConfig(targetPath: string): AsyncDResult<{ config: InstallConfig; configStats: InstallConfigStats }> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
 
-	for(const place of places) {
+	for(const place of PLACES) {
 		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 		if(!result.fails) {
 			content = result.value;
@@ -102,6 +104,18 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 
 	if(!isRecord(data)) {
 		return err(`Config file ${configStats.name} must export an object.`);
+	}
+
+	if(isString(data.$schema)) {
+		const match = VERSION_REGEX.exec(data.$schema);
+		if(!match) {
+			return err(`Config file ${configStats.name} must have a valid "$schema".`);
+		}
+
+		const version = Number.parseInt(match[2], 10);
+		if(version > 0) {
+			return err(`Config file ${configStats.name} is using a newer and unsupported version.`);
+		}
 	}
 
 	if(isArray(data.artifacts)) {

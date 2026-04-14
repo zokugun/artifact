@@ -1,0 +1,107 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v0/common.json",
+	"$defs": {
+		"always": {
+			"type": "object",
+			"properties": {
+				"remove": {
+					"type": "boolean"
+				},
+				"transforms": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/transform"
+					}
+				}
+			},
+			"additionalProperties": false
+		},
+		"install": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/upsert"
+				}
+			]
+		},
+		"transform": {
+			"type": "object",
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"jq": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"jq"
+			],
+			"additionalProperties": false
+		},
+		"uninstall": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/always"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"unmerge": {
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"update": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/upsert"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"missing": {
+							"type": "boolean"
+						},
+						"update": {
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"upsert": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/always"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"filter": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"overwrite": {
+							"type": "boolean"
+						},
+						"rename": {
+							"type": "string"
+						},
+						"route": {
+							"type": "object",
+							"additionalProperties": true
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		}
+	}
+}

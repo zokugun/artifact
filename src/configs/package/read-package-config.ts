@@ -9,7 +9,7 @@ import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
 import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 
-const places = [
+const PLACES = [
 	{
 		name: '.artifactrc.yml',
 		type: 'yaml',
@@ -27,12 +27,14 @@ const places = [
 	},
 ];
 
+const VERSION_REGEX = /https:\/\/raw.githubusercontent.com\/zokugun\/artifact\/v([\d.]+)\/schemas\/v(\d+)\/package.json/;
+
 export async function readPackageConfig(targetPath: string): AsyncDResult<PackageConfig> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
 
-	for(const place of places) {
+	for(const place of PLACES) {
 		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 
 		if(!result.fails) {
@@ -87,6 +89,18 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 	if(!isRecord(data)) {
 		return err(`Config file ${source} must export an object.`);
+	}
+
+	if(isString(data.$schema)) {
+		const match = VERSION_REGEX.exec(data.$schema);
+		if(!match) {
+			return err(`Config file ${source} must have a valid "$schema".`);
+		}
+
+		const version = Number.parseInt(match[2], 10);
+		if(version > 0) {
+			return err(`Config file ${source} is using a newer and unsupported version.`);
+		}
 	}
 
 	if(isRecord<string>(data.constants, (_key, value) => isString(value))) {
