@@ -56,7 +56,7 @@ export type FileUninstall = FileAlways & {
 
 export type FileUpdate = FileUpsert & {
 	missing: boolean;
-	update: boolean;
+	update?: boolean;
 };
 
 export type FileTransform = {

@@ -1,4 +1,4 @@
-import { isRecord } from '@zokugun/is-it-type';
+import { isBoolean, isRecord } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import { type FileUpdate } from '../../types/config.js';
 import { normalizeFileUpsert } from './normalize-file-upsert.js';
@@ -15,14 +15,14 @@ export function normalizeFileUpdate(data: unknown): DResult<FileUpdate> { // {{{
 	}
 
 	let missing: boolean = true;
-	let update: boolean = true;
+	let update: boolean | undefined;
 
 	if(data.missing === false) {
 		missing = false;
 	}
 
-	if(data.update === false) {
-		update = false;
+	if(isBoolean(data.update)) {
+		update = data.update;
 	}
 
 	return ok({
@@ -31,4 +31,3 @@ export function normalizeFileUpdate(data: unknown): DResult<FileUpdate> { // {{{
 		update,
 	});
 } // }}}
-

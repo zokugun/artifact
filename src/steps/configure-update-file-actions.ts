@@ -14,7 +14,8 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		context.onMissing = () => 'skip';
 	}
 	else {
-		const existingActions: Record<Exclude<ExistingAction, 'merge'>, string[]> = {
+		const existingActions: Record<ExistingAction, string[]> = {
+			merge: [],
 			overwrite: [],
 			skip: [],
 		};
@@ -30,7 +31,10 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 				skipMissings.push(file);
 			}
 
-			if(!update) {
+			if(update) {
+				existingActions.merge.push(file);
+			}
+			else if(update === false) {
 				existingActions.skip.push(file);
 			}
 			else if(overwrite) {

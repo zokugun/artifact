@@ -158,31 +158,31 @@ describe('command.update', () => {
 		vol.fromJSON({
 			'/target/.artifactrc': commandFxt.newerYes.target,
 			'/target/package.json': packageFxt.default.project,
-			'/incoming/.artifactrc': commandFxt.update.incomingArtifactrc,
+			'/incoming/.artifactrc': commandFxt.updateNo.incomingArtifactrc,
 			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
-			'/incoming/configs/src/index.ts': commandFxt.update.incomingSrc,
+			'/incoming/configs/src/index.ts': commandFxt.updateNo.incomingSrc,
 		}, '/');
 
 		await update();
 
 		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.update.incomingSrc);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.updateNo.incomingSrc);
 	}); // }}}
 
 	it('update.yes', async () => { // {{{
 		vol.fromJSON({
 			'/target/.artifactrc': commandFxt.newerYes.target,
 			'/target/package.json': packageFxt.default.project,
-			'/target/src/index.ts': commandFxt.update.targetSrc,
-			'/incoming/.artifactrc': commandFxt.update.incomingArtifactrc,
+			'/target/src/index.ts': commandFxt.updateYes.targetSrc,
+			'/incoming/.artifactrc': commandFxt.updateYes.incomingArtifactrc,
 			'/incoming/package.json': commandFxt.newerYes.incomingPackage,
-			'/incoming/configs/src/index.ts': commandFxt.update.incomingSrc,
+			'/incoming/configs/src/index.ts': commandFxt.updateYes.incomingSrc,
 		}, '/');
 
 		await update();
 
 		expect(vol.readFileSync('/target/.artifactrc', 'utf8')).to.eql(commandFxt.newerYes.merged);
-		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.update.targetSrc);
+		expect(vol.readFileSync('/target/src/index.ts', 'utf8')).to.eql(commandFxt.updateYes.incomingSrc);
 	}); // }}}
 
 	it('overwrite.no', async () => { // {{{
