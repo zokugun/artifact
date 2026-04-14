@@ -1,4 +1,4 @@
-export function overwrite({ current, incoming }: { current: unknown | undefined; incoming: unknown | undefined }): unknown {
+export async function overwrite({ current, incoming }: { current: unknown | undefined; incoming: unknown | undefined }): Promise<unknown> {
 	if(incoming === undefined) {
 		return current ?? [];
 	}

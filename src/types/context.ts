@@ -1,6 +1,6 @@
 import { type AsyncDResult } from '@zokugun/xtry';
 import { type BinaryFile } from './binary-file.js';
-import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest } from './config.js';
+import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform } from './config.js';
 import { type Format } from './format.js';
 import { type TextFile } from './text-file.js';
 import { type Journey } from './travel.js';
@@ -38,6 +38,8 @@ export type Context = {
 	routes: (file: string) => Journey | undefined;
 	targetPath: string;
 	textFiles: TextFile[];
+	transformedFiles: TextFile[];
+	transforms: (file: string) => FileTransform[] | undefined;
 };
 
 export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, options: Options) => AsyncDResult<Context | undefined>;

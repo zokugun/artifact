@@ -41,6 +41,7 @@ export type FileUpsert = {
 	remove: boolean;
 	rename?: string;
 	route?: Record<string, any>;
+	transforms: FileTransform[];
 };
 
 export type FileInstall = FileUpsert & {
@@ -48,12 +49,18 @@ export type FileInstall = FileUpsert & {
 
 export type FileUninstall = {
 	remove: boolean;
+	transforms: FileTransform[];
 	unmerge: boolean;
 };
 
 export type FileUpdate = FileUpsert & {
 	missing: boolean;
 	update: boolean;
+};
+
+export type FileTransform = {
+	description?: string;
+	jq: string;
 };
 
 export type InstallConfigStats = {

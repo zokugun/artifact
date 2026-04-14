@@ -1,0 +1,14 @@
+uninstall:
+  .czrc:
+    remove: true
+  package.json:
+    transforms:
+      - description: Remove scripts.commit only when it clearly invokes Commitizen
+        jq: |
+          if ((.scripts.commit? // "") | test("cz")) then
+            del(.scripts.commit)
+          else
+            .
+          end
+      - description: Remove commitizen from devDependencies
+        jq: 'del(.devDependencies.commitizen)'

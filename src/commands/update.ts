@@ -23,6 +23,7 @@ const { mainFlow } = composeSteps(
 		steps.readEditorConfig,
 		steps.replaceTemplates,
 		steps.mergeTextFiles,
+		steps.transformUntouchedFiles,
 		steps.insertFinalNewLine,
 		steps.applyFormatting,
 		steps.copyBinaryFiles,

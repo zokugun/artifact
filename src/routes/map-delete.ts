@@ -1,6 +1,6 @@
 import { isArray, isEmptyRecord, isRecord } from '@zokugun/is-it-type';
 
-export function mapDelete({ current, incoming }: { current: Record<string, unknown> | undefined; incoming: Record<string, unknown> | undefined }): Record<string, unknown> {
+export async function mapDelete({ current, incoming }: { current: Record<string, unknown> | undefined; incoming: Record<string, unknown> | undefined }): Promise<Record<string, unknown>> {
 	if(!incoming) {
 		return current ?? {};
 	}
@@ -14,7 +14,7 @@ export function mapDelete({ current, incoming }: { current: Record<string, unkno
 			return current;
 		}
 		else if(isRecord(value) && isRecord(current[key])) {
-			const newValue = mapDelete({ current: current[key], incoming: value });
+			const newValue = await mapDelete({ current: current[key], incoming: value });
 
 			if(isEmptyRecord(newValue)) {
 				delete current[key];

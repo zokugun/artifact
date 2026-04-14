@@ -1,4 +1,4 @@
-import { isPlainObject } from 'lodash-es';
+import { isArray, isRecord } from '@zokugun/is-it-type';
 import { compose, fork, json, mapSort } from '../../compositors/index.js';
 import { command, listConcat, mapConcat, primitive } from '../../routes/index.js';
 import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
@@ -9,20 +9,20 @@ const mainRoute = compose({
 	keywords: listConcat,
 	homepage: primitive,
 	bugs: fork(
-		[isPlainObject, mapConcat],
+		[isRecord, mapConcat],
 		primitive,
 	),
 	license: fork(
-		[isPlainObject, mapConcat],
+		[isRecord, mapConcat],
 		primitive,
 	),
 	licenses: listConcat,
 	author: fork(
-		[isPlainObject, mapConcat],
+		[isRecord, mapConcat],
 		primitive,
 	),
 	repository: fork(
-		[isPlainObject, mapConcat],
+		[isRecord, mapConcat],
 		primitive,
 	),
 	scripts: mapSort(compose({
@@ -51,8 +51,8 @@ const mainRoute = compose({
 		'preferGlobal',
 	],
 	$$default: fork(
-		[Array.isArray, listConcat],
-		[isPlainObject, mapConcat],
+		[isArray, listConcat],
+		[isRecord, mapConcat],
 		primitive,
 	),
 });

@@ -1,4 +1,4 @@
-export function primitive({ current, incoming }: { current: unknown | undefined; incoming: unknown | undefined }): unknown {
+export async function primitive({ current, incoming }: { current: unknown | undefined; incoming: unknown | undefined }): Promise<unknown> {
 	if(incoming === undefined) {
 		return current ?? [];
 	}

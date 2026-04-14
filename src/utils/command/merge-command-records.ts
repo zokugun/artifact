@@ -2,7 +2,7 @@ import { isEqual } from 'lodash-es';
 import { listConcat } from '../../routes/list-concat.js';
 import { type Command } from '../../types/command.js';
 
-export function mergeCommandRecords(currentCommand: Record<string, Command[]>, incomingCommand: Record<string, Command[]>, currentString: string): Record<string, Command[]> {
+export async function mergeCommandRecords(currentCommand: Record<string, Command[]>, incomingCommand: Record<string, Command[]>, currentString: string): Promise<Record<string, Command[]>> {
 	const result: Record<string, Command[]> = {};
 
 	// Start with current commands to preserve ordering
@@ -35,8 +35,8 @@ export function mergeCommandRecords(currentCommand: Record<string, Command[]>, i
 					if(shouldMerge) {
 						// replace with merged instance
 						result[name][index] = {
-							args: listConcat({ current: currentInstance.args, incoming: instance.args }) as string[],
-							env: listConcat({ current: currentInstance.env, incoming: instance.env }) as string[],
+							args: await listConcat({ current: currentInstance.args, incoming: instance.args }) as string[],
+							env: await listConcat({ current: currentInstance.env, incoming: instance.env }) as string[],
 							separator: instance.separator ?? currentInstance.separator,
 						};
 					}

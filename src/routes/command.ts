@@ -1,6 +1,6 @@
 import { splitCommand, joinCommand, mergeWithSemicolonMix, mergeAndChains, mergeOrSegments, mergeSemicolonSegments, mergeCommandRecords } from '../utils/command/index.js';
 
-export function command({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {
+export async function command({ current, incoming }: { current: string | undefined; incoming: string | undefined }): Promise<string> {
 	if(!incoming) {
 		return current ?? '';
 	}
@@ -43,7 +43,7 @@ export function command({ current, incoming }: { current: string | undefined; in
 	const currentCommand = splitCommand(current);
 	const incomingCommand = splitCommand(incoming);
 
-	const merged = mergeCommandRecords(currentCommand, incomingCommand, current);
+	const merged = await mergeCommandRecords(currentCommand, incomingCommand, current);
 
 	return joinCommand(merged);
 }

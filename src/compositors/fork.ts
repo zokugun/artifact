@@ -3,7 +3,7 @@ import { type Route } from '../types/travel.js';
 export type ForkParameter = [(value: any) => boolean, Route<any>] | Route<any>;
 
 export function fork<T>(...cases: ForkParameter[]): Route<T> {
-	return ({ current, incoming }) => {
+	return async ({ current, incoming }) => {
 		const targetCase = cases.find((c) => {
 			if(Array.isArray(c)) {
 				return c[0](current ?? incoming);

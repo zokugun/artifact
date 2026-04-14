@@ -1,6 +1,7 @@
 import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import { isMatch } from 'micromatch';
+import { type FileTransform } from '../types/config.js';
 import { type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
 import { buildTravel } from '../utils/build-travel.js';
@@ -15,9 +16,10 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 	const overwrites: string[] = [];
 	const filters: Record<string, string[]> = {};
 	const routes: Record<string, Journey> = {};
+	const transformations: Record<string, FileTransform[]> = {};
 
 	for(const [file, fileUpdate] of Object.entries(install)) {
-		const { filter, overwrite, remove, rename, route } = fileUpdate;
+		const { filter, overwrite, remove, rename, route, transforms } = fileUpdate;
 
 		if(overwrite) {
 			overwrites.push(file);
@@ -60,6 +62,10 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 				};
 			}
 		}
+
+		if(transforms) {
+			transformations[file] = transforms;
+		}
 	}
 
 	if(overwrites.length > 0) {
@@ -83,6 +89,18 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 			for(const [pattern, route] of Object.entries(routes)) {
 				if(isMatch(file, pattern)) {
 					return route;
+				}
+			}
+
+			return undefined;
+		};
+	}
+
+	if(isNonEmptyRecord(transformations)) {
+		context.transforms = (file) => {
+			for(const [pattern, transforms] of Object.entries(transformations)) {
+				if(isMatch(file, pattern)) {
+					return transforms;
 				}
 			}
 

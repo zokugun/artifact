@@ -1,4 +1,4 @@
-export function mapConcat({ current, incoming }: { current: Record<string, any> | undefined; incoming: Record<string, any> | undefined }): Record<string, any> {
+export async function mapConcat({ current, incoming }: { current: Record<string, any> | undefined; incoming: Record<string, any> | undefined }): Promise<Record<string, any>> {
 	if(!incoming) {
 		return current ?? {};
 	}

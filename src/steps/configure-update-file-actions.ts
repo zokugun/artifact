@@ -1,6 +1,7 @@
 import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import { isMatch } from 'micromatch';
+import { type FileTransform } from '../types/config.js';
 import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
 import { buildTravel } from '../utils/build-travel.js';
@@ -20,9 +21,10 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		const skipMissings: string[] = [];
 		const filters: Record<string, string[]> = {};
 		const routes: Record<string, Journey> = {};
+		const transformations: Record<string, FileTransform[]> = {};
 
 		for(const [file, fileUpdate] of Object.entries(update)) {
-			const { filter, missing, overwrite, remove, rename, route, update } = fileUpdate;
+			const { filter, missing, overwrite, remove, rename, route, transforms, update } = fileUpdate;
 
 			if(!missing) {
 				skipMissings.push(file);
@@ -72,6 +74,10 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 					};
 				}
 			}
+
+			if(transforms) {
+				transformations[file] = transforms;
+			}
 		}
 
 		if(skipMissings.length > 0) {
@@ -107,6 +113,18 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 				for(const [pattern, route] of Object.entries(routes)) {
 					if(isMatch(file, pattern)) {
 						return route;
+					}
+				}
+
+				return undefined;
+			};
+		}
+
+		if(isNonEmptyRecord(transformations)) {
+			context.transforms = (file) => {
+				for(const [pattern, transforms] of Object.entries(transformations)) {
+					if(isMatch(file, pattern)) {
+						return transforms;
 					}
 				}
 

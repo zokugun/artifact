@@ -1,4 +1,4 @@
-export function listSortConcat({ current, incoming }: { current: unknown[] | undefined; incoming: unknown[] | undefined }): any[] {
+export async function listSortConcat({ current, incoming }: { current: unknown[] | undefined; incoming: unknown[] | undefined }): Promise<any[]> {
 	if(!incoming) {
 		return current ?? [];
 	}

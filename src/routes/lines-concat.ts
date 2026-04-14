@@ -2,7 +2,7 @@ import { toLines } from '../utils/to-lines.js';
 import { trimFinalNewLine } from '../utils/trim-final-newline.js';
 import { listConcat } from './list-concat.js';
 
-export function linesConcat({ current, incoming }: { current: string | undefined; incoming: string | undefined }): string {
+export async function linesConcat({ current, incoming }: { current: string | undefined; incoming: string | undefined }): Promise<string> {
 	if(!incoming) {
 		return current ?? '';
 	}
@@ -14,7 +14,7 @@ export function linesConcat({ current, incoming }: { current: string | undefined
 	const currentLines = toLines(trimFinalNewLine(current));
 	const incomingLines = toLines(trimFinalNewLine(incoming));
 
-	const result = listConcat({
+	const result = await listConcat({
 		current: currentLines,
 		incoming: incomingLines,
 	});

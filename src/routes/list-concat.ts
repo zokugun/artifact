@@ -1,6 +1,6 @@
 import { isEqual, uniqWith } from 'lodash-es';
 
-export function listConcat({ current, incoming }: { current: unknown[] | undefined; incoming: unknown[] | undefined }): any[] {
+export async function listConcat({ current, incoming }: { current: unknown[] | undefined; incoming: unknown[] | undefined }): Promise<any[]> {
 	if(!incoming) {
 		return current ?? [];
 	}

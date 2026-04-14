@@ -1,6 +1,7 @@
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import { type FileUpsert } from '../../types/config.js';
+import { type FileTransform, type FileUpsert } from '../../types/config.js';
+import { isTransform } from './is-transform.js';
 
 export function normalizeFileUpsert(data: unknown, name: string): DResult<FileUpsert> { // {{{
 	if(!isRecord(data)) {
@@ -12,6 +13,7 @@ export function normalizeFileUpsert(data: unknown, name: string): DResult<FileUp
 	let remove: boolean = false;
 	let rename: string | undefined;
 	let route: Record<string, any> | undefined;
+	let transforms: FileTransform[] = [];
 
 	if(isArray<string>(data.filter, isString)) {
 		filter = data.filter;
@@ -33,11 +35,16 @@ export function normalizeFileUpsert(data: unknown, name: string): DResult<FileUp
 		route = data.route;
 	}
 
+	if(isArray<FileTransform>(data.transforms, isTransform)) {
+		transforms = data.transforms;
+	}
+
 	return ok({
 		filter,
 		overwrite,
 		remove,
 		rename,
 		route,
+		transforms,
 	});
 } // }}}

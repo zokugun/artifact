@@ -4,7 +4,7 @@ import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
-export async function writeTextFiles({ mergedTextFiles, targetPath, options }: Context): AsyncDResult {
+export async function writeTextFiles({ mergedTextFiles, options, targetPath, transformedFiles }: Context): AsyncDResult {
 	if(options.dryRun) {
 		if(options.verbose) {
 			for(const file of mergedTextFiles) {
@@ -13,7 +13,7 @@ export async function writeTextFiles({ mergedTextFiles, targetPath, options }: C
 		}
 	}
 	else {
-		for(const file of mergedTextFiles) {
+		for(const file of [...mergedTextFiles, ...transformedFiles]) {
 			const filePath = path.join(targetPath, file.name);
 
 			const result = await fse.outputFile(filePath, file.data, 'utf8');

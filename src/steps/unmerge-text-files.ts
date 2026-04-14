@@ -13,9 +13,9 @@ import { buildTravelPlan } from '../utils/build-travel-plan.js';
 
 const mainRoute = compose({
 	$$default: fork(
-		[isArray, ({ current }: { current: unknown[] }) => current],
+		[isArray, async ({ current }: { current: unknown[] }) => current],
 		[isRecord, mapDelete],
-		({ current }: { current: Primitive }) => current,
+		async ({ current }: { current: Primitive }) => current,
 	),
 });
 
@@ -51,7 +51,7 @@ export async function unmergeTextFiles({ targetPath, textFiles, mergedTextFiles,
 				logger.debug(`${file.name}, an unmerger has been found`);
 			}
 
-			const data = travel({
+			const data = await travel({
 				current: current.value,
 				incoming: file.data,
 			});

@@ -5,7 +5,7 @@ import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { getJourney } from '../journeys/index.js';
 import { type Context } from '../types/context.js';
 
-export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, options }: Context): AsyncDResult {
+export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, transforms, options }: Context): AsyncDResult {
 	for(const file of textFiles) {
 		if(options.verbose) {
 			logger.debug(`${file.name} is going to be merged`);
@@ -71,10 +71,11 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 						return err(stringifyError(current.error));
 					}
 
-					const data = journey.travel({
+					const data = await journey.travel({
 						current: current.value,
 						incoming: file.data,
 						filters: filters(file.name),
+						transforms: transforms(file.name),
 					});
 
 					mergedTextFiles.push({

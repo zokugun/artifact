@@ -1,7 +1,7 @@
 import { has, isNil, without } from 'lodash-es';
 import { type Route } from '../types/travel.js';
 
-function apply(map: ComposeMap, keys: string[], current: Record<string, any>, incoming: Record<string, any>, result: Record<string, any>): void {
+async function apply(map: ComposeMap, keys: string[], current: Record<string, any>, incoming: Record<string, any>, result: Record<string, any>): Promise<void> {
 	if(keys.length === 0) {
 		return;
 	}
@@ -22,7 +22,7 @@ function apply(map: ComposeMap, keys: string[], current: Record<string, any>, in
 
 		const incomingValue = incoming[key] as unknown;
 
-		result[key] = (transform as Route<unknown>)({
+		result[key] = await (transform as Route<unknown>)({
 			current: currentValue,
 			incoming: incomingValue,
 			ignores: map.$$ignore,
@@ -37,7 +37,7 @@ type ComposeMap = {
 };
 
 export function compose(map: ComposeMap): Route<Record<string, any>> {
-	return ({ current, incoming, filters }) => {
+	return async ({ current, incoming, filters }) => {
 		if(isNil(incoming)) {
 			return current ?? {};
 		}
@@ -53,16 +53,16 @@ export function compose(map: ComposeMap): Route<Record<string, any>> {
 		if(filters) {
 			const result = { ...current };
 
-			apply(map, filters, current, incoming, result);
-			apply(map, newKeys, current, incoming, result);
+			await apply(map, filters, current, incoming, result);
+			await apply(map, newKeys, current, incoming, result);
 
 			return result;
 		}
 		else {
 			const result = {};
 
-			apply(map, currentKeys, current, incoming, result);
-			apply(map, newKeys, current, incoming, result);
+			await apply(map, currentKeys, current, incoming, result);
+			await apply(map, newKeys, current, incoming, result);
 
 			return result;
 		}

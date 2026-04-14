@@ -62,13 +62,25 @@ function indentWithTab(data: string): string { // {{{
 	}
 } // }}}
 
-export async function applyFormatting({ mergedTextFiles, formats }: { mergedTextFiles: TextFile[]; formats: Format[] }): AsyncDResult {
+export async function applyFormatting({ formats, mergedTextFiles, transformedFiles }: { formats: Format[]; mergedTextFiles: TextFile[]; transformedFiles?: TextFile[] }): AsyncDResult {
 	for(const file of mergedTextFiles) {
 		for(const format of formats) {
 			if(fnmatch(file.name, format.glob)) {
 				applyFormat(file, format);
 
 				break;
+			}
+		}
+	}
+
+	if(transformedFiles) {
+		for(const file of transformedFiles) {
+			for(const format of formats) {
+				if(fnmatch(file.name, format.glob)) {
+					applyFormat(file, format);
+
+					break;
+				}
 			}
 		}
 	}
