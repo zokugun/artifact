@@ -19,22 +19,26 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 	const transformations: Record<string, FileTransform[]> = {};
 
 	for(const [file, fileUpdate] of Object.entries(install)) {
-		const { filter, overwrite, remove, rename, route, transforms } = fileUpdate;
+		const { filter, ifExists, rename, route, transforms } = fileUpdate;
 
-		if(overwrite) {
-			overwrites.push(file);
-		}
-		else if(remove) {
-			context.removedPatterns.push(file);
-
-			continue;
-		}
-		else if(rename) {
+		if(rename) {
 			context.renamedPatterns.push({
 				from: file,
 				to: rename,
 			});
 
+			continue;
+		}
+
+		if(ifExists === 'overwrite') {
+			overwrites.push(file);
+		}
+		else if(ifExists === 'remove') {
+			context.removedPatterns.push(file);
+
+			continue;
+		}
+		else if(ifExists === 'skip') {
 			continue;
 		}
 

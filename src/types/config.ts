@@ -36,13 +36,13 @@ export type InstallConfig = {
 };
 
 export type FileAlways = {
-	remove: boolean;
+	ifExists: 'force-merge' | 'merge' | 'overwrite' | 'remove' | 'skip';
 	transforms: FileTransform[];
 };
 
 export type FileUpsert = FileAlways & {
 	filter?: string[];
-	overwrite: boolean;
+	ifMissing: 'merge' | 'skip';
 	rename?: string;
 	route?: Record<string, any>;
 };
@@ -50,13 +50,12 @@ export type FileUpsert = FileAlways & {
 export type FileInstall = FileUpsert & {
 };
 
-export type FileUninstall = FileAlways & {
-	unmerge: boolean;
+export type FileUninstall = {
+	ifExists: 'remove' | 'skip' | 'unmerge';
+	transforms: FileTransform[];
 };
 
 export type FileUpdate = FileUpsert & {
-	missing: boolean;
-	update?: boolean;
 };
 
 export type FileTransform = {

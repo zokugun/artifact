@@ -4,37 +4,17 @@ import { isNumber, isRecord, isString } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type FileUninstall, type FileInstall, type FileUpdate, type PackageConfig } from '../../types/config.js';
+import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_PACKAGE_REGEX } from '../utils/constants.js';
 import { normalizeFileAlways } from '../utils/normalize-file-always.js';
 import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
-import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
-
-const PLACES = [
-	{
-		name: '.artifactrc.yml',
-		type: 'yaml',
-	},
-	{
-		name: '.artifactrc.yaml',
-		type: 'yaml',
-	},
-	{
-		name: '.artifactrc.json',
-		type: 'json',
-	},
-	{
-		name: '.artifactrc',
-	},
-];
-
-const VERSION_REGEX = /https:\/\/raw.githubusercontent.com\/zokugun\/artifact\/v([\d.]+)\/schemas\/v(\d+)\/package.json/;
 
 export async function readPackageConfig(targetPath: string): AsyncDResult<PackageConfig> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
 
-	for(const place of PLACES) {
+	for(const place of CONFIG_LOCATIONS) {
 		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 
 		if(!result.fails) {
@@ -92,14 +72,14 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 	}
 
 	if(isString(data.$schema)) {
-		const match = VERSION_REGEX.exec(data.$schema);
+		const match = VERSION_PACKAGE_REGEX.exec(data.$schema);
 		if(!match) {
-			return err(`Config file ${source} must have a valid "$schema".`);
+			return err(`Cannot validate the "$schema" in the package's "${source}".`);
 		}
 
 		const version = Number.parseInt(match[2], 10);
-		if(version > 0) {
-			return err(`Config file ${source} is using a newer and unsupported version.`);
+		if(version > MAX_VERSION) {
+			return err(`Don't support newer version (v${version}) in the package's "${source}".`);
 		}
 	}
 
@@ -133,21 +113,21 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 				return normalized;
 			}
 
+			const { ifExists, transforms } = normalized.value;
+
 			install[key] = {
 				...normalized.value,
-				overwrite: false,
+				ifMissing: 'merge',
 			};
 
 			uninstall[key] = {
-				...normalized.value,
-				unmerge: false,
+				ifExists: ifExists === 'force-merge' || ifExists === 'merge' || ifExists === 'overwrite' ? 'skip' : ifExists,
+				transforms,
 			};
 
 			update[key] = {
 				...normalized.value,
-				overwrite: false,
-				missing: true,
-				update: true,
+				ifMissing: 'merge',
 			};
 		}
 	}
@@ -163,8 +143,6 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 			update[key] = {
 				...normalized.value,
-				missing: true,
-				update: true,
 			};
 		}
 	}
@@ -200,7 +178,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeFileUpdate(value);
+			const normalized = normalizeFileUpsert(value, 'update');
 			if(normalized.fails) {
 				return normalized;
 			}

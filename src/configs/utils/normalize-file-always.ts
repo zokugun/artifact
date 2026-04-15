@@ -1,4 +1,4 @@
-import { isArray, isRecord } from '@zokugun/is-it-type';
+import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import { type FileAlways, type FileTransform } from '../../types/config.js';
 import { isTransform } from './is-transform.js';
@@ -8,11 +8,16 @@ export function normalizeFileAlways(data: unknown): DResult<FileAlways> { // {{{
 		return err('"always" must be an object.');
 	}
 
-	let remove: boolean = false;
+	let ifExists: 'merge' | 'overwrite' | 'remove' | 'skip' = 'merge';
 	let transforms: FileTransform[] = [];
 
-	if(data.remove === true) {
-		remove = true;
+	if(isString(data.if_exists)) {
+		if(data.if_exists === 'overwrite' || data.if_exists === 'remove' || data.if_exists === 'skip') {
+			ifExists = data.if_exists;
+		}
+	}
+	else if(data.remove === true) {
+		ifExists = 'remove';
 	}
 
 	if(isArray<FileTransform>(data.transforms, isTransform)) {
@@ -20,7 +25,7 @@ export function normalizeFileAlways(data: unknown): DResult<FileAlways> { // {{{
 	}
 
 	return ok({
-		remove,
+		ifExists,
 		transforms,
 	});
 } // }}}

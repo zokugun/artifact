@@ -17,12 +17,12 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 	const transformations: Record<string, FileTransform[]> = {};
 
 	for(const [file, fileUpdate] of Object.entries(uninstall)) {
-		const { remove, transforms, unmerge } = fileUpdate;
+		const { ifExists, transforms } = fileUpdate;
 
-		if(remove) {
+		if(ifExists === 'remove') {
 			context.removedPatterns.push(file);
 		}
-		else if(unmerge) {
+		else if(ifExists === 'unmerge') {
 			const filePath = path.join(cwd, file);
 
 			const result = await fse.readFile(filePath, 'utf8');

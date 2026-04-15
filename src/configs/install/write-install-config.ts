@@ -9,6 +9,7 @@ import { insertFinalNewLine } from '../../steps/insert-final-new-line.js';
 import { type Artifact, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
 import { type Options } from '../../types/context.js';
 import { type Format } from '../../types/format.js';
+import { MAX_VERSION, VERSION_RELEASE } from '../utils/constants.js';
 
 export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): AsyncDResult {
 	const exported: {
@@ -16,7 +17,7 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 		artifacts: Record<string, Artifact>;
 		update?: boolean | Record<string, FileUpdate>;
 	} = {
-		$schema: 'https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v0/install.json',
+		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
 		artifacts: config.artifacts,
 	};
 

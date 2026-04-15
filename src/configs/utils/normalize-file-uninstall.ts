@@ -1,4 +1,4 @@
-import { isArray, isRecord } from '@zokugun/is-it-type';
+import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import { type FileTransform, type FileUninstall } from '../../types/config.js';
 import { isTransform } from './is-transform.js';
@@ -8,25 +8,27 @@ export function normalizeFileUninstall(data: unknown): DResult<FileUninstall> { 
 		return err('"uninstall" must be an object.');
 	}
 
-	let remove: boolean = false;
+	let ifExists: 'remove' | 'skip' | 'unmerge' = 'skip';
 	let transforms: FileTransform[] = [];
-	let unmerge: boolean = false;
 
-	if(data.remove === true) {
-		remove = true;
+	if(isString(data.if_exists)) {
+		if(data.if_exists === 'remove' || data.if_exists === 'unmerge') {
+			ifExists = data.if_exists;
+		}
+	}
+	else if(data.remove === true) {
+		ifExists = 'remove';
+	}
+	else if(data.unmerge === true) {
+		ifExists = 'unmerge';
 	}
 
 	if(isArray<FileTransform>(data.transforms, isTransform)) {
 		transforms = data.transforms;
 	}
 
-	if(data.unmerge === true) {
-		unmerge = true;
-	}
-
 	return ok({
-		remove,
+		ifExists,
 		transforms,
-		unmerge,
 	});
 } // }}}

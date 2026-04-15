@@ -1,0 +1,57 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/package.json",
+	"type": "object",
+	"properties": {
+		"constants": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		},
+		"extends": {
+			"type": "string"
+		},
+		"install": {
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/common.json#/$defs/install"
+			}
+		},
+		"orphan": {
+			"type": "boolean"
+		},
+		"uninstall": {
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/common.json#/$defs/uninstall"
+			}
+		},
+		"update": {
+			"oneOf": [
+				{
+					"const": false
+				},
+				{
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/common.json#/$defs/update"
+					}
+				}
+			]
+		},
+		"variables": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		},
+		"variants": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		}
+	},
+	"additionalProperties": false
+}

@@ -25,31 +25,32 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		const transformations: Record<string, FileTransform[]> = {};
 
 		for(const [file, fileUpdate] of Object.entries(update)) {
-			const { filter, missing, overwrite, remove, rename, route, transforms, update } = fileUpdate;
+			const { filter, ifExists, ifMissing, rename, route, transforms } = fileUpdate;
 
-			if(!missing) {
-				skipMissings.push(file);
-			}
-
-			if(update) {
-				existingActions.merge.push(file);
-			}
-			else if(update === false) {
-				existingActions.skip.push(file);
-			}
-			else if(overwrite) {
-				existingActions.overwrite.push(file);
-			}
-			else if(remove) {
-				context.removedPatterns.push(file);
-
-				continue;
-			}
-			else if(rename) {
+			if(rename) {
 				context.renamedPatterns.push({
 					from: file,
 					to: rename,
 				});
+
+				continue;
+			}
+
+			if(ifMissing === 'skip') {
+				skipMissings.push(file);
+			}
+
+			if(ifExists === 'force-merge') {
+				existingActions.merge.push(file);
+			}
+			else if(ifExists === 'skip') {
+				existingActions.skip.push(file);
+			}
+			else if(ifExists === 'overwrite') {
+				existingActions.overwrite.push(file);
+			}
+			else if(ifExists === 'remove') {
+				context.removedPatterns.push(file);
 
 				continue;
 			}

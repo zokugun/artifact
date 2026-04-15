@@ -4,34 +4,15 @@ import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type Artifact, type FileInstall, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
-import { normalizeFileUpdate } from '../utils/normalize-file-update.js';
-
-const PLACES = [
-	{
-		name: '.artifactrc.yml',
-		type: 'yaml',
-	},
-	{
-		name: '.artifactrc.yaml',
-		type: 'yaml',
-	},
-	{
-		name: '.artifactrc.json',
-		type: 'json',
-	},
-	{
-		name: '.artifactrc',
-	},
-];
-
-const VERSION_REGEX = /https:\/\/raw.githubusercontent.com\/zokugun\/artifact\/v([\d.]+)\/schemas\/v(\d+)\/install.json/;
+import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_INSTALL_REGEX } from '../utils/constants.js';
+import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 
 export async function readInstallConfig(targetPath: string): AsyncDResult<{ config: InstallConfig; configStats: InstallConfigStats }> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
 
-	for(const place of PLACES) {
+	for(const place of CONFIG_LOCATIONS) {
 		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
 		if(!result.fails) {
 			content = result.value;
@@ -107,14 +88,14 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 	}
 
 	if(isString(data.$schema)) {
-		const match = VERSION_REGEX.exec(data.$schema);
+		const match = VERSION_INSTALL_REGEX.exec(data.$schema);
 		if(!match) {
-			return err(`Config file ${configStats.name} must have a valid "$schema".`);
+			return err(`Cannot validate the "$schema" in the project's "${configStats.name}".`);
 		}
 
 		const version = Number.parseInt(match[2], 10);
-		if(version > 0) {
-			return err(`Config file ${configStats.name} is using a newer and unsupported version.`);
+		if(version > MAX_VERSION) {
+			return err(`Don't support newer version (v${version}) in the project's "${configStats.name}".`);
 		}
 	}
 
@@ -161,7 +142,7 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeFileUpdate(value);
+			const normalized = normalizeFileUpsert(value, 'update');
 			if(normalized.fails) {
 				return normalized;
 			}
