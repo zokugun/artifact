@@ -34,7 +34,6 @@
 		"lint:fix": "xo --fix",
 		"prepack": "npm run build",
 		"prepare": "husky; fixpack || true",
-		"prepublishOnly": "npm run compile",
 		"release": "release-it",
 		"test": "tsc -p test && mocha",
 		"test:dev": "mocha",
