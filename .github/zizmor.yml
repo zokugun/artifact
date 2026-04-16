@@ -2,4 +2,4 @@ rules:
   superfluous-actions:
     ignore:
       # allows `softprops/action-gh-release` action
-      - publish.yml:108
+      - publish.yml:107
