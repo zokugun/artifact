@@ -62,6 +62,11 @@ jobs:
         run: |
           gh api ${TGZ_URL} --header 'Accept: application/octet-stream' > ${TGZ_NAME}
           echo "CHECKSUM=$(sha256sum ${TGZ_NAME} | cut -d ' ' -f 1)" >> $GITHUB_ENV
+
+          tar xvfz ${TGZ_NAME} --strip-components=1
+
+          jq 'del(.scripts.prepack)' package.json > package.json.tmp
+          mv package.json.tmp package.json
         env:
           GH_TOKEN: ${{ github.token }}
 
