@@ -76,10 +76,13 @@ jobs:
           node-version-file: .nvmrc
           package-manager-cache: false
 
+      - name: Install
+        run: |
+          npm ci
+
       - name: Build
         if: env.RELEASE_EXISTS == 'no'
         run: |
-          npm ci
           npm pack
 
           TGZ_NAME=$(ls *.tgz)
