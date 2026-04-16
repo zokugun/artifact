@@ -3,12 +3,12 @@ import { vol } from 'memfs';
 import { add } from './rewires/artifact.js';
 import { fixtures } from './utils/fixtures.js';
 
-describe('variants', () => {
+describe('variant.add', () => {
 	const editorConfigFxt = fixtures('editorconfig');
 	const fixpackFxt = fixtures('fixpack');
 	const nvmrcFxt = fixtures('nvm');
 	const packageFxt = fixtures('package');
-	const variantsFxt = fixtures('variants');
+	const variantsFxt = fixtures('variant-add');
 
 	beforeEach(async () => { // {{{
 		vol.reset();

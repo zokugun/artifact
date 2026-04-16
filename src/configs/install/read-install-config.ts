@@ -148,7 +148,7 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 			}
 
 			if(update[key]) {
-				return err(`Conflict with the "${key}" key on "update".`);
+				return err(`Conflict with the "${key}" key on "update"1.`);
 			}
 
 			update[key] = normalized.value;

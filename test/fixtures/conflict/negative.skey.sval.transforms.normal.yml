@@ -1,0 +1,62 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 0.1.0
+/target/.czrc: |
+/target/.nvmrc: |
+  v20.0.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "devDependencies": {
+      "commitizen": "^4.3.1"
+    }
+  }
+
+
+
+/incoming/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/package.json
+
+  always:
+    .czrc:
+      if_exists: remove
+
+    package.json:
+      transforms:
+        - jq: 'del(.devDependencies.commitizen)'
+
+  update:
+    package.json:
+      transforms:
+        - jq: 'del(.devDependencies.commitizen)'
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/.nvmrc: |
+  v20.20.2
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/.nvmrc: |
+  v20.20.2
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "devDependencies": {}
+  }

@@ -1,8 +1,8 @@
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import detectIndent from 'detect-indent';
-import minimatch from 'editorconfig/src/lib/fnmatch';
 import { type Format, IndentStyle } from '../types/format.js';
 import { type TextFile } from '../types/text-file.js';
+import { getFormat } from '../utils/get-format.js';
 
 function applyFormat(file: TextFile, format: Format): void { // {{{
 	if(format.indentStyle === IndentStyle.SPACE) {
@@ -19,11 +19,6 @@ function applyFormat(file: TextFile, format: Format): void { // {{{
 			file.data = `${file.data}\n`;
 		}
 	}
-} // }}}
-
-function fnmatch(filepath: string, glob: string): boolean { // {{{
-	const matchOptions = { matchBase: true, dot: true, noext: true };
-	return minimatch(filepath, glob, matchOptions);
 } // }}}
 
 function indentWithSpace(data: string, size: number): string { // {{{
@@ -64,23 +59,19 @@ function indentWithTab(data: string): string { // {{{
 
 export async function applyFormatting({ formats, mergedTextFiles, transformedFiles }: { formats: Format[]; mergedTextFiles: TextFile[]; transformedFiles?: TextFile[] }): AsyncDResult {
 	for(const file of mergedTextFiles) {
-		for(const format of formats) {
-			if(fnmatch(file.name, format.glob)) {
-				applyFormat(file, format);
+		const format = getFormat(file.name, formats);
 
-				break;
-			}
+		if(format) {
+			applyFormat(file, format);
 		}
 	}
 
 	if(transformedFiles) {
 		for(const file of transformedFiles) {
-			for(const format of formats) {
-				if(fnmatch(file.name, format.glob)) {
-					applyFormat(file, format);
+			const format = getFormat(file.name, formats);
 
-					break;
-				}
+			if(format) {
+				applyFormat(file, format);
 			}
 		}
 	}

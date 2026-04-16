@@ -5,6 +5,7 @@ import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type FileUninstall, type FileInstall, type FileUpdate, type PackageConfig } from '../../types/config.js';
 import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_PACKAGE_REGEX } from '../utils/constants.js';
+import { mergeUpsertProperty } from '../utils/merge-upsert-property.js';
 import { normalizeFileAlways } from '../utils/normalize-file-always.js';
 import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
@@ -155,7 +156,10 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 			}
 
 			if(install[key]) {
-				return err(`Conflict with the "${key}" key on "install".`);
+				const result = mergeUpsertProperty(key, update[key], normalized.value);
+				if(result.fails) {
+					return result;
+				}
 			}
 
 			install[key] = normalized.value;
@@ -184,10 +188,14 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 			}
 
 			if(update[key]) {
-				return err(`Conflict with the "${key}" key on "update".`);
+				const result = mergeUpsertProperty(key, update[key], normalized.value);
+				if(result.fails) {
+					return result;
+				}
 			}
-
-			update[key] = normalized.value;
+			else {
+				update[key] = normalized.value;
+			}
 		}
 	}
 

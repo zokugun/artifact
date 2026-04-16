@@ -8,7 +8,10 @@ export async function executeNextBlock(context: Context): AsyncDResult {
 	if(!isNil(block)) {
 		const { name, version, variant, branch, incomingPath } = block;
 
-		await context.commonFlow(name, version, variant, branch, incomingPath, context);
+		const result = await context.commonFlow(name, version, variant, branch, incomingPath, context);
+		if(result.fails) {
+			return result;
+		}
 	}
 
 	return OK;

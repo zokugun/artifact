@@ -34,7 +34,10 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 
 			context.incomingConfig = variantConfig;
 
-			await context.commonFlow(name, version, variant, undefined, variantPath, context);
+			const result = await context.commonFlow(name, version, variant, undefined, variantPath, context);
+			if(result.fails) {
+				return result;
+			}
 		}
 		else if(variantConfig.extends) {
 			context.blocks.unshift({
@@ -62,7 +65,10 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 
 				context.incomingConfig = variantConfig;
 
-				await context.commonFlow(name, version, variant, undefined, variantPath, context);
+				const result = await context.commonFlow(name, version, variant, undefined, variantPath, context);
+				if(result.fails) {
+					return result;
+				}
 			}
 			else {
 				const variant = context.incomingConfig!.variants[context.request.variant!] ?? context.request.variant;
@@ -80,7 +86,10 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 
 				context.incomingConfig = undefined;
 
-				await context.commonFlow(name, version, root, undefined, incomingPath, context);
+				const result = await context.commonFlow(name, version, root, undefined, incomingPath, context);
+				if(result.fails) {
+					return result;
+				}
 			}
 		}
 	}
@@ -95,12 +104,18 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 
 		context.incomingConfig = undefined;
 
-		await context.commonFlow(name, version, root, undefined, incomingPath, context);
+		const result = await context.commonFlow(name, version, root, undefined, incomingPath, context);
+		if(result.fails) {
+			return result;
+		}
 	}
 	else {
 		context.result = { name, version };
 
-		await context.commonFlow(name, version, undefined, undefined, context.incomingPath, context);
+		const result = await context.commonFlow(name, version, undefined, undefined, context.incomingPath, context);
+		if(result.fails) {
+			return result;
+		}
 	}
 
 	return OK;
