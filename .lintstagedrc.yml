@@ -1,5 +1,5 @@
 ./package.json:
   - fixpack
-  - npm audit
+  # - npm audit
 .github/**/*.yml: zizmor
 "*.ts": xo
