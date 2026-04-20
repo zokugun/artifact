@@ -1,0 +1,60 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "scripts": {
+      "commit": "cz",
+      "lint": "xo"
+    },
+    "dependencies": {},
+    "devDependencies": {
+      "commitizen": "^4.3.1",
+      "xo": "0.60.0"
+    }
+  }
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/.artifactrc: |
+  upsert:
+    .czrc:
+      remove: true
+    package.json:
+      transforms:
+        - description: Remove scripts.commit only when it clearly invokes Commitizen
+          jq: |
+            if ((.scripts.commit? // "") | test("cz")) then
+              del(.scripts.commit)
+            else
+              .
+            end
+        - description: Remove commitizen from devDependencies
+          jq: 'del(.devDependencies.commitizen)'
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "scripts": {
+      "lint": "xo"
+    },
+    "dependencies": {},
+    "devDependencies": {
+      "xo": "0.60.0"
+    }
+  }
