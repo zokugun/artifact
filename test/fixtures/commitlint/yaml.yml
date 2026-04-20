@@ -1,0 +1,33 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/.commitlintrc.yaml: |
+  extends:
+    - "@commitlint/config-conventional"
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/.commitlintrc.yaml: |
+  extends:
+    - lerna
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/.commitlintrc.yaml: |
+  extends:
+    - "@commitlint/config-conventional"
+    - lerna
