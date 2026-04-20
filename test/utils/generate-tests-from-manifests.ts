@@ -1,12 +1,16 @@
 import path from 'node:path';
 import process from 'node:process';
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { vol } from 'memfs';
 import YAML from 'yaml';
 import { add, remove, update } from '../rewires/artifact.js';
+
 // eslint-disable-next-line import/order
 import fse from '@zokugun/fs-extra-plus/sync';
+
+use(chaiAsPromised);
 
 const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
 

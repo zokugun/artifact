@@ -1,6 +1,0 @@
-$schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/package.json
-
-update:
-  src/*:
-    if_missing: skip
-    if_exists: skip
