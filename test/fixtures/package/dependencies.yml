@@ -1,0 +1,49 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "dependencies": {
+      "foobar": "0.1.0",
+      "quxbaz": "1.0.0"
+    }
+  }
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/package.json: |
+  {
+    "dependencies": {
+      "foobar": "1.0.0",
+      "corge": "1.0.0"
+    }
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "dependencies": {
+      "corge": "1.0.0",
+      "foobar": "1.0.0",
+      "quxbaz": "1.0.0"
+    }
+  }

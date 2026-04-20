@@ -1,5 +1,0 @@
-{
-	"bin": {
-		"#[[package.json.name]]": "bin/#[[package.json.name]]"
-	}
-}

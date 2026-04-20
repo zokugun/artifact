@@ -1,7 +1,0 @@
-{
-	"name": "my-awesome-project",
-	"version": "1.0.0",
-	"dependencies": {
-		"my-awesome-lib": "1.0.0"
-	}
-}
