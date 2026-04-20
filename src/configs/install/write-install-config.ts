@@ -1,8 +1,8 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
+import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
-import { isEmpty, isPlainObject } from 'lodash-es';
 import yaml from 'yaml';
 import { applyFormatting } from '../../steps/apply-formatting.js';
 import { insertFinalNewLine } from '../../steps/insert-final-new-line.js';
@@ -16,13 +16,23 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 		$schema: string;
 		artifacts: Record<string, Artifact>;
 		update?: boolean | Record<string, UpdateFileConfig>;
+		constants?: Record<string, string>;
+		variables?: Record<string, string>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
 		artifacts: config.artifacts,
 	};
 
-	if(!isPlainObject(config.update) || !isEmpty(config.update)) {
+	if(isNonEmptyRecord(config.update)) {
 		exported.update = config.update;
+	}
+
+	if(isNonEmptyRecord(config.constants)) {
+		exported.constants = config.constants;
+	}
+
+	if(isNonEmptyRecord(config.variables)) {
+		exported.variables = config.variables;
 	}
 
 	const file = {

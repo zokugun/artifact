@@ -1,5 +1,0 @@
-{
-	"bin": {
-		"#[[vars.BINARY_NAME]]": "bin/#[[vars.BINARY_NAME]]"
-	}
-}

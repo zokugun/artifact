@@ -1,7 +1,0 @@
-{
-	"name": "@my-org/my-awesome-project",
-	"version": "1.0.0",
-	"bin": {
-		"my": "bin/my"
-	}
-}

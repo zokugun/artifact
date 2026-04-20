@@ -1,0 +1,50 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "name": "@my-org/my-awesome-project",
+    "version": "1.0.0"
+  }
+/target/.artifactrc.yml: |
+  variables:
+    BINARY_NAME: package.json.name.split('/').at(-1).split('-').at(0)
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/.artifactrc.yml: |
+  variables:
+    BINARY_NAME: package.json.name.split('/').at(-1)
+/incoming/configs/package.json: |
+  {
+    "bin": {
+      "#[[vars.BINARY_NAME]]": "bin/#[[vars.BINARY_NAME]]"
+    }
+  }
+
+
+
+/merged/package.json: |
+  {
+    "name": "@my-org/my-awesome-project",
+    "version": "1.0.0",
+    "bin": {
+      "my": "bin/my"
+    }
+  }
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+  variables:
+    BINARY_NAME: package.json.name.split('/').at(-1).split('-').at(0)
