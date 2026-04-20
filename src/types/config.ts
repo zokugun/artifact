@@ -1,3 +1,4 @@
+import { type Primitive } from '@zokugun/is-it-type';
 import { type Indent } from './format.js';
 
 export type Request = {
@@ -11,13 +12,13 @@ export type PackageManifest = {
 };
 
 export type PackageConfig = {
-	constants: Record<string, string>;
+	constants: Record<string, Primitive>;
 	extends?: string;
 	install: InstallFileConfig[];
 	orphan: boolean;
 	uninstall: UninstallFileConfig[];
 	update: false | UpdateFileConfig[];
-	variables: Record<string, string>;
+	variables: Record<string, Primitive>;
 	variants: Record<string, string>;
 };
 
@@ -31,10 +32,10 @@ export type ArtifactResult = Artifact & { name: string };
 
 export type InstallConfig = {
 	artifacts: Record<string, Artifact>;
-	constants: Record<string, string>;
+	constants: Record<string, Primitive>;
 	install: Record<string, InstallFileConfig>;
 	update: false | Record<string, UpdateFileConfig>;
-	variables: Record<string, string>;
+	variables: Record<string, Primitive>;
 };
 
 export type FileConfig<E> = {

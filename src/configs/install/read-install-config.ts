@@ -1,6 +1,6 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
-import { isArray, isRecord, isString } from '@zokugun/is-it-type';
+import { isArray, isPrimitive, isRecord, isString, type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type Artifact, type InstallFileConfig, type UpdateFileConfig, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
@@ -72,10 +72,10 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 
 function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResult<{ config: InstallConfig; configStats: InstallConfigStats }> { // {{{
 	const artifacts: Record<string, Artifact> = {};
-	let constants: Record<string, string> = {};
+	let constants: Record<string, Primitive> = {};
 	const install: Record<string, InstallFileConfig> = {};
 	let update: boolean | Record<string, UpdateFileConfig> = {};
-	let variables: Record<string, string> = {};
+	let variables: Record<string, Primitive> = {};
 
 	if(!data) {
 		return ok({
@@ -140,7 +140,7 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 		}
 	}
 
-	if(isRecord<string>(data.constants, (_key, value) => isString(value))) {
+	if(isRecord<Primitive>(data.constants, (_key, value) => isPrimitive(value))) {
 		constants = data.constants;
 	}
 
@@ -158,7 +158,7 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 		}
 	}
 
-	if(isRecord<string>(data.variables, (_key, value) => isString(value))) {
+	if(isRecord<Primitive>(data.variables, (_key, value) => isPrimitive(value))) {
 		variables = data.variables;
 	}
 

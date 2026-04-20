@@ -1,5 +1,6 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/sync';
+import { isPrimitive, type Primitive } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -16,10 +17,10 @@ const PLACEHOLDER_REGEX = /^((?:[^/.]+(?:[^/]+\/)*\/)?\.?[^.]+(?:\.(?:json|ya?ml
 export class TemplateEngine {
 	private readonly basePath: string;
 	private readonly fileCache = new Map<string, Record<string, any>>();
-	private readonly variables: Record<string, string>;
+	private readonly variables: Record<string, Primitive>;
 	private readonly variableCache = new Map<string, string>();
 
-	constructor(basePath: string, variables?: Record<string, string>) { // {{{
+	constructor(basePath: string, variables?: Record<string, Primitive>) { // {{{
 		this.basePath = basePath;
 		this.variables = variables ?? {};
 	} // }}}
@@ -160,8 +161,13 @@ export class TemplateEngine {
 			return ok(this.variableCache.get(name)!);
 		}
 
-		const expression = this.variables[name];
-		if(typeof expression !== 'string' || expression.trim().length === 0) {
+		const value = this.variables[name];
+		if(!isPrimitive(value)) {
+			return err(`Invalid variable: ${name}.`);
+		}
+
+		const expression = String(value).trim();
+		if(expression.length === 0) {
 			return err(`Invalid variable: ${name}.`);
 		}
 

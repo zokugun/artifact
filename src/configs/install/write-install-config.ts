@@ -1,7 +1,7 @@
 import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
-import { isNonEmptyRecord } from '@zokugun/is-it-type';
+import { isNonEmptyRecord, type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { applyFormatting } from '../../steps/apply-formatting.js';
@@ -16,8 +16,8 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 		$schema: string;
 		artifacts: Record<string, Artifact>;
 		update?: boolean | Record<string, UpdateFileConfig>;
-		constants?: Record<string, string>;
-		variables?: Record<string, string>;
+		constants?: Record<string, Primitive>;
+		variables?: Record<string, Primitive>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
 		artifacts: config.artifacts,

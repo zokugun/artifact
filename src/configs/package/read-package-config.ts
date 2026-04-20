@@ -1,6 +1,6 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
-import { isNumber, isRecord, isString } from '@zokugun/is-it-type';
+import { isNumber, isPrimitive, isRecord, isString, type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type UninstallFileConfig, type InstallFileConfig, type UpdateFileConfig, type PackageConfig } from '../../types/config.js';
@@ -46,13 +46,13 @@ export async function readPackageConfig(targetPath: string): AsyncDResult<Packag
 }
 
 function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> { // {{{
-	let constants: Record<string, string> = {};
+	let constants: Record<string, Primitive> = {};
 	let xtends: string | undefined;
 	const install: InstallFileConfig[] = [];
 	let orphan: boolean = false;
 	const uninstall: UninstallFileConfig[] = [];
 	let update: false | UpdateFileConfig[] = [];
-	let variables: Record<string, string> = {};
+	let variables: Record<string, Primitive> = {};
 	let variants: Record<string, string> = {};
 
 	if(!data) {
@@ -84,7 +84,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 		}
 	}
 
-	if(isRecord<string>(data.constants, (_key, value) => isString(value))) {
+	if(isRecord<Primitive>(data.constants, (_key, value) => isPrimitive(value))) {
 		constants = data.constants;
 	}
 
@@ -99,7 +99,7 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 		orphan = true;
 	}
 
-	if(isRecord<string>(data.variables, (_key, value) => isString(value))) {
+	if(isRecord<Primitive>(data.variables, (_key, value) => isPrimitive(value))) {
 		variables = data.variables;
 	}
 
