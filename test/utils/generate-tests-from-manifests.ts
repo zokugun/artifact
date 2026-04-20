@@ -71,7 +71,12 @@ export function generateTestsFromManifests(directory: string): void {
 					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments[0]" to be an array of string.`);
 				}
 
-				action = async () => add(specs, { verbose: true });
+				const options = manifest.action.arguments[1] ?? {};
+				if(!isRecord(options)) {
+					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments[1]" to be the options.`);
+				}
+
+				action = async () => add(specs, { ...options, verbose: true });
 			}
 			else if(manifest.action.command === 'update') {
 				action = async () => update();
@@ -100,7 +105,14 @@ export function generateTestsFromManifests(directory: string): void {
 					}
 
 					for(const [file, data] of Object.entries(expectedFiles)) {
-						expect(vol.readFileSync(`/target/${file}`, 'utf8')).to.eql(data);
+						const action = vol.promises.readFile(`/target/${file}`, 'utf8');
+
+						if(isString(data)) {
+							expect(await action).to.eql(data);
+						}
+						else {
+							await expect(action).to.be.rejectedWith(`${(data as any).error}, open '/target/${file}'`);
+						}
 					}
 
 					expect(Object.keys(vol.toJSON()).filter((file) => file.startsWith('/target/')).length).to.eql(expectedCount);

@@ -60,6 +60,7 @@ export async function unmergeTextFiles({ targetPath, textFiles, mergedTextFiles,
 				name: file.name,
 				data,
 				finalNewLine: file.finalNewLine,
+				indent: file.indent,
 				mode: file.mode,
 			});
 

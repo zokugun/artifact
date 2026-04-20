@@ -1,8 +1,7 @@
 import { type AsyncDResult } from '@zokugun/xtry';
 import { type BinaryFile } from './binary-file.js';
 import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform } from './config.js';
-import { type Format } from './format.js';
-import { type TextFile } from './text-file.js';
+import { type Indent, type Format } from './format.js';
 import { type Journey } from './travel.js';
 
 export type ExistingAction = 'merge' | 'overwrite' | 'skip';
@@ -59,3 +58,29 @@ export type Block = {
 	branch?: string;
 	incomingPath: string;
 };
+
+// export type TextFile = {
+// 	data: string;
+// 	finalNewLine: boolean;
+// 	indentStyle: IndentStyle;
+// 	indentSize: number,
+// 	mode?: number;
+// 	name: string;
+// };
+
+// export type OutputFile = TextFile & {
+// 	input?: TextFile;
+// }
+
+export type TextFile = {
+	data: string;
+	finalNewLine: boolean;
+	indent?: Indent;
+	mode?: number;
+	name: string;
+};
+
+// export type OutputTextFile = {
+// 	data: string;
+// 	name: string;
+// };

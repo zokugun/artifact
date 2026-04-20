@@ -4,6 +4,8 @@ import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { type Artifact, type InstallFileConfig, type UpdateFileConfig, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { detectIndent } from '../../utils/detect-indent.js';
+import { hasFinalNewLine } from '../../utils/has-final-new-line.js';
 import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_INSTALL_REGEX } from '../utils/constants.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 
@@ -29,13 +31,15 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 		});
 	}
 
-	const finalNewLine = content.endsWith('\n');
+	const finalNewLine = hasFinalNewLine(content);
+	const indent = detectIndent(content);
 
 	if(type === 'json') {
 		return normalizeConfig(JSON.parse(content), {
 			name,
 			type: 'json',
 			finalNewLine,
+			indent,
 		});
 	}
 	else if(type === 'yaml') {
@@ -43,6 +47,7 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 			name,
 			type: 'yaml',
 			finalNewLine,
+			indent,
 		});
 	}
 	else {
@@ -51,6 +56,7 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 				name,
 				type: 'json',
 				finalNewLine,
+				indent,
 			});
 		}
 		catch {
@@ -58,6 +64,7 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 				name,
 				type: 'yaml',
 				finalNewLine,
+				indent,
 			});
 		}
 	}

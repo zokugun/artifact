@@ -5,6 +5,8 @@ import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import globby from 'globby';
 import { getEncoding, isText } from 'istextorbinary';
 import { type Context } from '../types/context.js';
+import { detectIndent } from '../utils/detect-indent.js';
+import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 import { readBuffer } from '../utils/read-buffer.js';
 
 export async function readFiles({ incomingPath, textFiles, binaryFiles, options }: Context): AsyncDResult {
@@ -26,7 +28,8 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 			}
 
 			const data = result.value;
-			const finalNewLine = data.endsWith('\n');
+			const finalNewLine = hasFinalNewLine(data);
+			const indent = detectIndent(data);
 
 			if(data.startsWith('#!')) {
 				// the text file might be executable
@@ -40,8 +43,9 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 				textFiles.push({
 					name: file,
 					data,
-					mode,
 					finalNewLine,
+					indent,
+					mode,
 				});
 
 				if(options.verbose) {
@@ -53,6 +57,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, options 
 					name: file,
 					data,
 					finalNewLine,
+					indent,
 				});
 
 				if(options.verbose) {

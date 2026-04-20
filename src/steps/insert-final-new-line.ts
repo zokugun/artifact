@@ -1,5 +1,5 @@
 import { type AsyncDResult, OK } from '@zokugun/xtry';
-import { type TextFile } from '../types/text-file.js';
+import { type TextFile } from '../types/context.js';
 
 export async function insertFinalNewLine({ mergedTextFiles, transformedFiles }: { mergedTextFiles: TextFile[]; transformedFiles?: TextFile[] }): AsyncDResult {
 	for(const file of mergedTextFiles) {

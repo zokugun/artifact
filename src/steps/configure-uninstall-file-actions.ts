@@ -5,6 +5,8 @@ import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { isMatch } from 'micromatch';
 import { type FileTransform } from '../types/config.js';
 import { type Context } from '../types/context.js';
+import { detectIndent } from '../utils/detect-indent.js';
+import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 
 export async function configureUninstallFileActions(context: Context): AsyncDResult {
 	const { uninstall } = context.incomingConfig!;
@@ -31,12 +33,14 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 			}
 
 			const data = result.value;
-			const finalNewLine = data.endsWith('\n');
+			const finalNewLine = hasFinalNewLine(data);
+			const indent = detectIndent(data);
 
 			context.textFiles.push({
 				name: pattern,
 				data,
 				finalNewLine,
+				indent,
 			});
 		}
 

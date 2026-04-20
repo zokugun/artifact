@@ -1,9 +1,9 @@
-import { IndentStyle } from '../types/format.js';
+import { type Indent, IndentStyle } from '../types/format.js';
 
 const INDENT_REGEX = /^(?:(\t+)|( +))/;
 const LINE_SEPARATOR_REGEX = /\r\n|\r|\n/;
 
-export function detectIndent(text: string): { style: IndentStyle; size: number } {
+export function detectIndent(text: string): Indent | undefined {
 	const lines = text.split(LINE_SEPARATOR_REGEX);
 
 	const indentations = new Set<number>();
@@ -29,6 +29,10 @@ export function detectIndent(text: string): { style: IndentStyle; size: number }
 			style: IndentStyle.TAB,
 			size: 1,
 		};
+	}
+
+	if(indentations.size === 0) {
+		return undefined;
 	}
 
 	const sorted = [...indentations].sort((a, b) => a - b);

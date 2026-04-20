@@ -1,3 +1,5 @@
+import { type Indent } from './format.js';
+
 export type Request = {
 	name: string;
 	variant?: string;
@@ -65,4 +67,5 @@ export type InstallConfigStats = {
 	name: string;
 	type: string;
 	finalNewLine: boolean;
+	indent?: Indent;
 };

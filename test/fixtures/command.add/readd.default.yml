@@ -1,0 +1,28 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/target/.artifactrc.yml: |
+  artifacts:
+    - name: awesome-config
+      version: 0.1.0
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+
+
+
+error: The incoming artifact has already been added.

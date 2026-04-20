@@ -1,10 +1,10 @@
 import { type AsyncDResult, OK } from '@zokugun/xtry';
-import detectIndent from 'detect-indent';
+import { type TextFile } from '../types/context.js';
 import { type Format, IndentStyle } from '../types/format.js';
-import { type TextFile } from '../types/text-file.js';
+import { detectIndent } from '../utils/detect-indent.js';
 import { getFormat } from '../utils/get-format.js';
 
-function applyFormat(file: TextFile, format: Format): void { // {{{
+function applyFormat(file: TextFile, format: Omit<Format, 'glob'>): void { // {{{
 	if(format.indentStyle === IndentStyle.SPACE) {
 		file.data = indentWithSpace(file.data, format.indentSize);
 	}
@@ -22,24 +22,29 @@ function applyFormat(file: TextFile, format: Format): void { // {{{
 } // }}}
 
 function indentWithSpace(data: string, size: number): string { // {{{
-	const { type, indent } = detectIndent(data);
+	const indent = detectIndent(data);
 
-	if(type === 'space') {
-		if(indent.length === size) {
+	if(!indent) {
+		return data;
+	}
+	else if(indent.style === IndentStyle.SPACE) {
+		if(indent.size === size) {
 			return data;
 		}
 		else {
-			data = data.replaceAll(new RegExp(indent, 'gm'), '\t');
-
+			const oldIndent = ' '.repeat(indent.size);
 			const newIndent = ' '.repeat(size);
+			const space2tab = new RegExp(`^(?:${oldIndent})+`, 'gm');
 
-			return data.replaceAll(/\t/gm, newIndent);
+			data = data.replaceAll(space2tab, (spaces) => '\t'.repeat(spaces.length / indent.size));
+
+			return data.replaceAll(/^\t+/gm, (tabs) => newIndent.repeat(tabs.length));
 		}
 	}
-	else if(type === 'tab') {
+	else if(indent.style === IndentStyle.TAB) {
 		const newIndent = ' '.repeat(size);
 
-		return data.replaceAll(new RegExp(indent, 'gm'), newIndent);
+		return data.replaceAll(/^\t+/gm, (tabs) => newIndent.repeat(tabs.length));
 	}
 	else {
 		return data;
@@ -47,22 +52,35 @@ function indentWithSpace(data: string, size: number): string { // {{{
 } // }}}
 
 function indentWithTab(data: string): string { // {{{
-	const { type, indent, amount } = detectIndent(data);
+	const indent = detectIndent(data);
 
-	if(type === 'space' && amount > 1) {
-		return data.replaceAll(new RegExp(indent, 'gm'), '\t');
+	if(!indent) {
+		return data;
+	}
+	else if(indent.style === IndentStyle.SPACE) {
+		const oldIndent = ' '.repeat(indent.size);
+		const space2tab = new RegExp(`^(?:${oldIndent})+`, 'gm');
+
+		return data.replaceAll(space2tab, (spaces) => '\t'.repeat(spaces.length / indent.size));
 	}
 	else {
 		return data;
 	}
 } // }}}
 
-export async function applyFormatting({ formats, mergedTextFiles, transformedFiles }: { formats: Format[]; mergedTextFiles: TextFile[]; transformedFiles?: TextFile[] }): AsyncDResult {
+export async function applyFormatting({ formats, mergedTextFiles, transformedFiles }: { formats: Format[]; mergedTextFiles: TextFile[];transformedFiles?: TextFile[] }): AsyncDResult {
 	for(const file of mergedTextFiles) {
 		const format = getFormat(file.name, formats);
 
 		if(format) {
 			applyFormat(file, format);
+		}
+		else if(file.indent) {
+			applyFormat(file, {
+				indentStyle: file.indent.style,
+				indentSize: file.indent.size,
+				insertFinalNewline: file.finalNewLine,
+			});
 		}
 	}
 
@@ -72,6 +90,13 @@ export async function applyFormatting({ formats, mergedTextFiles, transformedFil
 
 			if(format) {
 				applyFormat(file, format);
+			}
+			else if(file.indent) {
+				applyFormat(file, {
+					indentStyle: file.indent.style,
+					indentSize: file.indent.size,
+					insertFinalNewline: file.finalNewLine,
+				});
 			}
 		}
 	}

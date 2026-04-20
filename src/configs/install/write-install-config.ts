@@ -11,7 +11,7 @@ import { type Options } from '../../types/context.js';
 import { type Format } from '../../types/format.js';
 import { MAX_VERSION, VERSION_RELEASE } from '../utils/constants.js';
 
-export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): AsyncDResult {
+export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, indent, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): AsyncDResult {
 	const exported: {
 		$schema: string;
 		artifacts: Record<string, Artifact>;
@@ -28,6 +28,7 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 	const file = {
 		name,
 		data: type === 'yaml' ? yaml.stringify(exported) : JSON.stringify(exported, null, '\t'),
+		indent,
 		finalNewLine,
 	};
 

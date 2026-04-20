@@ -7,7 +7,6 @@ import globby from 'globby';
 import { getJourney } from '../journeys/index.js';
 import { type Context } from '../types/context.js';
 import { detectIndent } from '../utils/detect-indent.js';
-import { getFormat } from '../utils/get-format.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 
 export async function transformUntouchedFiles({ formats, options, routes, targetPath, textFiles, transformedFiles, transforms }: Context): AsyncDResult {
@@ -51,7 +50,8 @@ export async function transformUntouchedFiles({ formats, options, routes, target
 		}
 
 		const data = result.value;
-		const finalNewLine = data.endsWith('\n');
+		const finalNewLine = hasFinalNewLine(data);
+		const indent = detectIndent(data);
 
 		const transformed = await journey.travel({
 			current: data,
@@ -62,24 +62,12 @@ export async function transformUntouchedFiles({ formats, options, routes, target
 		transformedFiles.push({
 			name: file,
 			data: transformed,
-			finalNewLine: finalNewLine,
+			finalNewLine,
+			indent,
 		});
 
 		if(options.verbose) {
 			logger.debug(`${file} has been transformed`);
-		}
-
-		const format = getFormat(file, formats);
-
-		if(!format) {
-			const indent = detectIndent(data);
-
-			formats.push({
-				glob: file,
-				indentStyle: indent.style,
-				indentSize: indent.size,
-				insertFinalNewline: hasFinalNewLine(data),
-			});
 		}
 	}
 

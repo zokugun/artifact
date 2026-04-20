@@ -9,3 +9,8 @@ export type Format = {
 	indentSize: number;
 	insertFinalNewline: boolean;
 };
+
+export type Indent = {
+	style: IndentStyle;
+	size: number;
+};

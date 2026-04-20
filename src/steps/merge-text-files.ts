@@ -82,6 +82,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 						name: fileName,
 						data,
 						finalNewLine: file.finalNewLine,
+						indent: file.indent,
 						mode: file.mode,
 					});
 
