@@ -5,7 +5,7 @@ import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import YAML from 'yaml';
-import { add, update } from '../rewires/artifact.js';
+import { add, remove, update } from '../rewires/artifact.js';
 
 const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
 
@@ -76,7 +76,20 @@ export function generateTestsFromManifests(directory: string): void {
 					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments[1]" to be the options.`);
 				}
 
-				action = async () => add(specs, { ...options, verbose: true });
+				action = async () => add(specs, { ...options, verbose: DEBUG });
+			}
+			else if(manifest.action.command === 'remove') {
+				if(!isArray(manifest.action.arguments)) {
+					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments" entry (array).`);
+				}
+
+				const specs = manifest.action.arguments[0];
+
+				if(!isArray<string>(specs, isString)) {
+					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments[0]" to be an array of string.`);
+				}
+
+				action = async () => remove(specs, { verbose: DEBUG });
 			}
 			else if(manifest.action.command === 'update') {
 				action = async () => update();

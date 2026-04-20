@@ -4,6 +4,8 @@ import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { getJourney } from '../journeys/index.js';
 import { type Context } from '../types/context.js';
+import { detectIndent } from '../utils/detect-indent.js';
+import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 
 export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, transforms, options }: Context): AsyncDResult {
 	for(const file of textFiles) {
@@ -71,6 +73,9 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 						return err(stringifyError(current.error));
 					}
 
+					const finalNewLine = hasFinalNewLine(current.value);
+					const indent = detectIndent(current.value);
+
 					const data = await journey.travel({
 						current: current.value,
 						incoming: file.data,
@@ -81,8 +86,8 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 					mergedTextFiles.push({
 						name: fileName,
 						data,
-						finalNewLine: file.finalNewLine,
-						indent: file.indent,
+						finalNewLine,
+						indent,
 						mode: file.mode,
 					});
 
