@@ -1,9 +1,0 @@
-{
-	"compilerOptions": {
-		/* Basic Options */
-		"outDir": "../lib",
-
-		/* Module Resolution Options */
-		"resolveJsonModule": true,
-	},
-}
