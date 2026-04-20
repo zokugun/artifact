@@ -1,0 +1,37 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/incoming/configs/npmignore: |
+  node_modules
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/.npmignore: |
+  node_modules

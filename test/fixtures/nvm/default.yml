@@ -1,0 +1,29 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/.nvmrc: |
+  v12.8.4
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/.nvmrc: |
+  v14.21.3
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/.nvmrc: |
+  v14.21.3
