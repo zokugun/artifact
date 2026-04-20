@@ -9,6 +9,7 @@ action:
   artifacts:
     "awesome-config":
       version: 0.0.1
+/target/.czrc: |
 /target/package.json: |
   {
     "scripts": {
@@ -52,6 +53,8 @@ action:
 /merged/.artifactrc: |
   $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
   artifacts: {}
+/merged/.czrc:
+  error: "ENOENT: no such file or directory"
 /merged/package.json: |
   {
     "scripts": {

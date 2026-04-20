@@ -5,6 +5,7 @@ action:
 
 
 
+/target/.czrc: |
 /target/package.json: |
   {
     "scripts": {
@@ -50,6 +51,8 @@ action:
   artifacts:
     awesome-config:
       version: 1.0.0
+/merged/.czrc:
+  error: "ENOENT: no such file or directory"
 /merged/package.json: |
   {
     "scripts": {
