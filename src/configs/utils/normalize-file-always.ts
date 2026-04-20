@@ -1,9 +1,9 @@
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import { type FileAlways, type FileTransform } from '../../types/config.js';
+import { type AlwaysFileConfig, type FileTransform } from '../../types/config.js';
 import { isTransform } from './is-transform.js';
 
-export function normalizeFileAlways(data: unknown): DResult<FileAlways> { // {{{
+export function normalizeFileAlways(pattern: string, data: unknown): DResult<AlwaysFileConfig> { // {{{
 	if(!isRecord(data)) {
 		return err('"always" must be an object.');
 	}
@@ -26,6 +26,7 @@ export function normalizeFileAlways(data: unknown): DResult<FileAlways> { // {{{
 
 	return ok({
 		ifExists,
+		pattern,
 		transforms,
 	});
 } // }}}

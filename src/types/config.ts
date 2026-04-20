@@ -11,10 +11,10 @@ export type PackageManifest = {
 export type PackageConfig = {
 	constants: Record<string, string>;
 	extends?: string;
-	install: Record<string, FileInstall>;
+	install: InstallFileConfig[];
 	orphan: boolean;
-	uninstall: Record<string, FileUninstall>;
-	update: false | Record<string, FileUpdate>;
+	uninstall: UninstallFileConfig[];
+	update: false | UpdateFileConfig[];
 	variables: Record<string, string>;
 	variants: Record<string, string>;
 };
@@ -30,32 +30,30 @@ export type ArtifactResult = Artifact & { name: string };
 export type InstallConfig = {
 	artifacts: Record<string, Artifact>;
 	constants: Record<string, string>;
-	install: Record<string, FileInstall>;
-	update: false | Record<string, FileUpdate>;
+	install: Record<string, InstallFileConfig>;
+	update: false | Record<string, UpdateFileConfig>;
 	variables: Record<string, string>;
 };
 
-export type FileAlways = {
-	ifExists: 'force-merge' | 'merge' | 'overwrite' | 'remove' | 'skip';
+export type FileConfig<E> = {
+	ifExists: E;
+	pattern: string;
 	transforms: FileTransform[];
 };
 
-export type FileUpsert = FileAlways & {
+export type AlwaysFileConfig = FileConfig<'force-merge' | 'merge' | 'overwrite' | 'remove' | 'skip'>;
+
+export type InstallFileConfig = UpsertFileConfig;
+
+export type UninstallFileConfig = FileConfig<'remove' | 'skip' | 'unmerge'>;
+
+export type UpdateFileConfig = UpsertFileConfig;
+
+export type UpsertFileConfig = AlwaysFileConfig & {
 	filter?: string[];
 	ifMissing: 'merge' | 'skip';
 	rename?: string;
 	route?: Record<string, any>;
-};
-
-export type FileInstall = FileUpsert & {
-};
-
-export type FileUninstall = {
-	ifExists: 'remove' | 'skip' | 'unmerge';
-	transforms: FileTransform[];
-};
-
-export type FileUpdate = FileUpsert & {
 };
 
 export type FileTransform = {

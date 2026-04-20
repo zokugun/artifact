@@ -6,7 +6,7 @@ import { isEmpty, isPlainObject } from 'lodash-es';
 import yaml from 'yaml';
 import { applyFormatting } from '../../steps/apply-formatting.js';
 import { insertFinalNewLine } from '../../steps/insert-final-new-line.js';
-import { type Artifact, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { type Artifact, type UpdateFileConfig, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
 import { type Options } from '../../types/context.js';
 import { type Format } from '../../types/format.js';
 import { MAX_VERSION, VERSION_RELEASE } from '../utils/constants.js';
@@ -15,7 +15,7 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 	const exported: {
 		$schema: string;
 		artifacts: Record<string, Artifact>;
-		update?: boolean | Record<string, FileUpdate>;
+		update?: boolean | Record<string, UpdateFileConfig>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
 		artifacts: config.artifacts,

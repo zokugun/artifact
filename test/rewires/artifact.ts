@@ -1,6 +1,9 @@
+import process from 'node:process';
 import rewiremock from 'rewiremock';
 // eslint-disable-next-line import/order
 import { fs } from '../mocks/fs.js';
+
+const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
 
 rewiremock('fs').with(fs);
 rewiremock('fs/promises').with(fs.promises);
@@ -17,12 +20,18 @@ rewiremock('npm').with({
 });
 rewiremock('@zokugun/cli-utils').with({
 	c: {
+		bgBlue: (value: string) => value,
 		cyan: {
-			bold: () => {},
+			bold: (value: string) => value,
 		},
 	},
 	logger: {
 		beginTimer: () => {},
+		debug: (message: string) => {
+			if(DEBUG) {
+				console.log(message);
+			}
+		},
 		createSpinner: () => ({
 			fail: () => {},
 			succeed: () => {},
@@ -31,6 +40,11 @@ rewiremock('@zokugun/cli-utils').with({
 			throw new Error(message);
 		},
 		finishTimer: () => {},
+		print: (message: string) => {
+			if(DEBUG) {
+				console.log(message);
+			}
+		},
 	},
 });
 rewiremock('pacote').with({

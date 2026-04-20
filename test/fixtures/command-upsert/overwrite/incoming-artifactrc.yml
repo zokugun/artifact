@@ -1,3 +1,0 @@
-upsert:
-  src/*:
-    overwrite: true

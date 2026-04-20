@@ -1,20 +1,33 @@
+import { isNonEmptyArray } from '@zokugun/is-it-type';
 import { type DResult, err, OK } from '@zokugun/xtry';
 import { isEqual } from 'lodash-es';
-import { type FileUpsert } from '../../types/config.js';
+import { type UpsertFileConfig } from '../../types/config.js';
 
-export function mergeUpsertProperty(key: string, oldValue: FileUpsert, newValue: FileUpsert): DResult {
+export function mergeUpsertProperty(file: UpsertFileConfig, configs: UpsertFileConfig[]): DResult {
+	for(const config of configs) {
+		if(config.pattern === file.pattern) {
+			return merge(config, file);
+		}
+	}
+
+	configs.push(file);
+
+	return OK;
+}
+
+function merge(currentValue: UpsertFileConfig, newValue: UpsertFileConfig): DResult {
 	if(newValue.filter) {
-		if(oldValue.filter) {
+		if(currentValue.filter) {
 			return err('Not Implemented: filter');
 		}
 		else {
-			oldValue.filter = newValue.filter;
+			currentValue.filter = newValue.filter;
 		}
 	}
 
 	if(newValue.ifExists && newValue.ifExists !== 'merge') {
-		if(oldValue.ifExists) {
-			if(oldValue.ifExists === 'merge' || oldValue.ifExists === newValue.ifExists) {
+		if(currentValue.ifExists) {
+			if(currentValue.ifExists === 'merge' || currentValue.ifExists === newValue.ifExists) {
 				// pass
 			}
 			else {
@@ -22,13 +35,13 @@ export function mergeUpsertProperty(key: string, oldValue: FileUpsert, newValue:
 			}
 		}
 		else {
-			oldValue.ifExists = newValue.ifExists;
+			currentValue.ifExists = newValue.ifExists;
 		}
 	}
 
 	if(newValue.ifMissing && newValue.ifMissing !== 'merge') {
-		if(oldValue.ifMissing) {
-			if(oldValue.ifMissing === 'merge' || oldValue.ifMissing === newValue.ifMissing) {
+		if(currentValue.ifMissing) {
+			if(currentValue.ifMissing === 'merge' || currentValue.ifMissing === newValue.ifMissing) {
 				// pass
 			}
 			else {
@@ -36,36 +49,36 @@ export function mergeUpsertProperty(key: string, oldValue: FileUpsert, newValue:
 			}
 		}
 		else {
-			oldValue.ifMissing = newValue.ifMissing;
+			currentValue.ifMissing = newValue.ifMissing;
 		}
 	}
 
 	if(newValue.rename) {
-		if(oldValue.rename) {
+		if(currentValue.rename) {
 			return err('Not Implemented: rename');
 		}
 		else {
-			oldValue.rename = newValue.rename;
+			currentValue.rename = newValue.rename;
 		}
 	}
 
 	if(newValue.route) {
-		if(oldValue.route) {
+		if(currentValue.route) {
 			return err('Not Implemented: route');
 		}
 		else {
-			oldValue.route = newValue.route;
+			currentValue.route = newValue.route;
 		}
 	}
 
-	if(newValue.transforms && newValue.transforms.length > 0) {
-		if(oldValue.transforms) {
-			if(!isEqual(oldValue.transforms, newValue.transforms)) {
-				return err(`There is a conflict on the "transforms" property for the "${key}" file`);
+	if(isNonEmptyArray(newValue.transforms)) {
+		if(isNonEmptyArray(currentValue.transforms)) {
+			if(!isEqual(currentValue.transforms, newValue.transforms)) {
+				return err(`There is a conflict on the "transforms" property for the "${newValue.pattern}" file`);
 			}
 		}
 		else {
-			oldValue.transforms = newValue.transforms;
+			currentValue.transforms = newValue.transforms;
 		}
 	}
 

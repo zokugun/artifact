@@ -3,7 +3,7 @@ import fse from '@zokugun/fs-extra-plus/async';
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
-import { type Artifact, type FileInstall, type FileUpdate, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { type Artifact, type InstallFileConfig, type UpdateFileConfig, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
 import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_INSTALL_REGEX } from '../utils/constants.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 
@@ -66,8 +66,8 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResult<{ config: InstallConfig; configStats: InstallConfigStats }> { // {{{
 	const artifacts: Record<string, Artifact> = {};
 	let constants: Record<string, string> = {};
-	const install: Record<string, FileInstall> = {};
-	let update: boolean | Record<string, FileUpdate> = {};
+	const install: Record<string, InstallFileConfig> = {};
+	let update: boolean | Record<string, UpdateFileConfig> = {};
 	let variables: Record<string, string> = {};
 
 	if(!data) {
@@ -142,13 +142,9 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeFileUpsert(value, 'update');
+			const normalized = normalizeFileUpsert(key, value, 'update');
 			if(normalized.fails) {
 				return normalized;
-			}
-
-			if(update[key]) {
-				return err(`Conflict with the "${key}" key on "update"1.`);
 			}
 
 			update[key] = normalized.value;

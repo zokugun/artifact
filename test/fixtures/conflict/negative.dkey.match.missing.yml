@@ -1,0 +1,58 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 0.1.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/incoming/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/package.json
+
+  upsert:
+    .github/**/*.yml:
+      if_exists: overwrite
+
+  update:
+    .github/repo-starter-kit.yml:
+      if_exists: skip
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/.github/repo-starter-kit.yml: |
+  package: "@daiyam/default"
+  migrate:
+    labels:
+      bug: T-bug
+      stale: S-stale
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/.github/repo-starter-kit.yml: |
+  package: "@daiyam/default"
+  migrate:
+    labels:
+      bug: T-bug
+      stale: S-stale

@@ -14,22 +14,18 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		context.onMissing = () => 'skip';
 	}
 	else {
-		const existingActions: Record<ExistingAction, string[]> = {
-			merge: [],
-			overwrite: [],
-			skip: [],
-		};
+		const existingActions: Array<{ pattern: string; action: ExistingAction }> = [];
 		const skipMissings: string[] = [];
 		const filters: Record<string, string[]> = {};
 		const routes: Record<string, Journey> = {};
 		const transformations: Record<string, FileTransform[]> = {};
 
-		for(const [file, fileUpdate] of Object.entries(update)) {
-			const { filter, ifExists, ifMissing, rename, route, transforms } = fileUpdate;
+		for(const file of update) {
+			const { filter, ifExists, ifMissing, pattern, rename, route, transforms } = file;
 
 			if(rename) {
 				context.renamedPatterns.push({
-					from: file,
+					from: pattern,
 					to: rename,
 				});
 
@@ -37,26 +33,26 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 			}
 
 			if(ifMissing === 'skip') {
-				skipMissings.push(file);
+				skipMissings.push(pattern);
 			}
 
 			if(ifExists === 'force-merge') {
-				existingActions.merge.push(file);
-			}
-			else if(ifExists === 'skip') {
-				existingActions.skip.push(file);
+				existingActions.push({ pattern, action: 'merge' });
 			}
 			else if(ifExists === 'overwrite') {
-				existingActions.overwrite.push(file);
+				existingActions.push({ pattern, action: 'overwrite' });
 			}
 			else if(ifExists === 'remove') {
-				context.removedPatterns.push(file);
+				context.removedPatterns.push(pattern);
 
 				continue;
 			}
+			else if(ifExists === 'skip') {
+				existingActions.push({ pattern, action: 'skip' });
+			}
 
 			if(filter) {
-				filters[file] = filter;
+				filters[pattern] = filter;
 			}
 
 			if(route) {
@@ -68,20 +64,20 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 				}
 
 				if(alias) {
-					routes[file] = {
+					routes[pattern] = {
 						alias,
 						travel: travel.value,
 					};
 				}
 				else {
-					routes[file] = {
+					routes[pattern] = {
 						travel: travel.value,
 					};
 				}
 			}
 
 			if(transforms) {
-				transformations[file] = transforms;
+				transformations[pattern] = transforms;
 			}
 		}
 
@@ -89,11 +85,11 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 			context.onMissing = (file) => isMatch(file, skipMissings) ? 'skip' : 'continue';
 		}
 
-		if(existingActions.overwrite.length > 0 || existingActions.skip.length > 0) {
+		if(existingActions.length > 0) {
 			context.onExisting = (file) => {
-				for(const [action, files] of Object.entries(existingActions)) {
-					if(isMatch(file, files)) {
-						return action as ExistingAction;
+				for(const { pattern, action } of existingActions) {
+					if(isMatch(file, pattern)) {
+						return action;
 					}
 				}
 

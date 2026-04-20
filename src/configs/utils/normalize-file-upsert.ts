@@ -1,9 +1,9 @@
 import { isArray, isBoolean, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import { type FileTransform, type FileUpsert } from '../../types/config.js';
+import { type FileTransform, type UpsertFileConfig } from '../../types/config.js';
 import { isTransform } from './is-transform.js';
 
-export function normalizeFileUpsert(data: unknown, name: 'install' | 'update' | 'upsert'): DResult<FileUpsert> { // {{{
+export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert'): DResult<UpsertFileConfig> { // {{{
 	if(!isRecord(data)) {
 		return err(`"${name}" must be an object.`);
 	}
@@ -54,6 +54,7 @@ export function normalizeFileUpsert(data: unknown, name: 'install' | 'update' | 
 		filter,
 		ifExists,
 		ifMissing,
+		pattern,
 		rename,
 		route,
 		transforms,

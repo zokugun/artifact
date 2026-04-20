@@ -1,9 +1,9 @@
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import { type FileTransform, type FileUninstall } from '../../types/config.js';
+import { type FileTransform, type UninstallFileConfig } from '../../types/config.js';
 import { isTransform } from './is-transform.js';
 
-export function normalizeFileUninstall(data: unknown): DResult<FileUninstall> { // {{{
+export function normalizeFileUninstall(pattern: string, data: unknown): DResult<UninstallFileConfig> { // {{{
 	if(!isRecord(data)) {
 		return err('"uninstall" must be an object.');
 	}
@@ -29,6 +29,7 @@ export function normalizeFileUninstall(data: unknown): DResult<FileUninstall> { 
 
 	return ok({
 		ifExists,
+		pattern,
 		transforms,
 	});
 } // }}}

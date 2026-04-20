@@ -2,7 +2,7 @@ import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import { isMatch } from 'micromatch';
 import { type FileTransform } from '../types/config.js';
-import { type Context } from '../types/context.js';
+import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
 import { buildTravel } from '../utils/build-travel.js';
 
@@ -13,28 +13,31 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 		return OK;
 	}
 
-	const overwrites: string[] = [];
+	const existingActions: Array<{ pattern: string; action: ExistingAction }> = [];
 	const filters: Record<string, string[]> = {};
 	const routes: Record<string, Journey> = {};
 	const transformations: Record<string, FileTransform[]> = {};
 
-	for(const [file, fileUpdate] of Object.entries(install)) {
-		const { filter, ifExists, rename, route, transforms } = fileUpdate;
+	for(const file of install) {
+		const { filter, ifExists, pattern, rename, route, transforms } = file;
 
 		if(rename) {
 			context.renamedPatterns.push({
-				from: file,
+				from: pattern,
 				to: rename,
 			});
 
 			continue;
 		}
 
-		if(ifExists === 'overwrite') {
-			overwrites.push(file);
+		if(ifExists === 'force-merge') {
+			existingActions.push({ pattern, action: 'merge' });
+		}
+		else if(ifExists === 'overwrite') {
+			existingActions.push({ pattern, action: 'overwrite' });
 		}
 		else if(ifExists === 'remove') {
-			context.removedPatterns.push(file);
+			context.removedPatterns.push(pattern);
 
 			continue;
 		}
@@ -43,7 +46,7 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 		}
 
 		if(filter) {
-			filters[file] = filter;
+			filters[pattern] = filter;
 		}
 
 		if(route) {
@@ -55,25 +58,33 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 			}
 
 			if(alias) {
-				routes[file] = {
+				routes[pattern] = {
 					alias,
 					travel: travel.value,
 				};
 			}
 			else {
-				routes[file] = {
+				routes[pattern] = {
 					travel: travel.value,
 				};
 			}
 		}
 
 		if(transforms) {
-			transformations[file] = transforms;
+			transformations[pattern] = transforms;
 		}
 	}
 
-	if(overwrites.length > 0) {
-		context.onExisting = (file) => isMatch(file, overwrites) ? 'overwrite' : 'merge';
+	if(existingActions.length > 0) {
+		context.onExisting = (file) => {
+			for(const { pattern, action } of existingActions) {
+				if(isMatch(file, pattern)) {
+					return action;
+				}
+			}
+
+			return 'merge';
+		};
 	}
 
 	if(isNonEmptyRecord(filters)) {

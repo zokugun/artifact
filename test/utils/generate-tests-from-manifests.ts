@@ -1,10 +1,13 @@
 import path from 'node:path';
+import process from 'node:process';
 import fse from '@zokugun/fs-extra-plus/sync';
-import { isRecord, isString } from '@zokugun/is-it-type';
+import { isArray, isRecord, isString } from '@zokugun/is-it-type';
 import { expect } from 'chai';
 import { vol } from 'memfs';
 import YAML from 'yaml';
-import { update } from '../rewires/artifact.js';
+import { add, update } from '../rewires/artifact.js';
+
+const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
 
 export function generateTestsFromManifests(directory: string): void {
 	beforeEach(async () => { // {{{
@@ -57,6 +60,19 @@ export function generateTestsFromManifests(directory: string): void {
 			if(!isRecord(manifest.action) || !isString(manifest.action.command)) {
 				throw new Error(`The file "${path.relative(root, filePath)}" requires an "action" entry.`);
 			}
+			else if(manifest.action.command === 'add') {
+				if(!isArray(manifest.action.arguments)) {
+					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments" entry (array).`);
+				}
+
+				const specs = manifest.action.arguments[0];
+
+				if(!isArray<string>(specs, isString)) {
+					throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments[0]" to be an array of string.`);
+				}
+
+				action = async () => add(specs, { verbose: true });
+			}
 			else if(manifest.action.command === 'update') {
 				action = async () => update();
 			}
@@ -78,6 +94,10 @@ export function generateTestsFromManifests(directory: string): void {
 					vol.fromJSON(fromJSON);
 
 					await action();
+
+					if(DEBUG) {
+						console.log(vol.toJSON());
+					}
 
 					for(const [file, data] of Object.entries(expectedFiles)) {
 						expect(vol.readFileSync(`/target/${file}`, 'utf8')).to.eql(data);

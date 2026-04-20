@@ -16,14 +16,14 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 	const cwd = path.join(context.incomingPath, 'configs');
 	const transformations: Record<string, FileTransform[]> = {};
 
-	for(const [file, fileUpdate] of Object.entries(uninstall)) {
-		const { ifExists, transforms } = fileUpdate;
+	for(const file of uninstall) {
+		const { ifExists, pattern, transforms } = file;
 
 		if(ifExists === 'remove') {
-			context.removedPatterns.push(file);
+			context.removedPatterns.push(pattern);
 		}
 		else if(ifExists === 'unmerge') {
-			const filePath = path.join(cwd, file);
+			const filePath = path.join(cwd, pattern);
 
 			const result = await fse.readFile(filePath, 'utf8');
 			if(result.fails) {
@@ -34,14 +34,14 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 			const finalNewLine = data.endsWith('\n');
 
 			context.textFiles.push({
-				name: file,
+				name: pattern,
 				data,
 				finalNewLine,
 			});
 		}
 
 		if(transforms) {
-			transformations[file] = transforms;
+			transformations[pattern] = transforms;
 		}
 	}
 
