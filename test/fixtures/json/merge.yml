@@ -1,0 +1,74 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/target/default.json: |
+  {
+    "foo": "bar",
+    "qux": [
+      1,
+      2,
+      3
+    ],
+    "baz": {
+      "foo": 1,
+      "bar": 2
+    }
+  }
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/default.json: |
+  {
+    "foo": "bar2",
+    "qux": [
+      1,
+      2,
+      4
+    ],
+    "baz": {
+      "foo": 10,
+      "qux": 3
+    }
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/default.json: |
+  {
+    "foo": "bar2",
+    "qux": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "baz": {
+      "foo": 10,
+      "bar": 2,
+      "qux": 3
+    }
+  }
