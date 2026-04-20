@@ -1,5 +1,0 @@
-artifacts:
-  lang-js:
-    version: 1.0.0
-    provides:
-      - "14"

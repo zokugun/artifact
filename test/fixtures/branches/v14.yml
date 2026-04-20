@@ -1,0 +1,39 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/.artifactrc.yml: |
+  artifacts:
+    lang-js:
+      version: 1.0.0
+      requires:
+        - "14"
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/branches/[lang-js:14]/configs/.nvmrc: |
+  v14.21.3
+/incoming/branches/[lang-js:20]/configs/.nvmrc: |
+  v20.18.3
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    lang-js:
+      version: 1.0.0
+      requires:
+        - "14"
+    awesome-config:
+      version: 1.0.0
+/merged/.nvmrc: |
+  v14.21.3
