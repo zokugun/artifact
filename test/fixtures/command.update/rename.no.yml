@@ -1,0 +1,43 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    - name: awesome-config
+      version: 0.1.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/incoming/.artifactrc: |
+  update:
+    workflows/check-pr.yml:
+      rename: workflows/ci-pr.yml
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/workflows/ci-pr.yml: |
+  hello: Hello world!
+
+
+
+/merged/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/workflows/ci-pr.yml: |
+  hello: Hello world!

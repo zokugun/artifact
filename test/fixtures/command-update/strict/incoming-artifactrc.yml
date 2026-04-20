@@ -1,4 +1,0 @@
-update:
-  src/*:
-    missing: false
-    update: false

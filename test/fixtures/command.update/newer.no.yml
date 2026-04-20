@@ -1,0 +1,43 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    - name: awesome-config
+      version: 1.0.0
+/target/.gitignore: |
+  node_modules
+  out
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "0.1.0"
+  }
+/incoming/configs/gitignore: |
+  node_modules
+  lib
+
+
+
+/merged/.artifactrc: |
+  artifacts:
+    - name: awesome-config
+      version: 1.0.0
+/merged/.gitignore: |
+  node_modules
+  out
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }

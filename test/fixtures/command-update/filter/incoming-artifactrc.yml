@@ -1,6 +1,0 @@
-update:
-  package.json:
-    filter:
-      - main
-      - scripts
-      - devDependencies

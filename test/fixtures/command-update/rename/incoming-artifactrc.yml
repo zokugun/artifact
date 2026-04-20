@@ -1,3 +1,0 @@
-update:
-  workflows/check-pr.yml:
-    rename: workflows/ci-pr.yml

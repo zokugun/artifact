@@ -1,6 +1,0 @@
-update:
-  src/index.ts:
-    update: true
-
-  src/*:
-    update: false
