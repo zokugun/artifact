@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.1 | 2026-04-20
+- fix the order of the actions
+- improve formatting
+
 ## v0.6.0 | 2026-04-16
 - add `uninstall` command
 - add `always` and `upsert` lifecycles
