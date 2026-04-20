@@ -1,3 +1,0 @@
-uninstall:
-  package.json:
-    unmerge: true

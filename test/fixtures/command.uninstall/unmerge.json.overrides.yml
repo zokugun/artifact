@@ -1,0 +1,87 @@
+action:
+  command: remove
+  arguments:
+    - - awesome-config
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "homepage": "https://www.quxbaz.com",
+    "scripts": {
+      "bundle": "ncc build out/extension --out lib",
+      "compile": "tsc -p src",
+      "release": "release-it",
+      "vscode:prepublish": "npm run compile && npm run bundle",
+      "watch": "tsc-watch -p src --onSuccess 'npm run bundle'"
+    },
+    "devDependencies": {
+      "@types/vscode": "^1.23.0",
+      "@vercel/ncc": "^0.29.0",
+      "release-it": "^14.11.3",
+      "tsc-watch": "^4.4.0"
+    },
+    "overrides": {
+      "mocha": {
+        "diff": "8.0.3",
+        "serialize-javascript": "7.0.5"
+      }
+    }
+  }
+
+
+
+/incoming/.artifactrc: |
+  uninstall:
+    package.json:
+      unmerge: true
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/package.json: |
+  {
+    "scripts": {
+      "bundle": "ncc build out/extension --out lib",
+      "vscode:prepublish": "npm run compile && npm run bundle",
+      "watch": "tsc-watch -p src --onSuccess 'npm run bundle'"
+    },
+    "devDependencies": {
+      "@vercel/ncc": "^0.29.0"
+    },
+    "overrides": {
+      "mocha": {
+        "diff": "8.0.3",
+        "serialize-javascript": "7.0.5"
+      }
+    }
+  }
+
+
+
+/merged/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts: {}
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "homepage": "https://www.quxbaz.com",
+    "scripts": {
+      "compile": "tsc -p src",
+      "release": "release-it"
+    },
+    "devDependencies": {
+      "@types/vscode": "^1.23.0",
+      "release-it": "^14.11.3",
+      "tsc-watch": "^4.4.0"
+    },
+    "overrides": {}
+  }

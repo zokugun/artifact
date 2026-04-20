@@ -1,0 +1,47 @@
+action:
+  command: remove
+  arguments:
+    - - awesome-config
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/target/src/index2.ts: |
+  export function hello(name: string): string {
+    return `Hello ${name}!`;
+  }
+
+
+
+/incoming/.artifactrc: |
+  uninstall:
+    src/*:
+      remove: true
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+
+
+
+/merged/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts: {}
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/src/index2.ts:
+  error: "ENOENT: no such file or directory"
+/merged/src/index.ts:
+  error: "ENOENT: no such file or directory"

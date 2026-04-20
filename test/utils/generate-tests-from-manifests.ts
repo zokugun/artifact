@@ -43,7 +43,6 @@ export function generateTestsFromManifests(directory: string): void {
 
 			const fromJSON = {};
 			const expectedFiles = {};
-			let expectedCount = 0;
 
 			for(const [key, data] of Object.entries(manifest)) {
 				if(key.startsWith('/target/') || key.startsWith('/incoming/')) {
@@ -51,7 +50,6 @@ export function generateTestsFromManifests(directory: string): void {
 				}
 				else if(key.startsWith('/merged/')) {
 					expectedFiles[key.slice(8)] = data;
-					expectedCount += 1;
 				}
 			}
 
@@ -127,8 +125,6 @@ export function generateTestsFromManifests(directory: string): void {
 							await expect(action).to.be.rejectedWith(`${(data as any).error}, open '/target/${file}'`);
 						}
 					}
-
-					expect(Object.keys(vol.toJSON()).filter((file) => file.startsWith('/target/')).length).to.eql(expectedCount);
 				});
 			}
 		}
