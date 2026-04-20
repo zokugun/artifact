@@ -1,0 +1,47 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config:20
+
+
+
+
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/.artifactrc.yml: |
+  variants:
+    root: 14
+/incoming/variants/14/configs/.nvmrc: |
+  v14.21.3
+/incoming/variants/14/configs/.fixpackrc: |
+  sortToTop:
+    - description
+    - version
+/incoming/variants/20/.artifactrc.yml: |
+  extends: root
+/incoming/variants/20/configs/.nvmrc: |
+  v20.18.3
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+      requires:
+        - "20"
+      provides:
+        - "14"
+/merged/.nvmrc: |
+  v20.18.3
+/merged/.fixpackrc: |
+  sortToTop:
+    - description
+    - version

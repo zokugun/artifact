@@ -1,0 +1,80 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config:24
+
+
+
+
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/.artifactrc.yml: |
+  variants:
+    root: 14
+/incoming/variants/14/configs/.nvmrc: |
+  v14.21.3
+/incoming/variants/14/configs/.fixpackrc: |
+  sortToTop:
+    - description
+    - version
+/incoming/variants/20/.artifactrc.yml: |
+  extends: root
+/incoming/variants/20/configs/.nvmrc: |
+  v20.18.3
+/incoming/variants/20/configs/.editorconfig: |
+  root = true
+  
+  [*]
+  indent_style = tab
+  tab_width = 4
+  end_of_line = lf
+  charset = utf-8
+  trim_trailing_whitespace = true
+  insert_final_newline = true
+  
+  [{*.yml,*.yaml}]
+  indent_style = space
+  indent_size = 2
+/incoming/variants/24/.artifactrc.yml: |
+  extends: 20
+/incoming/variants/24/configs/.nvmrc: |
+  v24.12.0
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+      requires:
+        - "24"
+      provides:
+        - "14"
+        - "20"
+/merged/.nvmrc: |
+  v24.12.0
+/merged/.fixpackrc: |
+  sortToTop:
+    - description
+    - version
+/merged/.editorconfig: |
+  root = true
+  
+  [*]
+  indent_style = tab
+  tab_width = 4
+  end_of_line = lf
+  charset = utf-8
+  trim_trailing_whitespace = true
+  insert_final_newline = true
+  
+  [{*.yml,*.yaml}]
+  indent_style = space
+  indent_size = 2
