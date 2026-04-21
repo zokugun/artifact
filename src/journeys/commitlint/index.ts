@@ -1,16 +1,16 @@
-import { compose, json, rc, yaml } from '../../compositors/index.js';
+import { compose, json, mapSort, rc, yaml } from '../../compositors/index.js';
 import { listConcat, overwrite, primitive } from '../../routes/index.js';
 import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
 import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 
-const mainRoute = compose({
+const mainRoute = mapSort(compose({
 	extends: listConcat,
 	parserPreset: primitive,
-	rules: compose({
+	rules: mapSort(compose({
 		$$default: overwrite,
-	}),
+	})),
 	$$default: primitive,
-});
+}));
 
 const jsonRoute = json(mainRoute);
 const yamlRoute = yaml(mainRoute);

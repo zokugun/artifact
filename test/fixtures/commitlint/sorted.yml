@@ -1,0 +1,57 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/.commitlintrc.yml: |
+  rules:
+    type-enum:
+      - 2
+      - always
+      -
+        - build
+        - ci
+        - docs
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/configs/.commitlintrc.yml: |
+  rules:
+    body-max-line-length:
+      - 2
+      - always
+      - 200
+    type-enum:
+      - 2
+      - always
+      -
+        - build
+        - ci
+        - docs
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+/merged/.commitlintrc.yml: |
+  rules:
+    body-max-line-length:
+      - 2
+      - always
+      - 200
+    type-enum:
+      - 2
+      - always
+      - - build
+        - ci
+        - docs
