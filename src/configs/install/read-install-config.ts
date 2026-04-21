@@ -72,7 +72,6 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 
 function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResult<{ config: InstallConfig; configStats: InstallConfigStats }> { // {{{
 	const artifacts: Record<string, Artifact> = {};
-	let constants: Record<string, Primitive> = {};
 	const install: Record<string, InstallFileConfig> = {};
 	let update: boolean | Record<string, UpdateFileConfig> = {};
 	let variables: Record<string, Primitive> = {};
@@ -81,7 +80,6 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 		return ok({
 			config: {
 				artifacts,
-				constants,
 				install,
 				update,
 				variables,
@@ -140,10 +138,6 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 		}
 	}
 
-	if(isRecord<Primitive>(data.constants, (_key, value) => isPrimitive(value))) {
-		constants = data.constants;
-	}
-
 	if(data.update === false) {
 		update = false;
 	}
@@ -165,7 +159,6 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 	return ok({
 		config: {
 			artifacts,
-			constants,
 			install,
 			update,
 			variables,

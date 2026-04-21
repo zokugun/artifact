@@ -171,14 +171,23 @@ export class TemplateEngine {
 			return err(`Invalid variable: ${name}.`);
 		}
 
-		const result = this.resolveExpression(expression);
-		if(result.fails) {
+		if(expression.at(0) === '=') {
+			const result = this.resolveExpression(expression.slice(1));
+			if(result.fails) {
+				return result;
+			}
+
+			this.variableCache.set(name, result.value);
+
 			return result;
 		}
+		else {
+			const value = expression.at(0) === '\\' && expression.at(1) === '=' ? expression.slice(1) : expression;
 
-		this.variableCache.set(name, result.value);
+			this.variableCache.set(name, value);
 
-		return result;
+			return ok(value);
+		}
 	} // }}}
 
 	private splitPlaceholder(placeholder: string): DResult<{ name: string; propertyPath: string }> { // {{{

@@ -1,0 +1,50 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/target/.artifactrc.yml: |
+  variables:
+    ISSUE_ID: 99
+
+
+
+/incoming/package.json: |
+  {
+    "name": "awesome-config",
+    "version": "1.0.0"
+  }
+/incoming/.artifactrc.yml: |
+  variables:
+    ISSUE_ID: 1
+/incoming/configs/.github/ISSUE_TEMPLATE/preapproved.yml: |
+  name: Pre-Discussed and Approved Topics
+  body:
+    - type: markdown
+      attributes:
+        value: |-
+          Please prefer GitHub Discussions. See: https://github.com//issues/#[[vars.ISSUE_ID]]
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  artifacts:
+    awesome-config:
+      version: 1.0.0
+  variables:
+    ISSUE_ID: 99
+/merged/.github/ISSUE_TEMPLATE/preapproved.yml: |
+  name: Pre-Discussed and Approved Topics
+  body:
+    - type: markdown
+      attributes:
+        value: |-
+          Please prefer GitHub Discussions. See: https://github.com//issues/99

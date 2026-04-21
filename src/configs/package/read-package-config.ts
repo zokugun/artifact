@@ -46,7 +46,6 @@ export async function readPackageConfig(targetPath: string): AsyncDResult<Packag
 }
 
 function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> { // {{{
-	let constants: Record<string, Primitive> = {};
 	let xtends: string | undefined;
 	const install: InstallFileConfig[] = [];
 	let orphan: boolean = false;
@@ -57,7 +56,6 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 
 	if(!data) {
 		return ok({
-			constants,
 			extends: xtends,
 			install,
 			orphan,
@@ -82,10 +80,6 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 		if(version > MAX_VERSION) {
 			return err(`Don't support newer version (v${version}) in the package's "${source}".`);
 		}
-	}
-
-	if(isRecord<Primitive>(data.constants, (_key, value) => isPrimitive(value))) {
-		constants = data.constants;
 	}
 
 	if(isString(data.extends)) {
@@ -200,7 +194,6 @@ function normalizeConfig(data: unknown, source: string): DResult<PackageConfig> 
 	}
 
 	return ok({
-		constants,
 		extends: xtends,
 		install,
 		orphan,

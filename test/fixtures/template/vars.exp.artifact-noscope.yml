@@ -20,7 +20,7 @@ action:
   }
 /incoming/.artifactrc.yml: |
   variables:
-    BINARY_NAME: package.json.name.split('/').at(-1)
+    BINARY_NAME: =package.json.name.split('/').at(-1)
 /incoming/configs/package.json: |
   {
     "bin": {

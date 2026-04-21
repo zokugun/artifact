@@ -16,7 +16,6 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 		$schema: string;
 		artifacts: Record<string, Artifact>;
 		update?: boolean | Record<string, UpdateFileConfig>;
-		constants?: Record<string, Primitive>;
 		variables?: Record<string, Primitive>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
@@ -25,10 +24,6 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 
 	if(isNonEmptyRecord(config.update)) {
 		exported.update = config.update;
-	}
-
-	if(isNonEmptyRecord(config.constants)) {
-		exported.constants = config.constants;
 	}
 
 	if(isNonEmptyRecord(config.variables)) {

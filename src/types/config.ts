@@ -12,7 +12,6 @@ export type PackageManifest = {
 };
 
 export type PackageConfig = {
-	constants: Record<string, Primitive>;
 	extends?: string;
 	install: InstallFileConfig[];
 	orphan: boolean;
@@ -32,7 +31,6 @@ export type ArtifactResult = Artifact & { name: string };
 
 export type InstallConfig = {
 	artifacts: Record<string, Artifact>;
-	constants: Record<string, Primitive>;
 	install: Record<string, InstallFileConfig>;
 	update: false | Record<string, UpdateFileConfig>;
 	variables: Record<string, Primitive>;

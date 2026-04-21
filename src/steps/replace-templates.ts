@@ -6,9 +6,8 @@ export async function replaceTemplates({ textFiles, binaryFiles, targetPath, con
 	const variables = {
 		...incomingConfig?.variables,
 		...config?.variables,
-		...incomingConfig?.constants,
-		...config?.constants,
 	};
+
 	const engine = new TemplateEngine(targetPath, variables);
 
 	for(const file of textFiles) {
