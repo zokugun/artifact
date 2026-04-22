@@ -2,20 +2,17 @@ import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
-import globby from 'globby';
 import { getEncoding, isText } from 'istextorbinary';
 import { type Context } from '../types/context.js';
 import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
+import { listWorkingFiles } from '../utils/list-working-files.js';
 import { readBuffer } from '../utils/read-buffer.js';
 
 export async function readFiles({ incomingPath, textFiles, binaryFiles, options }: Context): AsyncDResult {
 	const cwd = path.join(incomingPath, 'configs');
 
-	const files = await globby(['**/*', '!**/*.lock', '!**/*-lock.*'], {
-		cwd,
-		dot: true,
-	});
+	const files = await listWorkingFiles(cwd);
 
 	for(const file of files) {
 		const filePath = path.join(cwd, file);

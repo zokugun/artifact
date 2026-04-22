@@ -11,6 +11,7 @@ export async function configureBranches(context: Context): AsyncDResult {
 	if(await fse.isExisting(cwd)) {
 		const directories = await globby('*', {
 			cwd,
+			deep: 1,
 			onlyDirectories: true,
 		});
 

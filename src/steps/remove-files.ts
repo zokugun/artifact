@@ -2,9 +2,9 @@ import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
-import globby from 'globby';
 import { isMatch } from 'micromatch';
 import { type Context } from '../types/context.js';
+import { listWorkingFiles } from '../utils/list-working-files.js';
 
 export async function removeFiles({ removedPatterns, targetPath, options }: Context): AsyncDResult {
 	if(removedPatterns.length === 0) {
@@ -12,11 +12,7 @@ export async function removeFiles({ removedPatterns, targetPath, options }: Cont
 	}
 
 	const cwd = path.join(targetPath);
-
-	const files = await globby(['**/*', '!**/*.lock', '!**/*-lock.*', '!.git'], {
-		cwd,
-		dot: true,
-	});
+	const files = await listWorkingFiles(cwd);
 
 	for(const file of files) {
 		if(isMatch(file, removedPatterns)) {
