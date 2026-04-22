@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.3 | 2026-04-22
+- limit file system traversing
+
 ## v0.6.2 | 2026-04-21
 - expressions in `variables` need to be prefixed with `=`
 - support non-expressions in `variables`
