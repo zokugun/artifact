@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.7.0 | 2026-04-24
+- pass variables to the `add` command
+- template expressions are supporting the pipe operator
+
 ## v0.6.3 | 2026-04-22
 - limit file system traversing
 
