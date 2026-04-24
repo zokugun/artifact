@@ -4,6 +4,7 @@ import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
+import { type Options } from '../types/context.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
@@ -32,11 +33,12 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 
 	const targetPath = process.cwd();
 
-	const options = {
+	const options: Options = {
+		dryRun: inputOptions?.dryRun ?? false,
 		force: inputOptions?.force ?? false,
 		skip: inputOptions?.skip ?? false,
+		variables: {},
 		verbose: inputOptions?.verbose ?? false,
-		dryRun: inputOptions?.dryRun ?? false,
 	};
 
 	const configResult = await readInstallConfig(targetPath);

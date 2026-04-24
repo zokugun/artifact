@@ -1,9 +1,10 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/sync';
-import { isPrimitive, type Primitive } from '@zokugun/is-it-type';
+import { isNonEmptyString, isPrimitive, type Primitive } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import gitUrlParse from 'git-url-parse';
 import { isNil, isPlainObject } from 'lodash-es';
 import * as YAML from '../parsers/yaml.js';
 import { tryJSON } from './try-json.js';
@@ -11,7 +12,14 @@ import { tryJSON } from './try-json.js';
 dayjs.extend(utc);
 
 const EXPRESSION_REGEX = /#\[\[(.*?)]]/g;
-const NEXT_PROPERTY_REGEX = /^(\w+?)((?=\.|$).*)$/;
+const PATH_PROPERTY_REGEX = /^(\w+?)(?:\.|$)(.*)$/;
+const PIPE_SEPARATOR_REGEX = /\s*\|>\s*/;
+// Pattern: |> fn(_).prop
+const PIPE_CALL_REGEX = /^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\(\s*_\s*\)\s*(\.\s*.*?)\s*$/;
+// Pattern: |> fn
+const PIPE_FUNCTION_REGEX = /^([A-Za-z_$][\w$]+(?:\.[A-Za-z_$][\w$]*)*)\s*$/;
+// Pattern: |> _.prop
+const PIPE_PROPERTY_REGEX = /^_\.\s*(.*?)\s*$/;
 const PLACEHOLDER_REGEX = /^((?:[^/.]+(?:[^/]+\/)*\/)?\.?[^.]+(?:\.(?:json|ya?ml))?)\.(.*)$/;
 
 export class TemplateEngine {
@@ -46,13 +54,13 @@ export class TemplateEngine {
 		return ok(content);
 	} // }}}
 
-	private getValueByPath(values: Record<string, unknown>, propertyPath: string): DResult<unknown> { // {{{
+	private getValueByPath(values: Record<string, unknown>, propertyPath: string): DResult<{ value: unknown; expression?: string }> { // {{{
 		let currentPath = propertyPath;
 		let currentValue: unknown = values;
 
 		let match: RegExpExecArray | null;
 
-		while((match = NEXT_PROPERTY_REGEX.exec(currentPath))) {
+		while((match = PATH_PROPERTY_REGEX.exec(currentPath))) {
 			if(!isPlainObject(currentValue)) {
 				return err(`Property path not found: ${propertyPath}`);
 			}
@@ -66,14 +74,63 @@ export class TemplateEngine {
 			currentPath = match[2];
 
 			if(currentPath.length === 0) {
-				return ok(currentValue);
+				return ok({ value: currentValue });
 			}
 		}
 
-		// eslint-disable-next-line no-new-func
-		const fn = new Function('it', `return it${unescapeCode(currentPath)};`);
+		return ok({ value: currentValue, expression: `.${currentPath}` });
+	} // }}}
 
-		return ok(fn(currentValue));
+	private evaluateExpression(expression: string, values: Record<string, unknown>): DResult<unknown> { // {{{
+		const operands = expression.split(PIPE_SEPARATOR_REGEX);
+		const root = this.getValueByPath(values, operands.shift()!);
+		if(root.fails) {
+			return root;
+		}
+
+		const { value, expression: rootExpression } = root.value;
+
+		if(operands.length === 0) {
+			if(isNonEmptyString<string>(rootExpression)) {
+				// eslint-disable-next-line no-new-func
+				const fn = new Function('it', `return it${unescapeCode(rootExpression)};`);
+
+				return ok(fn(value));
+			}
+			else {
+				return ok(value);
+			}
+		}
+
+		const lines: string[] = [];
+
+		if(isNonEmptyString<string>(rootExpression)) {
+			lines.push(`it = it${unescapeCode(rootExpression)};`);
+		}
+
+		let match: RegExpExecArray | null = null;
+
+		for(const operand of operands) {
+			if((match = PIPE_FUNCTION_REGEX.exec(operand))) {
+				lines.push(`it = ${unescapeCode(match[1])}(it);`);
+			}
+			else if((match = PIPE_PROPERTY_REGEX.exec(operand))) {
+				lines.push(`it = it.${unescapeCode(match[1])};`);
+			}
+			else if((match = PIPE_CALL_REGEX.exec(operand))) {
+				lines.push(`it = ${unescapeCode(match[1])}(it)${unescapeCode(match[2])};`);
+			}
+			else {
+				return err(`Cannot evaluate "${expression}"`);
+			}
+		}
+
+		lines.push('return it;');
+
+		// eslint-disable-next-line no-new-func
+		const fn = new Function('it, toGitUrl', lines.join('\n'));
+
+		return ok(fn(value, gitUrlParse));
 	} // }}}
 
 	private parseFile(filename: string): DResult<Record<string, any>> { // {{{
@@ -143,16 +200,17 @@ export class TemplateEngine {
 				return readResult;
 			}
 
-			const getValueResult = this.getValueByPath(readResult.value, propertyPath);
-			if(getValueResult.fails) {
-				return getValueResult;
+			// const getValueResult = this.getValueByPath(readResult.value, propertyPath);
+			const evalResult = this.evaluateExpression(propertyPath, readResult.value);
+			if(evalResult.fails) {
+				return evalResult;
 			}
 
-			if(isNil(getValueResult.value)) {
+			if(isNil(evalResult.value)) {
 				return err(expression);
 			}
 
-			return ok(String(getValueResult.value));
+			return ok(String(evalResult.value));
 		}
 	} // }}}
 
@@ -217,6 +275,6 @@ export class TemplateEngine {
 	} // }}}
 }
 
-export function unescapeCode(code: string): string {
+function unescapeCode(code: string): string {
 	return code.replaceAll(/\\('|\\)/g, '$1').replaceAll(/[\r\t\n]/g, ' ');
 }

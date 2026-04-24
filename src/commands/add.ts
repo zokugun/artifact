@@ -4,6 +4,7 @@ import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
+import { type Options } from '../types/context.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
@@ -32,17 +33,32 @@ const { mainFlow } = composeSteps(
 	],
 );
 
-export async function add(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
+type CLIOptions = {
+	dryRun?: boolean;
+	force?: boolean;
+	skip?: boolean;
+	var?: Array<{ name: string; value: string }>;
+	verbose?: boolean;
+};
+
+export async function add(specs: string[], inputOptions?: CLIOptions): Promise<void> {
 	logger.beginTimer();
 
 	const targetPath = process.cwd();
 
-	const options = {
+	const options: Options = {
+		dryRun: inputOptions?.dryRun ?? false,
 		force: inputOptions?.force ?? false,
 		skip: inputOptions?.skip ?? false,
+		variables: {},
 		verbose: inputOptions?.verbose ?? false,
-		dryRun: inputOptions?.dryRun ?? false,
 	};
+
+	if(inputOptions?.var) {
+		for(const { name, value } of inputOptions.var) {
+			options.variables[name] = value;
+		}
+	}
 
 	const configResult = await readInstallConfig(targetPath);
 	if(configResult.fails) {

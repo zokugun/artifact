@@ -1,3 +1,4 @@
+import { type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult } from '@zokugun/xtry';
 import { type BinaryFile } from './binary-file.js';
 import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform } from './config.js';
@@ -49,6 +50,7 @@ export type Options = {
 	skip: boolean;
 	verbose: boolean;
 	dryRun: boolean;
+	variables: Record<string, Primitive>;
 };
 
 export type Block = {
@@ -59,19 +61,6 @@ export type Block = {
 	incomingPath: string;
 };
 
-// export type TextFile = {
-// 	data: string;
-// 	finalNewLine: boolean;
-// 	indentStyle: IndentStyle;
-// 	indentSize: number,
-// 	mode?: number;
-// 	name: string;
-// };
-
-// export type OutputFile = TextFile & {
-// 	input?: TextFile;
-// }
-
 export type TextFile = {
 	data: string;
 	finalNewLine: boolean;
@@ -79,8 +68,3 @@ export type TextFile = {
 	mode?: number;
 	name: string;
 };
-
-// export type OutputTextFile = {
-// 	data: string;
-// 	name: string;
-// };

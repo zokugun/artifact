@@ -14,13 +14,13 @@ export async function validateNotPresentPackage({ incomingPackage, config, optio
 	if(artifact) {
 		if(options.skip) {
 			if(options.verbose) {
-				logger.debug('The incoming artifact is already present, skipping...');
+				logger.debug(`The "${name}" artifact is already present, skipping...`);
 			}
 
 			return OK_TRUE;
 		}
 		else {
-			return err('The incoming artifact has already been added.');
+			return err(`The "${name}" artifact has already been added.`);
 		}
 	}
 

@@ -6,6 +6,7 @@ import tempy from 'tempy';
 import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
+import { type Options } from '../types/context.js';
 
 const { mainFlow } = composeSteps(
 	[
@@ -38,11 +39,12 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 
 	const targetPath = process.cwd();
 
-	const options = {
+	const options: Options = {
+		dryRun: inputOptions?.dryRun ?? false,
 		force: inputOptions?.force ?? false,
 		skip: false,
+		variables: {},
 		verbose: inputOptions?.verbose ?? false,
-		dryRun: inputOptions?.dryRun ?? false,
 	};
 
 	const configResult = await readInstallConfig(targetPath);
