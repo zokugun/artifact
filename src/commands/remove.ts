@@ -1,5 +1,6 @@
 import process from 'process';
-import { c, logger } from '@zokugun/cli-utils';
+import { c, logger, enquirer, confirm } from '@zokugun/cli-utils';
+import { xtry } from '@zokugun/xtry/async';
 import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';
@@ -47,6 +48,38 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 	}
 
 	const { config, configStats } = configResult.value;
+
+	if(specs.length === 0) {
+		const { value } = await xtry(enquirer.prompt<{ specs: string[] }>({
+			type: 'multiselect',
+			name: 'specs',
+			message: 'Pick the artifacts to remove',
+			choices: Object.keys(config.artifacts).map((name) => ({ name })),
+		}));
+
+		const marked = value?.specs;
+
+		if(!marked || marked.length === 0) {
+			logger.warn('No artifacts marked for removal');
+		}
+		else {
+			const { value } = await xtry(enquirer.prompt<{ remove: boolean }>(
+				[
+					confirm({
+						name: 'remove',
+						message: `Remove the following artifacts: ${marked.map((name) => c.green(name)).join(',')}`,
+					}),
+				],
+			));
+
+			if(value?.remove) {
+				specs.push(...marked);
+			}
+			else {
+				logger.warn('Artifacts removal has been rejected');
+			}
+		}
+	}
 
 	for(const spec of specs) {
 		const requestResult = resolveRequest(spec);

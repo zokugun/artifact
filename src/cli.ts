@@ -36,23 +36,6 @@ program
 	.action(add);
 
 program
-	.command('update')
-	.description('update the current project using the installed artifacts')
-	.option('-d, --dry-run', 'fake update')
-	.option('--verbose', 'output more details')
-	.alias('up')
-	.action(update);
-
-program
-	.command('remove')
-	.description('remove an artifact from the current project')
-	.option('-d, --dry-run', 'fake uninstall')
-	.option('--verbose', 'output more details')
-	.argument('<artifacts...>')
-	.alias('rm')
-	.action(remove);
-
-program
 	.command('list')
 	.description('list the installed artifacts in the project')
 	.alias('ls')
@@ -63,5 +46,22 @@ program
 	.description('check for outdated artifacts')
 	.alias('od')
 	.action(outdated);
+
+program
+	.command('remove')
+	.description('remove an artifact from the current project')
+	.option('-d, --dry-run', 'fake uninstall')
+	.option('--verbose', 'output more details')
+	.argument('[artifacts...]')
+	.alias('rm')
+	.action(remove);
+
+program
+	.command('update')
+	.description('update the current project using the installed artifacts')
+	.option('-d, --dry-run', 'fake update')
+	.option('--verbose', 'output more details')
+	.alias('up')
+	.action(update);
 
 program.parse();

@@ -68,6 +68,26 @@ Artifacts published to npm must be prefixed with `artifact-`.
 Command Reference
 -----------------
 
+### Usage
+
+```
+Usage: artifact [options] [command]
+
+Boilerplate your project & keep your configurations up to date
+
+Options:
+  -v, --version                       output the version number
+  -h, --help                          display help for command
+
+Commands:
+  add [options] <artifacts...>        add an artifact to the current project
+  list|ls                             list the installed artifacts in the project
+  outdated|od                         check for outdated artifacts
+  remove|rm [options] [artifacts...]  remove an artifact from the current project
+  update|up [options]                 update the current project using the installed artifacts
+  help [command]                      display help for command
+```
+
 ### `artifact add`
 
 Registers and applies one or more artifacts in the current project.
@@ -78,7 +98,7 @@ Registers and applies one or more artifacts in the current project.
 
 `<artifact>` can be `name` or `name:variant`.
 
-### `artifact list` / `artifact l`
+### `artifact list` / `artifact ls`
 
 Shows the artifacts currently tracked in `.artifactrc*`, including versions and, when available, requested variants.
 
@@ -94,24 +114,6 @@ Applies or refreshes the files provided by each installed artifact. Re-run it wh
 - Alias: `artifact up`
 - Advanced: pass `-v, --verbose` for an execution trace of routes, variants, and branches.
 - Artifact authors can control how updates behave via `.artifactrc` files shipped inside their artifacts.
-
-```
-Usage: artifact [options] [command]
-
-Boilerplate your project & keep your configurations up to date
-
-Options:
-  -v, --version                       output the version number
-  -h, --help                          display help for command
-
-Commands:
-  add [options] <artifacts...>        add an artifact to the current project
-  update|up [options]                 update the current project using the installed artifacts
-  remove|rm [options] <artifacts...>  remove an artifact from the current project
-  list|ls                             list the installed artifacts in the project
-  outdated|od                         check for outdated artifacts
-  help [command]                      display help for command
-```
 
 #### Best practices
 
