@@ -61,9 +61,8 @@ export async function list(): Promise<void> {
 
 		const lines = formatTable(table, 'LLLL');
 
-		console.log(lines.join('\n'));
+		logger.print(lines.join('\n'));
 	}
 
 	logger.newLine();
 }
-

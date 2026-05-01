@@ -109,6 +109,7 @@ Commands:
   update|up [options]                 update the current project using the installed artifacts
   remove|rm [options] <artifacts...>  remove an artifact from the current project
   list|ls                             list the installed artifacts in the project
+  outdated|od                         check for outdated artifacts
   help [command]                      display help for command
 ```
 

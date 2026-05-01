@@ -46,11 +46,13 @@
 		"watch:test": "tsc-watch -p test"
 	},
 	"dependencies": {
+		"@types/cli-progress": "^3.11.6",
 		"@zokugun/cli-utils": "0.3.1",
 		"@zokugun/configdotts-merge": "0.2.1",
 		"@zokugun/fs-extra-plus": "0.3.7",
 		"@zokugun/is-it-type": "0.8.1",
 		"@zokugun/xtry": "0.11.4",
+		"cli-progress": "^3.12.0",
 		"dayjs": "1.11.20",
 		"editorconfig": "0.15.3",
 		"git-url-parse": "16.1.0",

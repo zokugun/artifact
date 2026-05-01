@@ -1,6 +1,6 @@
 import { Command } from '@zokugun/cli-utils/commander';
 import pkg from '../package.json';
-import { add, list, remove, update } from './commands/index.js';
+import { add, list, outdated, remove, update } from './commands/index.js';
 
 const program = new Command();
 
@@ -57,5 +57,11 @@ program
 	.description('list the installed artifacts in the project')
 	.alias('ls')
 	.action(list);
+
+program
+	.command('outdated')
+	.description('check for outdated artifacts')
+	.alias('od')
+	.action(outdated);
 
 program.parse();
