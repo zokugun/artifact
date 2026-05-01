@@ -37,7 +37,7 @@
 		"release": "release-it",
 		"test": "tsc -p test && mocha",
 		"test:dev": "mocha",
-		"test:watch": "tsc-watch -p src -p test --onSuccess 'mocha -g=\"vars.exp.pipe.gitname.dotprop\"'",
+		"test:watch": "tsc-watch -p src -p test --onSuccess 'mocha -g=\"\"'",
 		"update:artifacts": "artifact update",
 		"update:ci": "PINACT_MIN_AGE=7 pinact run",
 		"update:deps": "taze",

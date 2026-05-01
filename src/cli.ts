@@ -55,7 +55,7 @@ program
 program
 	.command('list')
 	.description('list the installed artifacts in the project')
-	.alias('l')
+	.alias('ls')
 	.action(list);
 
 program.parse();

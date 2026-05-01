@@ -83,7 +83,7 @@ Registers and applies one or more artifacts in the current project.
 Shows the artifacts currently tracked in `.artifactrc*`, including versions and, when available, requested variants.
 
 - Syntax: `artifact list`
-- Alias: `artifact l`
+- Alias: `artifact ls`
 - Output: prints each artifact as `name@version:variant`.
 
 ### `artifact update` / `artifact up`
@@ -94,6 +94,23 @@ Applies or refreshes the files provided by each installed artifact. Re-run it wh
 - Alias: `artifact up`
 - Advanced: pass `-v, --verbose` for an execution trace of routes, variants, and branches.
 - Artifact authors can control how updates behave via `.artifactrc` files shipped inside their artifacts.
+
+```
+Usage: artifact [options] [command]
+
+Boilerplate your project & keep your configurations up to date
+
+Options:
+  -v, --version                       output the version number
+  -h, --help                          display help for command
+
+Commands:
+  add [options] <artifacts...>        add an artifact to the current project
+  update|up [options]                 update the current project using the installed artifacts
+  remove|rm [options] <artifacts...>  remove an artifact from the current project
+  list|ls                             list the installed artifacts in the project
+  help [command]                      display help for command
+```
 
 #### Best practices
 

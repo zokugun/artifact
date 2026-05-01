@@ -1,11 +1,14 @@
+import path from 'node:path';
 import process from 'process';
-import { logger } from '@zokugun/cli-utils';
-import { last } from 'lodash-es';
+import { c, logger } from '@zokugun/cli-utils';
+import fse from '@zokugun/fs-extra-plus/async';
+import { stringifyError } from '@zokugun/xtry';
 import { readInstallConfig } from '../configs/index.js';
-import { type Artifact } from '../types/config.js';
+import { type Artifact, type PackageManifest } from '../types/config.js';
+import { formatTable } from '../utils/format-table.js';
 
 function formatVariant(artifact: Artifact): string {
-	const variant = Array.isArray(artifact.requires) ? last(artifact.requires) ?? '' : '';
+	const variant = Array.isArray(artifact.requires) ? artifact.requires.at(-1) ?? '' : '';
 
 	if(variant.length > 0) {
 		return `:${variant}`;
@@ -16,29 +19,51 @@ function formatVariant(artifact: Artifact): string {
 }
 
 export async function list(): Promise<void> {
-	const targetPath = process.env.INIT_CWD!;
+	const targetPath = process.cwd();
 
 	const configResult = await readInstallConfig(targetPath);
 	if(configResult.fails) {
 		logger.fatal(configResult.error);
 	}
 
+	const packageResult = await fse.readJSON(path.resolve(targetPath, './package.json'));
+	if(packageResult.fails) {
+		logger.fatal(stringifyError(packageResult.error));
+	}
+
+	const { name } = packageResult.value as PackageManifest;
+
 	const { config, configStats } = configResult.value;
 
 	const artifacts = Object.entries(config.artifacts);
+
+	logger.newLine();
 
 	if(artifacts.length === 0) {
 		logger.info('No artifacts have been installed.');
 	}
 	else {
-		logger.info(`List of installed artifacts (${configStats.name}):\n`);
+		logger.print(`${name} ${c.grey(configStats.name)}`);
+		logger.newLine();
+
+		const table: string[][] = [];
 
 		for(const [name, artifact] of artifacts) {
-			const version = artifact.version ? `@${artifact.version}` : '';
+			const line: string[] = [
+				' ',
+				name,
+				' ',
+				artifact.version ? `${c.green(artifact.version)}${c.gray(formatVariant(artifact))}` : '',
+			];
 
-			logger.info(`- ${name}${version}${formatVariant(artifact)}`);
+			table.push(line);
 		}
+
+		const lines = formatTable(table, 'LLLL');
+
+		console.log(lines.join('\n'));
 	}
 
 	logger.newLine();
 }
+
