@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.0 | 2026-05-02
+- add `outdated` command
+- the `remove` command prompts for a selection if no artifact has been passed
+- the `add` command prompts for a selection if `@<user>` is the only input of the command
+- fix the `list` command
+
 ## v0.7.0 | 2026-04-24
 - pass variables to the `add` command
 - template expressions are supporting the pipe operator
