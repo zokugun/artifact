@@ -1,8 +1,10 @@
-import process from 'process';
-import { logger, c } from '@zokugun/cli-utils';
+import process from 'node:process';
+import { logger, c, enquirer, confirm } from '@zokugun/cli-utils';
+import { xtry } from '@zokugun/xtry/async';
 import pacote from 'pacote';
 import tempy from 'tempy';
 import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
+import { readListingConfig } from '../configs/package/read-listing-config.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Options } from '../types/context.js';
 import { resolveRequest } from '../utils/resolve-request.js';
@@ -66,6 +68,58 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 	}
 
 	const { config, configStats } = configResult.value;
+
+	if(specs.length === 1 && /^@\w+$/.test(specs[0])) {
+		const request = `${specs.shift()}/artifact-listing`;
+		const spinner = logger.createSpinner(`${c.cyan.bold(request)}`);
+		const dir = tempy.directory();
+		const pkgResult = await xtry(pacote.extract(request, dir));
+
+		if(pkgResult.fails) {
+			logger.fatal(`The artifact '${request}' couldn't be found.`);
+		}
+
+		spinner.succeed();
+
+		logger.stopProgress();
+
+		const listing = await readListingConfig(dir);
+		if(listing.fails) {
+			logger.fatal(listing.error);
+		}
+
+		const { value } = await xtry(enquirer.prompt<{ specs: string[] }>({
+			type: 'multiselect',
+			name: 'specs',
+			message: 'Pick the artifacts to add',
+			// @ts-expect-error TS2353
+			limit: 7,
+			choices: listing.value.map(({ name, description }) => ({ name, message: `${name}${c.grey(`: ${description}`)}` })),
+		}));
+
+		const marked = value?.specs;
+
+		if(!marked || marked.length === 0) {
+			logger.warn('No artifacts marked for addition');
+		}
+		else {
+			const { value } = await xtry(enquirer.prompt<{ addition: boolean }>(
+				[
+					confirm({
+						name: 'addition',
+						message: `Adds the following artifacts: ${marked.map((name) => c.green(name)).join(',')}`,
+					}),
+				],
+			));
+
+			if(value?.addition) {
+				specs.push(...marked);
+			}
+			else {
+				logger.warn('Artifacts addition has been rejected');
+			}
+		}
+	}
 
 	for(const spec of specs) {
 		const requestResult = resolveRequest(spec);
