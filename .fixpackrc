@@ -1,4 +1,5 @@
 {
+	"finalNewLine": true,
 	"required": [
 		"dependencies"
 	],
@@ -7,6 +8,7 @@
 		"displayName",
 		"description",
 		"version",
+		"since",
 		"private",
 		"author",
 		"publisher",
@@ -26,6 +28,7 @@
 		"dependencies",
 		"devDependencies",
 		"optionalDependencies",
+		"peerDependencies",
 		"overrides",
 		"activationEvents",
 		"contributes",
@@ -33,6 +36,5 @@
 		"galleryBanner",
 		"categories",
 		"keywords"
-	],
-	"finalNewLine": true
+	]
 }

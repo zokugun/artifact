@@ -17,6 +17,7 @@
 		}
 	],
 	"rules": {
+		"@typescript-eslint/ban-types": "off",
 		"@typescript-eslint/brace-style": [
 			"error",
 			"stroustrup"
@@ -42,6 +43,18 @@
 						"after": false
 					}
 				}
+			}
+		],
+		"@typescript-eslint/member-ordering": [
+			"error",
+			{
+				"default": [
+					"field",
+					"constructor",
+					"get",
+					"set",
+					"method"
+				]
 			}
 		],
 		"@typescript-eslint/naming-convention": [
@@ -74,12 +87,23 @@
 		],
 		"@typescript-eslint/no-confusing-void-expression": "off",
 		"@typescript-eslint/no-dynamic-delete": "off",
+		"@typescript-eslint/no-empty-function": [
+			"error",
+			{
+				"allow": [
+					"arrowFunctions"
+				]
+			}
+		],
 		"@typescript-eslint/no-inferrable-types": "off",
 		"@typescript-eslint/no-namespace": "off",
 		"@typescript-eslint/object-curly-spacing": [
 			"error",
 			"always"
 		],
+		"@typescript-eslint/parameter-properties": "off",
+		"@typescript-eslint/prefer-promise-reject-errors": "off",
+		"@typescript-eslint/return-await": "off",
 		"arrow-parens": [
 			"error",
 			"always"
@@ -121,45 +145,21 @@
 		"no-else-return": "off",
 		"no-lonely-if": "off",
 		"no-negated-condition": "off",
+		"object-curly-newline": "off",
+		"object-shorthand": "off",
 		"one-var": [
 			"error",
 			"never"
 		],
 		"unicorn/empty-brace-spaces": "off",
 		"unicorn/no-array-callback-reference": "off",
+		"unicorn/no-length-as-slice-end": "off",
+		"unicorn/no-object-as-default-parameter": "off",
+		"unicorn/prefer-json-parse-buffer": "off",
 		"unicorn/prefer-module": "off",
 		"unicorn/prefer-node-protocol": "off",
 		"unicorn/prefer-switch": "off",
 		"unicorn/prefer-ternary": "off",
-		"@typescript-eslint/ban-types": "off",
-		"@typescript-eslint/member-ordering": [
-			"error",
-			{
-				"default": [
-					"field",
-					"constructor",
-					"get",
-					"set",
-					"method"
-				]
-			}
-		],
-		"@typescript-eslint/no-empty-function": [
-			"error",
-			{
-				"allow": [
-					"arrowFunctions"
-				]
-			}
-		],
-		"@typescript-eslint/parameter-properties": "off",
-		"@typescript-eslint/prefer-promise-reject-errors": "off",
-		"@typescript-eslint/return-await": "off",
-		"object-curly-newline": "off",
-		"object-shorthand": "off",
-		"unicorn/no-length-as-slice-end": "off",
-		"unicorn/no-object-as-default-parameter": "off",
-		"unicorn/prefer-json-parse-buffer": "off",
 		"unicorn/prevent-abbreviations": [
 			"error",
 			{
