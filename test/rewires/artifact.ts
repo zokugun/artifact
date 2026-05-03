@@ -54,6 +54,10 @@ rewiremock('process').with({
 	cwd: () => '/target',
 	env: {},
 });
+rewiremock('node:process').with({
+	cwd: () => '/target',
+	env: {},
+});
 rewiremock('tempy').with({
 	directory: () => '/incoming',
 });

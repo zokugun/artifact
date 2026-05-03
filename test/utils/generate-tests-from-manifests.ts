@@ -114,6 +114,10 @@ export function generateTestsFromManifests(directory: string): void {
 				it(name, async () => {
 					vol.fromJSON(fromJSON);
 
+					if(DEBUG) {
+						console.log(vol.toJSON());
+					}
+
 					await action();
 
 					if(DEBUG) {
