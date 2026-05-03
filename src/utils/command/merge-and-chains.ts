@@ -24,7 +24,8 @@ export function mergeAndChains(current: string, incoming: string): string | unde
 	if(!positionalMatch) {
 		// Merge by matching prefixes across current segments, append unmatched incoming segments.
 		const merged = mergePartsByPrefix(currentAnd, incomingAnd);
-		return merged.join('; ');
+
+		return merged.join(' && ');
 	}
 
 	// Positional merge: iterate positions, merge flags when prefixes equal, otherwise

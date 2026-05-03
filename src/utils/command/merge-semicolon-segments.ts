@@ -10,7 +10,14 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 	let currentSegments = splitSegments(current);
 	const incomingSegments = splitSegments(incoming);
 
-	for(const incomingSegment of incomingSegments) {
+	// Pre-scan incoming segments to find which ones match existing current segments by prefix
+	const initialMatchedIndices: number[] = incomingSegments.map((seg) => {
+		const p = splitPrefixAndFlags(seg).prefix;
+		return currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === p);
+	});
+
+	for(let incomingIndex = 0; incomingIndex < incomingSegments.length; incomingIndex++) {
+		const incomingSegment = incomingSegments[incomingIndex];
 		// If the incoming segment is itself a chain (&& or ||), merge subparts accordingly
 		if(incomingSegment.includes('||')) {
 			const incomingParts = incomingSegment.split('||').map((s) => s.trim()).filter(Boolean);
@@ -40,7 +47,62 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 			}
 
 			if(!mergedIntoCurrent) {
-				currentSegments.push(incomingSegment);
+				// Determine insertion position based on matched incoming segments context
+				let previousMatch = -1;
+				for(let j = incomingIndex - 1; j >= 0; j--) {
+					const mi = initialMatchedIndices[j];
+					if(mi >= 0) {
+						const pref = splitPrefixAndFlags(incomingSegments[j]).prefix;
+						const pos = currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === pref);
+						if(pos !== -1) {
+							previousMatch = pos;
+							break;
+						}
+					}
+				}
+
+				let nextMatch = -1;
+				for(let j = incomingIndex + 1; j < incomingSegments.length; j++) {
+					const mi = initialMatchedIndices[j];
+					if(mi >= 0) {
+						const pref = splitPrefixAndFlags(incomingSegments[j]).prefix;
+						const pos = currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === pref);
+						if(pos !== -1) {
+							nextMatch = pos;
+							break;
+						}
+					}
+				}
+
+				const incomingBase = (splitPrefixAndFlags(incomingSegment).prefix || incomingSegment).split(' ')[0];
+				let basePos: number | null = null;
+				for(let k = currentSegments.length - 1; k >= 0; k--) {
+					const cp = splitPrefixAndFlags(currentSegments[k]).prefix || currentSegments[k];
+					const cpBase = cp.split(' ')[0];
+					if(cpBase === incomingBase) {
+						basePos = k;
+						break;
+					}
+				}
+
+				let insertPos: number;
+				if((previousMatch >= 0) && (nextMatch >= 0)) {
+					insertPos = previousMatch + 1;
+				}
+				else if((basePos !== null) && (nextMatch < 0)) {
+					insertPos = basePos + 1;
+				}
+				else if(previousMatch >= 0) {
+					insertPos = previousMatch + 1;
+				}
+				else if(nextMatch >= 0) {
+					insertPos = nextMatch + 1;
+				}
+				else {
+					insertPos = currentSegments.length;
+				}
+
+				currentSegments.splice(insertPos, 0, incomingSegment);
 			}
 
 			continue;
@@ -107,7 +169,61 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 			}
 
 			if(!mergedIntoCurrent) {
-				currentSegments.push(incomingSegment);
+				let previousMatch = -1;
+				for(let j = incomingIndex - 1; j >= 0; j--) {
+					const mi = initialMatchedIndices[j];
+					if(mi >= 0) {
+						const pref = splitPrefixAndFlags(incomingSegments[j]).prefix;
+						const pos = currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === pref);
+						if(pos !== -1) {
+							previousMatch = pos;
+							break;
+						}
+					}
+				}
+
+				let nextMatch = -1;
+				for(let j = incomingIndex + 1; j < incomingSegments.length; j++) {
+					const mi = initialMatchedIndices[j];
+					if(mi >= 0) {
+						const pref = splitPrefixAndFlags(incomingSegments[j]).prefix;
+						const pos = currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === pref);
+						if(pos !== -1) {
+							nextMatch = pos;
+							break;
+						}
+					}
+				}
+
+				const incomingBase = (splitPrefixAndFlags(incomingSegment).prefix || incomingSegment).split(' ')[0];
+				let basePos: number | null = null;
+				for(let k = currentSegments.length - 1; k >= 0; k--) {
+					const cp = splitPrefixAndFlags(currentSegments[k]).prefix || currentSegments[k];
+					const cpBase = cp.split(' ')[0];
+					if(cpBase === incomingBase) {
+						basePos = k;
+						break;
+					}
+				}
+
+				let insertPos: number;
+				if((previousMatch >= 0) && (nextMatch >= 0)) {
+					insertPos = previousMatch + 1;
+				}
+				else if((basePos !== null) && (nextMatch < 0)) {
+					insertPos = basePos + 1;
+				}
+				else if(previousMatch >= 0) {
+					insertPos = previousMatch + 1;
+				}
+				else if(nextMatch >= 0) {
+					insertPos = nextMatch + 1;
+				}
+				else {
+					insertPos = currentSegments.length;
+				}
+
+				currentSegments.splice(insertPos, 0, incomingSegment);
 			}
 
 			continue;
@@ -120,12 +236,67 @@ export function mergeSemicolonSegments(current: string, incoming: string): strin
 			if(currentPartsObject.prefix && incomingPartsObject.prefix && currentPartsObject.prefix === incomingPartsObject.prefix) {
 				currentSegments[i] = mergeFlagsAsString(currentSegments[i], incomingPartsObject);
 				matched = true;
+
 				break;
 			}
 		}
 
 		if(!matched) {
-			currentSegments.push(incomingSegment);
+			let previousMatch = -1;
+			for(let j = incomingIndex - 1; j >= 0; j--) {
+				const mi = initialMatchedIndices[j];
+				if(mi >= 0) {
+					const pref = splitPrefixAndFlags(incomingSegments[j]).prefix;
+					const pos = currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === pref);
+					if(pos !== -1) {
+						previousMatch = pos;
+						break;
+					}
+				}
+			}
+
+			let nextMatch = -1;
+			for(let j = incomingIndex + 1; j < incomingSegments.length; j++) {
+				const mi = initialMatchedIndices[j];
+				if(mi >= 0) {
+					const pref = splitPrefixAndFlags(incomingSegments[j]).prefix;
+					const pos = currentSegments.findIndex((cs) => splitPrefixAndFlags(cs).prefix === pref);
+					if(pos !== -1) {
+						nextMatch = pos;
+						break;
+					}
+				}
+			}
+
+			const incomingBase = (incomingPartsObject.prefix || incomingSegment).split(' ')[0];
+			let basePos: number | null = null;
+			for(let k = currentSegments.length - 1; k >= 0; k--) {
+				const cp = splitPrefixAndFlags(currentSegments[k]).prefix || currentSegments[k];
+				const cpBase = cp.split(' ')[0];
+				if(cpBase === incomingBase) {
+					basePos = k;
+					break;
+				}
+			}
+
+			let insertPos: number;
+			if((previousMatch >= 0) && (nextMatch >= 0)) {
+				insertPos = previousMatch + 1;
+			}
+			else if((basePos !== null) && (nextMatch < 0)) {
+				insertPos = basePos + 1;
+			}
+			else if(previousMatch >= 0) {
+				insertPos = previousMatch + 1;
+			}
+			else if(nextMatch >= 0) {
+				insertPos = nextMatch + 1;
+			}
+			else {
+				insertPos = currentSegments.length;
+			}
+
+			currentSegments.splice(insertPos, 0, incomingSegment);
 		}
 	}
 

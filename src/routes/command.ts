@@ -18,8 +18,16 @@ export async function command({ current, incoming }: { current: string | undefin
 
 	if(trueAndMatch) {
 		const incomingCommand = trueAndMatch[1].trim();
-
 		return currentSegments.has(incomingCommand) ? current : `${current} && ${incomingCommand}`;
+	}
+
+	const incomingAndMatch = /^(.+?)\s*&&\s*(.+)$/.exec(incoming);
+
+	if(incomingAndMatch && !current.includes('&&')) {
+		const left = incomingAndMatch[1].trim();
+		if(current.trim() === left || currentSegments.has(left)) {
+			return incoming;
+		}
 	}
 
 	const mixed = mergeWithSemicolonMix(current, incoming);

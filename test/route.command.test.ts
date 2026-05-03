@@ -118,7 +118,7 @@ describe('route.command', () => {
 		expect(await command({
 			current: 'foo bar -v && bar -v',
 			incoming: 'foo baz -t && bar -t',
-		})).to.eql('foo bar -v; bar -v -t; foo baz -t');
+		})).to.eql('foo bar -v && bar -v -t && foo baz -t');
 	}); // }}}
 
 	it('and-and-seq-mix', async () => { // {{{
@@ -231,5 +231,33 @@ describe('route.command', () => {
 			current: 'rimraf lib; rimraf .test',
 			incoming: 'rimraf .src',
 		})).to.eql('rimraf lib; rimraf .test; rimraf .src');
+	}); // }}}
+
+	it('extend-and-chain', async () => { // {{{
+		expect(await command({
+			current: 'tsc-leda update-package',
+			incoming: 'tsc-leda update-package && npm run lint:package',
+		})).to.eql('tsc-leda update-package && npm run lint:package');
+	}); // }}}
+
+	it('preserve-npm-order', async () => { // {{{
+		expect(await command({
+			current: 'fixpack && npm audit && npm run ci:lint && npm run lint',
+			incoming: 'npm audit && npm run lint:package && npm run ci:lint',
+		})).to.eql('fixpack && npm audit && npm run lint:package && npm run ci:lint && npm run lint');
+	}); // }}}
+
+	it('prefer-incoming-args', async () => { // {{{
+		expect(await command({
+			current: 'taze',
+			incoming: 'taze --all',
+		})).to.eql('taze --all');
+	}); // }}}
+
+	it('insert-npm-lint-package', async () => { // {{{
+		expect(await command({
+			current: 'fixpack; npm audit; npm run ci:lint; npm run lint',
+			incoming: 'npm audit; npm run lint:package; npm run ci:lint',
+		})).to.eql('fixpack; npm audit; npm run lint:package; npm run ci:lint; npm run lint');
 	}); // }}}
 });

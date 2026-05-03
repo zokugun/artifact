@@ -30,7 +30,7 @@ export async function mergeCommandRecords(currentCommand: Record<string, Command
 					const currentPrefix = getPrefix(currentInstance.args);
 					const incomingPrefix = getPrefix(instance.args);
 
-					const shouldMerge = currentPrefix && incomingPrefix && currentPrefix === incomingPrefix && (hasFlags(currentInstance.args) || hasFlags(instance.args) || (currentInstance.env.length > 0) || (instance.env.length > 0));
+					const shouldMerge = (currentPrefix === incomingPrefix) && (hasFlags(currentInstance.args) || hasFlags(instance.args) || (currentInstance.env.length > 0) || (instance.env.length > 0));
 
 					if(shouldMerge) {
 						// replace with merged instance
