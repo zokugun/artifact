@@ -13,7 +13,7 @@ action:
 
 
 
-/incoming/configs/tsconfig.json: |
+/registry/artifact-awesome-config/configs/tsconfig.json: |
   {
     "compilerOptions": {
       /* Basic Options */
@@ -39,7 +39,7 @@ action:
       // "importHelpers": true,            /* Import emit helpers from 'tslib'. */
       // "downlevelIteration": true,          /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
       // "isolatedModules": true,            /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
-  
+
       /* Strict Type-Checking Options */
       "strict": true,                  /* Enable all strict type-checking options. */
       // "noImplicitAny": true,            /* Raise error on expressions and declarations with an implied 'any' type. */
@@ -51,18 +51,18 @@ action:
       "alwaysStrict": true,              /* Parse in strict mode and emit "use strict" for each source file. */
     }
   }
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
 
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
   artifacts:
-    awesome-config:
+    artifact-awesome-config:
       version: 1.0.0
 /merged/package.json: |
   {
@@ -95,7 +95,7 @@ action:
       // "importHelpers": true,            /* Import emit helpers from 'tslib'. */
       // "downlevelIteration": true,          /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
       // "isolatedModules": true,            /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
-  
+
       /* Strict Type-Checking Options */
       "strict": true,                  /* Enable all strict type-checking options. */
       // "noImplicitAny": true,            /* Raise error on expressions and declarations with an implied 'any' type. */

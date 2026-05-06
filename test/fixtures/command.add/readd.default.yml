@@ -12,17 +12,17 @@ action:
   }
 /target/.artifactrc.yml: |
   artifacts:
-    - name: awesome-config
+    - name: artifact-awesome-config
       version: 0.1.0
 
 
 
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
 
 
 
-error: The "awesome-config" artifact has already been added.
+error: The "artifact-awesome-config" artifact has already been added.

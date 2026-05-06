@@ -1,6 +1,6 @@
-import { type Journey, type TravelPlan } from '../types/travel.js';
+import { type JourneyPlan, type TravelPlan } from '../types/travel.js';
 
-export function buildJourneyPlan(plan: TravelPlan, alias?: string): (basename: string) => Journey | undefined {
+export function buildJourneyPlan(plan: TravelPlan, alias?: string): JourneyPlan {
 	return (basename) => {
 		const travel = plan(basename);
 

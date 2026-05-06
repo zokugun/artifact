@@ -1,3 +1,4 @@
+export { codec } from './codec.js';
 export { compose } from './compose.js';
 export { fork } from './fork.js';
 export { json } from './json.js';

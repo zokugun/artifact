@@ -3,16 +3,17 @@ import { logger, c, enquirer, confirm } from '@zokugun/cli-utils';
 import { xtry } from '@zokugun/xtry/async';
 import pacote from 'pacote';
 import tempy from 'tempy';
-import { readInstallConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
+import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { readListingConfig } from '../configs/package/read-listing-config.js';
 import { composeSteps, steps } from '../steps/index.js';
+import { type Request } from '../types/config.js';
 import { type Options } from '../types/context.js';
+import { loadPackage } from '../utils/load-package.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
 	[
 		steps.readIncomingPackage,
-		steps.validateNotPresentPackage,
 		steps.readIncomingConfig,
 		steps.executeFirstBlock,
 	],
@@ -45,29 +46,6 @@ type CLIOptions = {
 
 export async function add(specs: string[], inputOptions?: CLIOptions): Promise<void> {
 	logger.beginTimer();
-
-	const targetPath = process.cwd();
-
-	const options: Options = {
-		dryRun: inputOptions?.dryRun ?? false,
-		force: inputOptions?.force ?? false,
-		skip: inputOptions?.skip ?? false,
-		variables: {},
-		verbose: inputOptions?.verbose ?? false,
-	};
-
-	if(inputOptions?.var) {
-		for(const { name, value } of inputOptions.var) {
-			options.variables[name] = value;
-		}
-	}
-
-	const configResult = await readInstallConfig(targetPath);
-	if(configResult.fails) {
-		logger.fatal(configResult.error);
-	}
-
-	const { config, configStats } = configResult.value;
 
 	if(specs.length === 1 && /^@\w+$/.test(specs[0])) {
 		const request = `${specs.shift()}/artifact-listing`;
@@ -121,30 +99,86 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 		}
 	}
 
+	const targetPath = process.cwd();
+
+	const options: Options = {
+		dryRun: inputOptions?.dryRun ?? false,
+		force: inputOptions?.force ?? false,
+		skip: inputOptions?.skip ?? false,
+		variables: {},
+		verbose: inputOptions?.verbose ?? false,
+	};
+
+	if(inputOptions?.var) {
+		for(const { name, value } of inputOptions.var) {
+			options.variables[name] = value;
+		}
+	}
+
+	const configResult = await readInstallConfig(targetPath);
+	if(configResult.fails) {
+		logger.fatal(configResult.error);
+	}
+
+	const config = configResult.value;
+
+	const requests: Request[] = [];
+
 	for(const spec of specs) {
-		const requestResult = resolveRequest(spec);
-		if(requestResult.fails) {
-			logger.fatal(requestResult.error);
+		const request = resolveRequest(spec);
+		if(request.fails) {
+			logger.fatal(request.error);
 		}
 
-		const request = requestResult.value;
-		const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
-		const dir = tempy.directory();
-		const pkgResult = await pacote.extract(request.name, dir);
+		if(!options.force) {
+			const { name } = request.value;
+			const artifact = config.local.artifacts[name];
 
-		if(!pkgResult.resolved) {
-			if(options.force || options.skip) {
-				spinner.fail();
-
-				if(options.verbose) {
-					logger.warn(`The artifact '${spec}' couldn't be found, skipping...`);
+			if(artifact) {
+				if(options.skip) {
+					if(options.verbose) {
+						logger.debug(`The "${name}" artifact is already present, skipping...`);
+					}
 				}
+				else {
+					logger.fatal(`The "${name}" artifact has already been added.`);
+				}
+			}
+		}
 
-				continue;
-			}
-			else {
-				logger.fatal(pkgResult.from);
-			}
+		requests.push(request.value);
+	}
+
+	for(const [name, { version }] of Object.entries(config.local.artifacts)) {
+		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
+		const dir = await loadPackage(`${name}@${version}`, spinner, options);
+
+		if(!dir) {
+			continue;
+		}
+
+		const result = await readPackageConfig(dir, config.global.routes);
+		if(result.fails) {
+			logger.fatal(result.error);
+		}
+
+		for(const [name, journey] of Object.entries(result.value.journeys)) {
+			config.global.journeys[name] = journey;
+		}
+
+		for(const [name, route] of Object.entries(result.value.routes)) {
+			config.global.routes[name] = route;
+		}
+
+		spinner.succeed();
+	}
+
+	for(const request of requests) {
+		const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
+		const dir = await loadPackage(request.name, spinner, options);
+
+		if(!dir) {
+			continue;
 		}
 
 		const flowResult = await mainFlow(targetPath, dir, request, config, options);
@@ -160,7 +194,7 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 
 		updateInstallConfig(config, flowResult.value.result);
 
-		await writeInstallConfig(config, configStats, flowResult.value.formats, targetPath, options);
+		await writeInstallConfig(config, flowResult.value.formats, targetPath, options);
 
 		spinner.succeed();
 	}

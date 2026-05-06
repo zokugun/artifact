@@ -1,6 +1,7 @@
 import path from 'node:path';
 import process from 'node:process';
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
+import { xtry } from '@zokugun/xtry/sync';
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { vol } from 'memfs';
@@ -38,9 +39,16 @@ export function generateTestsFromManifests(directory: string): void {
 
 			const filePath = file.value.path;
 			const name = path.basename(filePath).slice(0, path.basename(filePath).lastIndexOf('.'));
-
 			const readResult = fse.readFile(filePath, 'utf8');
-			const manifest = YAML.parse(readResult.value!) as unknown;
+			const manifestResult = xtry(() => YAML.parse(readResult.value!) as unknown);
+
+			if(manifestResult.fails) {
+				console.error(filePath);
+
+				throw manifestResult.error;
+			}
+
+			const manifest = manifestResult.value;
 
 			if(!isRecord(manifest)) {
 				throw new Error(`The file "${path.relative(root, filePath)}" isn't an object.`);
@@ -50,7 +58,7 @@ export function generateTestsFromManifests(directory: string): void {
 			const expectedFiles = {};
 
 			for(const [key, data] of Object.entries(manifest)) {
-				if(key.startsWith('/target/') || key.startsWith('/incoming/')) {
+				if(key.startsWith('/target/') || key.startsWith('/incoming/') || key.startsWith('/registry/')) {
 					fromJSON[key] = data;
 				}
 				else if(key.startsWith('/merged/')) {

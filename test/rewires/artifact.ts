@@ -61,6 +61,18 @@ rewiremock('node:process').with({
 rewiremock('tempy').with({
 	directory: () => '/incoming',
 });
+rewiremock('../utils/load-package.js').with({
+	loadPackage: (spec: string) => {
+		const index = spec.lastIndexOf('@');
+
+		if(index === -1) {
+			return `/registry/${spec}`;
+		}
+		else {
+			return `/registry/${spec.slice(0, index)}`;
+		}
+	},
+});
 
 // unload to it can use mocked's fs
 const name = require.resolve('fast-glob/out/settings.js');

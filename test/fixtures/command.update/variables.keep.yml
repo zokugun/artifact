@@ -5,7 +5,7 @@ action:
 
 /target/.artifactrc: |
   artifacts:
-    - name: awesome-config
+    - name: artifact-awesome-config
       version: 0.1.0
   variables:
     DISCUSSION_ID: 2
@@ -18,18 +18,18 @@ action:
 
 
 
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
 
 
 
 /merged/.artifactrc: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
   artifacts:
-    awesome-config:
+    artifact-awesome-config:
       version: 1.0.0
   variables:
     DISCUSSION_ID: 2

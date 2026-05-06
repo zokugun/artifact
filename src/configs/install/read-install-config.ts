@@ -3,13 +3,14 @@ import fse from '@zokugun/fs-extra-plus/async';
 import { isArray, isPrimitive, isRecord, isString, type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
-import { type Artifact, type InstallFileConfig, type UpdateFileConfig, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { type Artifact, type InstallFileConfig, type UpdateFileConfig, type InstallConfig } from '../../types/config.js';
+import { type JourneyPlan, type Route } from '../../types/travel.js';
 import { detectIndent } from '../../utils/detect-indent.js';
 import { hasFinalNewLine } from '../../utils/has-final-new-line.js';
 import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_INSTALL_REGEX } from '../utils/constants.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 
-export async function readInstallConfig(targetPath: string): AsyncDResult<{ config: InstallConfig; configStats: InstallConfigStats }> {
+export async function readInstallConfig(targetPath: string): AsyncDResult<InstallConfig> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
@@ -70,37 +71,45 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<{ conf
 	}
 }
 
-function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResult<{ config: InstallConfig; configStats: InstallConfigStats }> { // {{{
+function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<InstallConfig> { // {{{
 	const artifacts: Record<string, Artifact> = {};
 	const install: Record<string, InstallFileConfig> = {};
+	const journeys: Record<string, JourneyPlan> = {};
+	const routes: Record<string, Route<any>> = {};
 	let update: boolean | Record<string, UpdateFileConfig> = {};
 	let variables: Record<string, Primitive> = {};
 
 	if(!data) {
 		return ok({
-			config: {
+			file,
+			global: {
+				journeys: {},
+				routes: {},
+			},
+			local: {
 				artifacts,
 				install,
+				journeys,
+				routes,
 				update,
 				variables,
 			},
-			configStats,
 		});
 	}
 
 	if(!isRecord(data)) {
-		return err(`Config file ${configStats.name} must export an object.`);
+		return err(`Config file ${file.name} must export an object.`);
 	}
 
 	if(isString(data.$schema)) {
 		const match = VERSION_INSTALL_REGEX.exec(data.$schema);
 		if(!match) {
-			return err(`Cannot validate the "$schema" in the project's "${configStats.name}".`);
+			return err(`Cannot validate the "$schema" in the project's "${file.name}".`);
 		}
 
 		const version = Number.parseInt(match[2], 10);
 		if(version > MAX_VERSION) {
-			return err(`Don't support newer version (v${version}) in the project's "${configStats.name}".`);
+			return err(`Don't support newer version (v${version}) in the project's "${file.name}".`);
 		}
 	}
 
@@ -157,12 +166,18 @@ function normalizeConfig(data: unknown, configStats: InstallConfigStats): DResul
 	}
 
 	return ok({
-		config: {
+		file,
+		global: {
+			journeys: {},
+			routes: {},
+		},
+		local: {
 			artifacts,
 			install,
+			journeys,
+			routes,
 			update,
 			variables,
 		},
-		configStats,
 	});
 }

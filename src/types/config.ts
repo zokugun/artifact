@@ -1,5 +1,6 @@
 import { type Primitive } from '@zokugun/is-it-type';
 import { type Indent } from './format.js';
+import { type JourneyPlan, type Route } from './travel.js';
 
 export type Request = {
 	name: string;
@@ -14,7 +15,9 @@ export type PackageManifest = {
 export type PackageConfig = {
 	extends?: string;
 	install: InstallFileConfig[];
+	journeys: Record<string, JourneyPlan>;
 	orphan: boolean;
+	routes: Record<string, Route<any>>;
 	uninstall: UninstallFileConfig[];
 	update: false | UpdateFileConfig[];
 	variables: Record<string, Primitive>;
@@ -30,10 +33,24 @@ export type Artifact = {
 export type ArtifactResult = Artifact & { name: string };
 
 export type InstallConfig = {
-	artifacts: Record<string, Artifact>;
-	install: Record<string, InstallFileConfig>;
-	update: false | Record<string, UpdateFileConfig>;
-	variables: Record<string, Primitive>;
+	file: {
+		name: string;
+		finalNewLine: boolean;
+		indent?: Indent;
+		type: string;
+	};
+	global: {
+		journeys: Record<string, JourneyPlan>;
+		routes: Record<string, Route<any>>;
+	};
+	local: {
+		artifacts: Record<string, Artifact>;
+		install: Record<string, InstallFileConfig>;
+		journeys: Record<string, JourneyPlan>;
+		routes: Record<string, Route<any>>;
+		update: false | Record<string, UpdateFileConfig>;
+		variables: Record<string, Primitive>;
+	};
 };
 
 export type FileConfig<E> = {
@@ -54,17 +71,9 @@ export type UpsertFileConfig = AlwaysFileConfig & {
 	filter?: string[];
 	ifMissing: 'merge' | 'skip';
 	rename?: string;
-	route?: Record<string, any>;
 };
 
 export type FileTransform = {
 	description?: string;
 	jq: string;
-};
-
-export type InstallConfigStats = {
-	name: string;
-	type: string;
-	finalNewLine: boolean;
-	indent?: Indent;
 };

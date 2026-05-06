@@ -7,8 +7,13 @@ async function apply(map: ComposeMap, keys: string[], current: Record<string, an
 	}
 
 	const ignores = map.$$ignore ?? [];
+	const removes = map.$$remove ?? [];
 
 	for(const key of keys) {
+		if(removes.includes(key)) {
+			continue;
+		}
+
 		const currentValue = current[key] as unknown;
 		const transform = map[key] ?? map.$$default;
 
@@ -34,6 +39,7 @@ type ComposeMap = {
 	[key: string]: Route<any> | string[] | undefined;
 
 	$$ignore?: string[];
+	$$remove?: string[];
 };
 
 export function compose(map: ComposeMap): Route<Record<string, any>> {

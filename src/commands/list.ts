@@ -33,9 +33,9 @@ export async function list(): Promise<void> {
 
 	const { name } = packageResult.value as PackageManifest;
 
-	const { config, configStats } = configResult.value;
+	const config = configResult.value;
 
-	const artifacts = Object.entries(config.artifacts);
+	const artifacts = Object.entries(config.local.artifacts);
 
 	logger.newLine();
 
@@ -43,7 +43,7 @@ export async function list(): Promise<void> {
 		logger.info('No artifacts have been installed.');
 	}
 	else {
-		logger.print(`${name} ${c.grey(configStats.name)}`);
+		logger.print(`${name} ${c.grey(config.file.name)}`);
 		logger.newLine();
 
 		const table: string[][] = [];

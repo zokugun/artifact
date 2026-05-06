@@ -62,15 +62,6 @@ function merge(currentValue: UpsertFileConfig, newValue: UpsertFileConfig): DRes
 		}
 	}
 
-	if(newValue.route) {
-		if(currentValue.route) {
-			return err('Not Implemented: route');
-		}
-		else {
-			currentValue.route = newValue.route;
-		}
-	}
-
 	if(isNonEmptyArray(newValue.transforms)) {
 		if(isNonEmptyArray(currentValue.transforms)) {
 			if(!isEqual(currentValue.transforms, newValue.transforms)) {

@@ -1,0 +1,80 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    - name: artifact-awesome-config
+      version: 0.1.0
+/target/.xo-config.js: |
+  module.exports = {
+    plugins: [
+      "chai"
+    ],
+    rules: {
+      "capitalized-comments": "on",
+      "complexity": "off",
+      "max-depth": [
+        "error",
+        2
+      ]
+    }
+  }
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/.artifactrc: |
+  journeys:
+    - name: xo
+      travels:
+        - path: .xo-config.js
+      route:
+        mergeDotJs
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/.xo-config.js: |
+  module.exports = {
+    plugins: [
+      "chai-friendly"
+    ],
+    rules: {
+      "capitalized-comments": "off",
+      "max-depth": [
+        "error",
+        8
+      ],
+      "no-await-in-loop": "off"
+    }
+  }
+
+
+
+/merged/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/.xo-config.js: |
+  module.exports = {
+    plugins: ["chai", "chai-friendly"],
+    rules: {
+      "capitalized-comments": "off",
+      "complexity": "off",
+      "max-depth": ["error", 2, "error", 8],
+      "no-await-in-loop": "off"
+    }
+  };
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }

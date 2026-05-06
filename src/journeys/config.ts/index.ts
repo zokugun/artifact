@@ -1,16 +1,9 @@
-import { merge } from '@zokugun/configdotts-merge';
-import { type Args, type Route } from '../../types/travel.js';
+import { mergeDotJs } from '../../routes/index.js';
 import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
 import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 
-async function route({ current, incoming }: Args<string>): Promise<string> {
-	const data = merge(current!, incoming!);
-
-	return data;
-}
-
 const travelPlan = buildTravelPlan(
-	[/\.config\.ts/, route as Route<string>],
+	[/\.config\.ts/, mergeDotJs],
 );
 
 export default buildJourneyPlan(travelPlan);

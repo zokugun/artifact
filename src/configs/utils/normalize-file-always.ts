@@ -9,6 +9,7 @@ export function normalizeFileAlways(pattern: string, data: unknown): DResult<Alw
 	}
 
 	let ifExists: 'merge' | 'overwrite' | 'remove' | 'skip' = 'merge';
+	let route: Record<string, any> | undefined;
 	let transforms: FileTransform[] = [];
 
 	if(isString(data.if_exists)) {
@@ -20,6 +21,10 @@ export function normalizeFileAlways(pattern: string, data: unknown): DResult<Alw
 		ifExists = 'remove';
 	}
 
+	if(isRecord(data.route)) {
+		route = data.route;
+	}
+
 	if(isArray<FileTransform>(data.transforms, isTransform)) {
 		transforms = data.transforms;
 	}
@@ -27,6 +32,7 @@ export function normalizeFileAlways(pattern: string, data: unknown): DResult<Alw
 	return ok({
 		ifExists,
 		pattern,
+		route,
 		transforms,
 	});
 } // }}}

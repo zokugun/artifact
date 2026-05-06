@@ -1,0 +1,91 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    - name: artifact-awesome-config
+      version: 0.1.0
+/target/.fixpackrc: |
+  {
+    "sortToTop": [
+      "name",
+      "displayName",
+      "description",
+      "version",
+      "dependencies"
+    ]
+  }
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/.artifactrc: |
+  journeys:
+    - name: fixpack
+      travels:
+        - path: .fixpackrc
+          format: json
+      route:
+        mapSort:
+          compose:
+            $$default:
+              fork:
+                array: listConcat
+                object:
+                  - mapConcat
+                  - mapSort
+                default: primitive
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/.fixpackrc: |
+  {
+    "sortToTop": [
+      "scripts",
+      "dependencies",
+      "devDependencies",
+      "optionalDependencies"
+    ],
+    "required": [
+      "dependencies"
+    ],
+    "finalNewLine": true
+  }
+
+
+
+/merged/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/.fixpackrc: |
+  {
+    "finalNewLine": true,
+    "required": [
+      "dependencies"
+    ],
+    "sortToTop": [
+      "name",
+      "displayName",
+      "description",
+      "version",
+      "scripts",
+      "dependencies",
+      "devDependencies",
+      "optionalDependencies"
+    ]
+  }
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }

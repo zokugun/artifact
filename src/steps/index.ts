@@ -22,7 +22,6 @@ import { replaceTemplates } from './replace-templates.js';
 import { transformUntouchedFiles } from './transform-untouched-files.js';
 import { unmergeTextFiles } from './unmerge-text-files.js';
 import { validateNewerPackage } from './validate-newer-package.js';
-import { validateNotPresentPackage } from './validate-not-present-package.js';
 import { validatePresentPackage } from './validate-present-package.js';
 import { writeTextFiles } from './write-text-files.js';
 
@@ -47,7 +46,6 @@ export const steps = {
 	transformUntouchedFiles,
 	unmergeTextFiles,
 	validateNewerPackage,
-	validateNotPresentPackage,
 	validatePresentPackage,
 	writeTextFiles,
 };

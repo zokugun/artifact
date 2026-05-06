@@ -7,7 +7,6 @@ import utc from 'dayjs/plugin/utc';
 import gitUrlParse from 'git-url-parse';
 import { isNil, isPlainObject } from 'lodash-es';
 import * as YAML from '../parsers/yaml.js';
-import { tryJSON } from './try-json.js';
 
 dayjs.extend(utc);
 
@@ -150,7 +149,7 @@ export class TemplateEngine {
 				return ok(YAML.parse(content));
 			}
 			else {
-				return ok(tryJSON(content) ?? YAML.parse(content));
+				return ok(JSON.parse(content) ?? YAML.parse(content));
 			}
 		}
 		catch (parseError: unknown) {
@@ -200,7 +199,6 @@ export class TemplateEngine {
 				return readResult;
 			}
 
-			// const getValueResult = this.getValueByPath(readResult.value, propertyPath);
 			const evalResult = this.evaluateExpression(propertyPath, readResult.value);
 			if(evalResult.fails) {
 				return evalResult;

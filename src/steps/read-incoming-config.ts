@@ -4,7 +4,7 @@ import { type Context } from '../types/context.js';
 
 export async function readIncomingConfig(context: Context): AsyncDResult<boolean | void> {
 	if(!context.incomingConfig) {
-		const config = await readPackageConfig(context.incomingPath);
+		const config = await readPackageConfig(context.incomingPath, context.config.global.routes);
 
 		if(config.fails) {
 			return config;

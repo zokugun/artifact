@@ -17,16 +17,16 @@ action:
 
 
 
-/incoming/.artifactrc.yml: |
+/registry/artifact-awesome-config/.artifactrc.yml: |
   upsert:
     src/*:
       if_exists: overwrite
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
-/incoming/configs/src/index.ts: |
+/registry/artifact-awesome-config/configs/src/index.ts: |
   export function hello(firstname: string, lastname: string): string {
     return `Hello ${firstname} ${lastname}!`;
   }
@@ -34,9 +34,9 @@ action:
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
   artifacts:
-    awesome-config:
+    artifact-awesome-config:
       version: 1.0.0
 /merged/package.json: |
   {

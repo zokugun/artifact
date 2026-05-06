@@ -6,12 +6,12 @@ import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { applyFormatting } from '../../steps/apply-formatting.js';
 import { insertFinalNewLine } from '../../steps/insert-final-new-line.js';
-import { type Artifact, type UpdateFileConfig, type InstallConfig, type InstallConfigStats } from '../../types/config.js';
+import { type Artifact, type UpdateFileConfig, type InstallConfig } from '../../types/config.js';
 import { type Options } from '../../types/context.js';
 import { type Format } from '../../types/format.js';
 import { MAX_VERSION, VERSION_RELEASE } from '../utils/constants.js';
 
-export async function writeInstallConfig(config: InstallConfig, { name, finalNewLine, indent, type }: InstallConfigStats, formats: Format[], targetPath: string, options: Options): AsyncDResult {
+export async function writeInstallConfig(config: InstallConfig, formats: Format[], targetPath: string, options: Options): AsyncDResult {
 	const exported: {
 		$schema: string;
 		artifacts: Record<string, Artifact>;
@@ -19,17 +19,18 @@ export async function writeInstallConfig(config: InstallConfig, { name, finalNew
 		variables?: Record<string, Primitive>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
-		artifacts: config.artifacts,
+		artifacts: config.local.artifacts,
 	};
 
-	if(isNonEmptyRecord(config.update)) {
-		exported.update = config.update;
+	if(isNonEmptyRecord(config.local.update)) {
+		exported.update = config.local.update;
 	}
 
-	if(isNonEmptyRecord(config.variables)) {
-		exported.variables = config.variables;
+	if(isNonEmptyRecord(config.local.variables)) {
+		exported.variables = config.local.variables;
 	}
 
+	const { name, type, indent, finalNewLine } = config.file;
 	const file = {
 		name,
 		data: type === 'yaml' ? yaml.stringify(exported) : JSON.stringify(exported, null, '\t'),

@@ -4,7 +4,6 @@ import { isMatch } from 'micromatch';
 import { type FileTransform } from '../types/config.js';
 import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
-import { buildTravel } from '../utils/build-travel.js';
 
 export async function configureInstallFileActions(context: Context): AsyncDResult {
 	const { install } = context.incomingConfig!;
@@ -19,7 +18,7 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 	const transformations: Record<string, FileTransform[]> = {};
 
 	for(const file of install) {
-		const { filter, ifExists, pattern, rename, route, transforms } = file;
+		const { filter, ifExists, pattern, rename, transforms } = file;
 
 		if(rename) {
 			context.renamedPatterns.push({
@@ -47,27 +46,6 @@ export async function configureInstallFileActions(context: Context): AsyncDResul
 
 		if(filter) {
 			filters[pattern] = filter;
-		}
-
-		if(route) {
-			const { alias } = route as { alias?: string };
-
-			const travel = buildTravel(route);
-			if(travel.fails) {
-				return travel;
-			}
-
-			if(alias) {
-				routes[pattern] = {
-					alias,
-					travel: travel.value,
-				};
-			}
-			else {
-				routes[pattern] = {
-					travel: travel.value,
-				};
-			}
 		}
 
 		if(transforms) {

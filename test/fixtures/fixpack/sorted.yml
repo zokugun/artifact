@@ -16,12 +16,28 @@ action:
 
 
 
-/incoming/package.json: |
+/registry/artifact-awesome-config/.artifactrc: |
+  journeys:
+    - name: fixpack
+      travels:
+        - path: .fixpackrc
+          format: yaml
+      route:
+        mapSort:
+          compose:
+            $$default:
+              fork:
+                array: listConcat
+                object:
+                  - mapConcat
+                  - mapSort
+                default: primitive
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
-/incoming/configs/.fixpackrc: |
+/registry/artifact-awesome-config/configs/.fixpackrc: |
   required:
     - dependencies
   sortToTop:
@@ -34,9 +50,9 @@ action:
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
   artifacts:
-    awesome-config:
+    artifact-awesome-config:
       version: 1.0.0
 /merged/.fixpackrc: |
   finalNewLine: true

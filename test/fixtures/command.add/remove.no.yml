@@ -13,13 +13,13 @@ action:
 
 
 
-/incoming/.artifactrc: |
+/registry/artifact-awesome-config/.artifactrc: |
   install:
     src/*:
       remove: true
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
 

@@ -4,7 +4,6 @@ import { isMatch } from 'micromatch';
 import { type FileTransform } from '../types/config.js';
 import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
-import { buildTravel } from '../utils/build-travel.js';
 
 export async function configureUpdateFileActions(context: Context): AsyncDResult {
 	const { update } = context.incomingConfig!;
@@ -21,7 +20,7 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		const transformations: Record<string, FileTransform[]> = {};
 
 		for(const file of update) {
-			const { filter, ifExists, ifMissing, pattern, rename, route, transforms } = file;
+			const { filter, ifExists, ifMissing, pattern, rename, transforms } = file;
 
 			if(rename) {
 				context.renamedPatterns.push({
@@ -53,27 +52,6 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 
 			if(filter) {
 				filters[pattern] = filter;
-			}
-
-			if(route) {
-				const { alias } = route as { alias?: string };
-
-				const travel = buildTravel(route);
-				if(travel.fails) {
-					return travel;
-				}
-
-				if(alias) {
-					routes[pattern] = {
-						alias,
-						travel: travel.value,
-					};
-				}
-				else {
-					routes[pattern] = {
-						travel: travel.value,
-					};
-				}
 			}
 
 			if(transforms) {

@@ -7,13 +7,16 @@ import { type Context } from '../types/context.js';
 import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 
-export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, transforms, options }: Context): AsyncDResult {
+export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, transforms, incomingConfig, config, options }: Context): AsyncDResult {
 	for(const file of textFiles) {
 		if(options.verbose) {
 			logger.debug(`${file.name} is going to be merged`);
 		}
 
-		const journey = routes(file.name) ?? getJourney(file.name);
+		const journey = routes(file.name)
+			?? getJourney(file.name, Object.values(incomingConfig!.journeys))
+			?? getJourney(file.name, Object.values(config.global.journeys))
+			?? getJourney(file.name);
 
 		if(!journey) {
 			if(options.verbose) {

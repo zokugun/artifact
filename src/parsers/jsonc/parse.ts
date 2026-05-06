@@ -1,15 +1,18 @@
+import { isNonBlankString } from '@zokugun/is-it-type';
+import { ok } from '@zokugun/xtry';
 import { visit, ParseErrorCode } from 'jsonc-parser';
+import { type ParseResult } from '../../types/context.js';
 import { type Transform } from './transform.js';
 
 type Comment = { text: string[]; line: number };
-type Value = any[] | Record<string, any>;
+type Value = unknown[] | Record<string, unknown>;
 
-export function parse(text: string | undefined): { data: any; transform: Transform | undefined } {
-	if(!text) {
-		return {
-			data: undefined,
+export function parse(text: string): ParseResult {
+	if(!isNonBlankString<string>(text)) {
+		return ok({
+			data: {},
 			transform: {},
-		};
+		});
 	}
 
 	const stack: Value[] = [];
@@ -205,8 +208,8 @@ export function parse(text: string | undefined): { data: any; transform: Transfo
 		},
 	});
 
-	return {
-		data: current,
+	return ok({
+		data: current as Record<string, unknown>,
 		transform,
-	};
+	});
 }

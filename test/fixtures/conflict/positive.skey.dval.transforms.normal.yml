@@ -4,9 +4,9 @@ action:
 
 
 /target/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
   artifacts:
-    awesome-config:
+    artifact-awesome-config:
       version: 0.1.0
 /target/.czrc: |
 /target/.nvmrc: |
@@ -22,7 +22,7 @@ action:
 
 
 
-/incoming/.artifactrc.yml: |
+/registry/artifact-awesome-config/.artifactrc.yml: |
   $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/package.json
 
   always:
@@ -37,12 +37,12 @@ action:
     package.json:
       transforms:
         - jq: 'del(.devDependencies.cz)'
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
-/incoming/configs/.nvmrc: |
+/registry/artifact-awesome-config/configs/.nvmrc: |
   v20.20.2
 
 

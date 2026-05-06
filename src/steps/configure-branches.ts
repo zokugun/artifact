@@ -23,7 +23,7 @@ export async function configureBranches(context: Context): AsyncDResult {
 			if(match) {
 				const [branch, name, variant] = match;
 				const packageName = name.replaceAll(/:(artifact-)?/g, '/artifact-');
-				const artifact = context.config.artifacts[packageName];
+				const artifact = context.config.local.artifacts[packageName];
 				let found = false;
 
 				if(artifact) {

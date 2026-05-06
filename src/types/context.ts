@@ -1,5 +1,6 @@
 import { type Primitive } from '@zokugun/is-it-type';
-import { type AsyncDResult } from '@zokugun/xtry';
+import { type DResult, type AsyncDResult } from '@zokugun/xtry';
+import { type Transform } from '../parsers/jsonc/transform.js';
 import { type BinaryFile } from './binary-file.js';
 import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform } from './config.js';
 import { type Indent, type Format } from './format.js';
@@ -67,4 +68,14 @@ export type TextFile = {
 	indent?: Indent;
 	mode?: number;
 	name: string;
+};
+
+export type ParseResult = DResult<{
+	data: Record<string, unknown>;
+	transform?: Transform;
+}>;
+
+export type Codec = {
+	parse: (data: string) => ParseResult;
+	stringify: (data: Record<string, unknown>, transform?: Transform) => string;
 };

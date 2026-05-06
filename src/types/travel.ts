@@ -10,3 +10,5 @@ export type Journey = {
 	alias?: string;
 	travel: Route<string>;
 };
+
+export type JourneyPlan = (basename: string) => Journey | undefined;

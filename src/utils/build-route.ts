@@ -1,11 +1,11 @@
 import { isRecord } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import { fork, type ForkParameter } from '../compositors/fork.js';
-import { compose, mapSort } from '../compositors/index.js';
-import { command, linesConcat, listConcat, mapConcat, overwrite, primitive } from '../routes/index.js';
+import { compose, json, mapSort, yaml } from '../compositors/index.js';
+import { command, linesConcat, listConcat, listConcatAfter, mapConcat, mergeDotJs, overwrite, primitive } from '../routes/index.js';
 import { type Route } from '../types/travel.js';
 
-export function buildRoute(route: any): DResult<Route<any>> { // {{{
+export function buildRoute(route: unknown): DResult<Route<any>> { // {{{
 	if(Array.isArray(route) && route.length > 0) {
 		const buildResult = buildRoute(route[0]);
 		if(buildResult.fails) {
@@ -19,35 +19,38 @@ export function buildRoute(route: any): DResult<Route<any>> { // {{{
 				result = mapSort(result);
 			}
 			else {
-				return err('Can\'t build route');
+				return err(`Cannot build route "${JSON.stringify(route)}"`);
 			}
 		}
 
 		return ok(result);
 	}
 	else if(isRecord(route)) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		const { compose: rtCompose, fork: rtFork, mapSort: rtMapSort } = route as { compose?: Record<string, any>; fork?: Record<string, any>; mapSort?: any };
-
-		if(rtCompose) {
+		if(isRecord(route.compose)) {
 			const map = {};
+			const entries = Object.entries(route.compose);
 
-			for(const [name, route] of Object.entries(rtCompose)) {
-				const result = buildRoute(route);
-				if(result.fails) {
-					return result;
+			for(const [name, route] of entries) {
+				if(name === '$$ignore' || name === '$$remove') {
+					map[name] = route;
 				}
+				else {
+					const result = buildRoute(route);
+					if(result.fails) {
+						return result;
+					}
 
-				map[name] = result.value;
+					map[name] = result.value;
+				}
 			}
 
 			return ok(compose(map));
 		}
-		else if(rtFork) {
+		else if(isRecord(route.fork)) {
 			const map: ForkParameter[] = [];
 
-			if(rtFork.array) {
-				const result = buildRoute(rtFork.array);
+			if(route.fork.array) {
+				const result = buildRoute(route.fork.array);
 				if(result.fails) {
 					return result;
 				}
@@ -55,8 +58,8 @@ export function buildRoute(route: any): DResult<Route<any>> { // {{{
 				map.push([Array.isArray, result.value]);
 			}
 
-			if(rtFork.object) {
-				const result = buildRoute(rtFork.object);
+			if(route.fork.object) {
+				const result = buildRoute(route.fork.object);
 				if(result.fails) {
 					return result;
 				}
@@ -64,8 +67,16 @@ export function buildRoute(route: any): DResult<Route<any>> { // {{{
 				map.push([isRecord, result.value]);
 			}
 
-			if(rtFork.default) {
-				const result = buildRoute(rtFork.default);
+			if(route.fork.default) {
+				const result = buildRoute(route.fork.default);
+				if(result.fails) {
+					return result;
+				}
+
+				map.push(result.value);
+			}
+			else if(route.fork.$$default) {
+				const result = buildRoute(route.fork.$$default);
 				if(result.fails) {
 					return result;
 				}
@@ -75,13 +86,29 @@ export function buildRoute(route: any): DResult<Route<any>> { // {{{
 
 			return ok(fork(...map));
 		}
-		else if(rtMapSort) {
-			const result = buildRoute(rtMapSort);
+		else if(route.json) {
+			const result = buildRoute(route.json);
+			if(result.fails) {
+				return result;
+			}
+
+			return ok(json(result.value));
+		}
+		else if(route.mapSort) {
+			const result = buildRoute(route.mapSort);
 			if(result.fails) {
 				return result;
 			}
 
 			return ok(mapSort(result.value));
+		}
+		else if(route.yaml) {
+			const result = buildRoute(route.yaml);
+			if(result.fails) {
+				return result;
+			}
+
+			return ok(yaml(result.value));
 		}
 	}
 	else if(route === 'command') {
@@ -93,8 +120,14 @@ export function buildRoute(route: any): DResult<Route<any>> { // {{{
 	else if(route === 'listConcat') {
 		return ok(listConcat);
 	}
+	else if(route === 'listConcatAfter') {
+		return ok(listConcatAfter);
+	}
 	else if(route === 'mapConcat') {
 		return ok(mapConcat);
+	}
+	else if(route === 'mergeDotJs') {
+		return ok(mergeDotJs);
 	}
 	else if(route === 'overwrite') {
 		return ok(overwrite);
@@ -103,5 +136,5 @@ export function buildRoute(route: any): DResult<Route<any>> { // {{{
 		return ok(primitive);
 	}
 
-	return err('Can\'t build route');
+	return err(`Cannot build route "${JSON.stringify(route)}"`);
 } // }}}

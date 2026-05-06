@@ -21,12 +21,12 @@ action:
 
 
 
-/incoming/package.json: |
+/registry/artifact-awesome-config/package.json: |
   {
-    "name": "awesome-config",
+    "name": "artifact-awesome-config",
     "version": "1.0.0"
   }
-/incoming/.artifactrc: |
+/registry/artifact-awesome-config/.artifactrc: |
   always:
     .czrc:
       remove: true
@@ -41,15 +41,15 @@ action:
             end
         - description: Remove commitizen from devDependencies
           jq: 'del(.devDependencies.commitizen)'
-/incoming/configs/package.json: |
+/registry/artifact-awesome-config/configs/package.json: |
   {}
 
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
   artifacts:
-    awesome-config:
+    artifact-awesome-config:
       version: 1.0.0
 /merged/.czrc:
   error: "ENOENT: no such file or directory"

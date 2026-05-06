@@ -1,11 +1,10 @@
 import process from 'process';
 import { c, logger, enquirer, confirm } from '@zokugun/cli-utils';
 import { xtry } from '@zokugun/xtry/async';
-import pacote from 'pacote';
-import tempy from 'tempy';
 import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Options } from '../types/context.js';
+import { loadPackage } from '../utils/load-package.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
@@ -47,14 +46,14 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 		logger.fatal(configResult.error);
 	}
 
-	const { config, configStats } = configResult.value;
+	const config = configResult.value;
 
 	if(specs.length === 0) {
 		const { value } = await xtry(enquirer.prompt<{ specs: string[] }>({
 			type: 'multiselect',
 			name: 'specs',
 			message: 'Pick the artifacts to remove',
-			choices: Object.keys(config.artifacts).map((name) => ({ name })),
+			choices: Object.keys(config.local.artifacts).map((name) => ({ name })),
 		}));
 
 		const marked = value?.specs;
@@ -89,22 +88,10 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 
 		const request = requestResult.value;
 		const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
-		const dir = tempy.directory();
-		const pkgResult = await pacote.extract(request.name, dir);
+		const dir = await loadPackage(request.name, spinner, options);
 
-		if(!pkgResult.resolved) {
-			if(options.force || options.skip) {
-				spinner.fail();
-
-				if(options.verbose) {
-					logger.debug(`The artifact '${spec}' couldn't be found, skipping...`);
-				}
-
-				continue;
-			}
-			else {
-				logger.fatal(pkgResult.from);
-			}
+		if(!dir) {
+			continue;
 		}
 
 		const flowResult = await mainFlow(targetPath, dir, request, config, options);
@@ -120,7 +107,7 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 
 		updateUninstallConfig(config, flowResult.value.result);
 
-		await writeInstallConfig(config, configStats, flowResult.value.formats, targetPath, options);
+		await writeInstallConfig(config, flowResult.value.formats, targetPath, options);
 
 		spinner.succeed();
 	}

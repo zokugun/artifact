@@ -1,4 +1,5 @@
 import { type Route, type TravelPlan } from '../types/travel.js';
+// import { fnmatch } from './fnmatch.js';
 
 export function buildTravelPlan(...mappers: Array<[RegExp | string, Route<string>]>): TravelPlan {
 	return (basename) => {

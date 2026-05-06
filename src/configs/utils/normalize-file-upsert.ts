@@ -1,9 +1,13 @@
 import { isArray, isBoolean, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import { type FileTransform, type UpsertFileConfig } from '../../types/config.js';
+import { type JourneyPlan, type Route } from '../../types/travel.js';
+import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
+import { buildRoute } from '../../utils/build-route.js';
+import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 import { isTransform } from './is-transform.js';
 
-export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert'): DResult<UpsertFileConfig> { // {{{
+export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert', journeys?: Record<string, JourneyPlan>, routes?: Record<string, Route<any>>): DResult<UpsertFileConfig> { // {{{
 	if(!isRecord(data)) {
 		return err(`"${name}" must be an object.`);
 	}
@@ -12,7 +16,6 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 	let ifExists: 'force-merge' | 'merge' | 'overwrite' | 'remove' | 'skip' = 'merge';
 	let ifMissing: 'merge' | 'skip' = 'merge';
 	let rename: string | undefined;
-	let route: Record<string, any> | undefined;
 	let transforms: FileTransform[] = [];
 
 	if(isArray<string>(data.filter, isString)) {
@@ -42,8 +45,16 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		rename = data.rename;
 	}
 
-	if(isRecord(data.route)) {
-		route = data.route;
+	if(journeys && routes && isRecord(data.route)) {
+		const route = buildRoute(data.route);
+		if(route.fails) {
+			return route;
+		}
+
+		const travel = buildTravelPlan([pattern, route.value]);
+		const journey = buildJourneyPlan(travel);
+
+		journeys[pattern] = journey;
 	}
 
 	if(isArray<FileTransform>(data.transforms, isTransform)) {
@@ -56,7 +67,6 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		ifMissing,
 		pattern,
 		rename,
-		route,
 		transforms,
 	});
 } // }}}
