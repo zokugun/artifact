@@ -15,7 +15,15 @@ use(chaiAsPromised);
 
 const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
 
-export function generateTestsFromManifests(directory: string): void {
+export function generateTestsFromManifests(...directories: string[]): void {
+	for(const directory of directories) {
+		describe(directory, () => {
+			generateDirectory(directory);
+		});
+	}
+}
+
+function generateDirectory(directory: string): void {
 	beforeEach(async () => { // {{{
 		vol.reset();
 	}); // }}}
