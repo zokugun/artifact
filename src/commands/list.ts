@@ -35,7 +35,7 @@ export async function list(): Promise<void> {
 
 	const config = configResult.value;
 
-	const artifacts = Object.entries(config.local.artifacts);
+	const artifacts = Object.entries(config.artifacts);
 
 	logger.newLine();
 

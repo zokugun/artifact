@@ -1,6 +1,6 @@
 import { c, logger } from '@zokugun/cli-utils';
 import { ok, OK_UNDEFINED } from '@zokugun/xtry';
-import { type CommonFlow, type Context, type MainFlow } from '../types/context.js';
+import { Mode, type CommonFlow, type Context, type MainFlow } from '../types/context.js';
 import { type Step } from '../types/step.js';
 import { applyFormatting } from './apply-formatting.js';
 import { configureBranches } from './configure-branches.js';
@@ -51,7 +51,7 @@ export const steps = {
 };
 
 export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow: MainFlow;	commonFlow: CommonFlow } {
-	const mainFlow: MainFlow = async (targetPath, incomingPath, request, config, options) => {
+	const mainFlow: MainFlow = async (targetPath, incomingPath, request, config, global, options) => {
 		const context: Context = {
 			binaryFiles: [],
 			blocks: [],
@@ -59,9 +59,11 @@ export function composeSteps(validations: Step[], processes: Step[]): {	mainFlow
 			config,
 			filters: () => undefined,
 			formats: [],
+			global,
 			incomingPath,
 			incomingVariant: request.variant,
 			mergedTextFiles: [],
+			mode: Mode.Default,
 			onExisting: () => 'merge',
 			onMissing: () => 'continue',
 			options,

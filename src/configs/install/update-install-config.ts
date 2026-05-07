@@ -13,5 +13,5 @@ export function updateInstallConfig(config: InstallConfig, { name, version, prov
 		artifact.provides = provides;
 	}
 
-	config.local.artifacts[name] = artifact;
+	config.artifacts[name] = artifact;
 }

@@ -7,7 +7,7 @@ import { type Context } from '../types/context.js';
 import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 
-export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, transforms, incomingConfig, config, options }: Context): AsyncDResult {
+export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, onExisting, onMissing, filters, routes, transforms, incomingConfig, global, options }: Context): AsyncDResult {
 	for(const file of textFiles) {
 		if(options.verbose) {
 			logger.debug(`${file.name} is going to be merged`);
@@ -15,7 +15,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 
 		const journey = routes(file.name)
 			?? getJourney(file.name, Object.values(incomingConfig!.journeys))
-			?? getJourney(file.name, Object.values(config.global.journeys))
+			?? getJourney(file.name, Object.values(global.journeys))
 			?? getJourney(file.name);
 
 		if(!journey) {
@@ -103,6 +103,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 
 				case 'overwrite': {
 					mergedTextFiles.push(file);
+					global.overwrittenTextFiles.push(fileName);
 
 					if(options.verbose) {
 						logger.debug(`${file.name} has been overwritten`);

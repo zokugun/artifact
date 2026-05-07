@@ -19,15 +19,15 @@ export async function writeInstallConfig(config: InstallConfig, formats: Format[
 		variables?: Record<string, Primitive>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
-		artifacts: config.local.artifacts,
+		artifacts: config.artifacts,
 	};
 
-	if(isNonEmptyRecord(config.local.update)) {
-		exported.update = config.local.update;
+	if(isNonEmptyRecord(config.update)) {
+		exported.update = config.update;
 	}
 
-	if(isNonEmptyRecord(config.local.variables)) {
-		exported.variables = config.local.variables;
+	if(isNonEmptyRecord(config.variables)) {
+		exported.variables = config.variables;
 	}
 
 	const { name, type, indent, finalNewLine } = config.file;

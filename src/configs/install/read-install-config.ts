@@ -82,18 +82,12 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 	if(!data) {
 		return ok({
 			file,
-			global: {
-				journeys: {},
-				routes: {},
-			},
-			local: {
-				artifacts,
-				install,
-				journeys,
-				routes,
-				update,
-				variables,
-			},
+			artifacts,
+			install,
+			journeys,
+			routes,
+			update,
+			variables,
 		});
 	}
 
@@ -167,17 +161,11 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 
 	return ok({
 		file,
-		global: {
-			journeys: {},
-			routes: {},
-		},
-		local: {
-			artifacts,
-			install,
-			journeys,
-			routes,
-			update,
-			variables,
-		},
+		artifacts,
+		install,
+		journeys,
+		routes,
+		update,
+		variables,
 	});
 }

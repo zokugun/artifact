@@ -3,76 +3,91 @@ import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { getEncoding, isText } from 'istextorbinary';
-import { type Context } from '../types/context.js';
+import { Mode, type Options, type TextFile, type Context } from '../types/context.js';
 import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 import { listWorkingFiles } from '../utils/list-working-files.js';
 import { readBuffer } from '../utils/read-buffer.js';
 
-export async function readFiles({ incomingPath, textFiles, binaryFiles, options }: Context): AsyncDResult {
+export async function readFiles({ incomingPath, textFiles, binaryFiles, mode, global, options }: Context): AsyncDResult {
 	const cwd = path.join(incomingPath, 'configs');
 
 	const files = await listWorkingFiles(cwd);
 
-	for(const file of files) {
-		const filePath = path.join(cwd, file);
+	if(mode === Mode.Default) {
+		for(const file of files) {
+			const filePath = path.join(cwd, file);
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-		if(isText(file) || getEncoding(await readBuffer(filePath, 24)) === 'utf8') {
-			const result = await fse.readFile(filePath, 'utf8');
-			if(result.fails) {
-				return err(stringifyError(result.error));
-			}
-
-			const data = result.value;
-			const finalNewLine = hasFinalNewLine(data);
-			const indent = detectIndent(data);
-
-			if(data.startsWith('#!')) {
-				// the text file might be executable
-				const result = await fse.stat(filePath);
-				if(result.fails) {
-					return err(stringifyError(result.error));
-				}
-
-				const { mode } = result.value;
-
-				textFiles.push({
-					name: file,
-					data,
-					finalNewLine,
-					indent,
-					mode,
-				});
-
-				if(options.verbose) {
-					logger.debug(`${file} is a shebang file`);
-				}
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+			if(isText(file) || getEncoding(await readBuffer(filePath, 24)) === 'utf8') {
+				await readTextFile(file, filePath, textFiles, options);
 			}
 			else {
-				textFiles.push({
-					name: file,
-					data,
-					finalNewLine,
-					indent,
+				binaryFiles.push({
+					source: file,
+					target: file,
 				});
 
 				if(options.verbose) {
-					logger.debug(`${file} is a text file`);
+					logger.debug(`${file} is a binary file`);
 				}
 			}
 		}
-		else {
-			binaryFiles.push({
-				source: file,
-				target: file,
-			});
+	}
+	else {
+		for(const file of files) {
+			if(global.overwrittenTextFiles.includes(file)) {
+				const filePath = path.join(cwd, file);
 
-			if(options.verbose) {
-				logger.debug(`${file} is a binary file`);
+				await readTextFile(file, filePath, textFiles, options);
 			}
 		}
 	}
 
 	return OK;
 }
+
+async function readTextFile(file: string, filePath: string, textFiles: TextFile[], options: Options) { // {{{
+	const result = await fse.readFile(filePath, 'utf8');
+	if(result.fails) {
+		return err(stringifyError(result.error));
+	}
+
+	const data = result.value;
+	const finalNewLine = hasFinalNewLine(data);
+	const indent = detectIndent(data);
+
+	if(data.startsWith('#!')) {
+		// the text file might be executable
+		const result = await fse.stat(filePath);
+		if(result.fails) {
+			return err(stringifyError(result.error));
+		}
+
+		const { mode } = result.value;
+
+		textFiles.push({
+			name: file,
+			data,
+			finalNewLine,
+			indent,
+			mode,
+		});
+
+		if(options.verbose) {
+			logger.debug(`${file} is a shebang file`);
+		}
+	}
+	else {
+		textFiles.push({
+			name: file,
+			data,
+			finalNewLine,
+			indent,
+		});
+
+		if(options.verbose) {
+			logger.debug(`${file} is a text file`);
+		}
+	}
+} // }}}

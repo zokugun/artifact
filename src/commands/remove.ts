@@ -3,7 +3,7 @@ import { c, logger, enquirer, confirm } from '@zokugun/cli-utils';
 import { xtry } from '@zokugun/xtry/async';
 import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
-import { type Options } from '../types/context.js';
+import { type Options, type Global } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
@@ -53,7 +53,7 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 			type: 'multiselect',
 			name: 'specs',
 			message: 'Pick the artifacts to remove',
-			choices: Object.keys(config.local.artifacts).map((name) => ({ name })),
+			choices: Object.keys(config.artifacts).map((name) => ({ name })),
 		}));
 
 		const marked = value?.specs;
@@ -80,6 +80,12 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 		}
 	}
 
+	const global: Global = {
+		journeys: {},
+		overwrittenTextFiles: [],
+		routes: {},
+	};
+
 	for(const spec of specs) {
 		const requestResult = resolveRequest(spec);
 		if(requestResult.fails) {
@@ -94,7 +100,7 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 			continue;
 		}
 
-		const flowResult = await mainFlow(targetPath, dir, request, config, options);
+		const flowResult = await mainFlow(targetPath, dir, request, config, global, options);
 		if(flowResult.fails) {
 			logger.fatal(flowResult.error);
 		}

@@ -1,10 +1,10 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
-import { type Context } from '../types/context.js';
+import { Mode, type Context } from '../types/context.js';
 
-export async function renameFiles({ renamedPatterns, targetPath }: Context): AsyncDResult {
-	if(renamedPatterns.length === 0) {
+export async function renameFiles({ renamedPatterns, targetPath, mode }: Context): AsyncDResult {
+	if(renamedPatterns.length === 0 || mode !== Mode.Default) {
 		return OK;
 	}
 

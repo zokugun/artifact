@@ -7,7 +7,7 @@ import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstall
 import { readListingConfig } from '../configs/package/read-listing-config.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
-import { type Options } from '../types/context.js';
+import { type Options, type Global } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
@@ -132,7 +132,7 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 
 		if(!options.force) {
 			const { name } = request.value;
-			const artifact = config.local.artifacts[name];
+			const artifact = config.artifacts[name];
 
 			if(artifact) {
 				if(options.skip) {
@@ -149,7 +149,13 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 		requests.push(request.value);
 	}
 
-	for(const [name, { version }] of Object.entries(config.local.artifacts)) {
+	const global: Global = {
+		journeys: {},
+		overwrittenTextFiles: [],
+		routes: {},
+	};
+
+	for(const [name, { version }] of Object.entries(config.artifacts)) {
 		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
 		const dir = await loadPackage(`${name}@${version}`, spinner, options);
 
@@ -157,17 +163,17 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 			continue;
 		}
 
-		const result = await readPackageConfig(dir, config.global.routes);
+		const result = await readPackageConfig(dir, global.routes);
 		if(result.fails) {
 			logger.fatal(result.error);
 		}
 
 		for(const [name, journey] of Object.entries(result.value.journeys)) {
-			config.global.journeys[name] = journey;
+			global.journeys[name] = journey;
 		}
 
 		for(const [name, route] of Object.entries(result.value.routes)) {
-			config.global.routes[name] = route;
+			global.routes[name] = route;
 		}
 
 		spinner.succeed();
@@ -181,7 +187,7 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 			continue;
 		}
 
-		const flowResult = await mainFlow(targetPath, dir, request, config, options);
+		const flowResult = await mainFlow(targetPath, dir, request, config, global, options);
 		if(flowResult.fails) {
 			logger.fatal(flowResult.error);
 		}

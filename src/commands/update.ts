@@ -4,7 +4,7 @@ import { last } from 'lodash-es';
 import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
-import { type Options } from '../types/context.js';
+import { type Options, type Global } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 
 const { mainFlow } = composeSteps(
@@ -53,7 +53,13 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 
 	const config = configResult.value;
 
-	for(const [name, artifact] of Object.entries(config.local.artifacts)) {
+	const global: Global = {
+		journeys: {},
+		overwrittenTextFiles: [],
+		routes: {},
+	};
+
+	for(const [name, artifact] of Object.entries(config.artifacts)) {
 		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
 		const request: Request = artifact.requires ? { name, variant: last(artifact.requires) } : { name };
 		const dir = await loadPackage(request.name, spinner, options);
@@ -62,7 +68,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 			continue;
 		}
 
-		const result = await mainFlow(targetPath, dir, request, config, options);
+		const result = await mainFlow(targetPath, dir, request, config, global, options);
 		if(result.fails) {
 			logger.fatal(result.error);
 		}
@@ -71,25 +77,25 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 
 		if(context?.incomingConfig) {
 			for(const [name, journey] of Object.entries(context.incomingConfig.journeys)) {
-				config.global.journeys[name] = journey;
+				global.journeys[name] = journey;
 			}
 
 			for(const [name, route] of Object.entries(context.incomingConfig.routes)) {
-				config.global.routes[name] = route;
+				global.routes[name] = route;
 			}
 		}
 		else {
-			const result = await readPackageConfig(dir, config.global.routes);
+			const result = await readPackageConfig(dir, global.routes);
 			if(result.fails) {
 				logger.fatal(result.error);
 			}
 
 			for(const [name, journey] of Object.entries(result.value.journeys)) {
-				config.global.journeys[name] = journey;
+				global.journeys[name] = journey;
 			}
 
 			for(const [name, route] of Object.entries(result.value.routes)) {
-				config.global.routes[name] = route;
+				global.routes[name] = route;
 			}
 		}
 

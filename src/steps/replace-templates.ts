@@ -5,7 +5,7 @@ import { TemplateEngine } from '../utils/template.js';
 export async function replaceTemplates({ textFiles, binaryFiles, targetPath, config, incomingConfig, options }: Context): AsyncDResult {
 	const variables = {
 		...incomingConfig?.variables,
-		...config?.local.variables,
+		...config?.variables,
 		...options.variables,
 	};
 

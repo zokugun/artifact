@@ -39,18 +39,12 @@ export type InstallConfig = {
 		indent?: Indent;
 		type: string;
 	};
-	global: {
-		journeys: Record<string, JourneyPlan>;
-		routes: Record<string, Route<any>>;
-	};
-	local: {
-		artifacts: Record<string, Artifact>;
-		install: Record<string, InstallFileConfig>;
-		journeys: Record<string, JourneyPlan>;
-		routes: Record<string, Route<any>>;
-		update: false | Record<string, UpdateFileConfig>;
-		variables: Record<string, Primitive>;
-	};
+	artifacts: Record<string, Artifact>;
+	install: Record<string, InstallFileConfig>;
+	journeys: Record<string, JourneyPlan>;
+	routes: Record<string, Route<any>>;
+	update: false | Record<string, UpdateFileConfig>;
+	variables: Record<string, Primitive>;
 };
 
 export type FileConfig<E> = {

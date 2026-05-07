@@ -22,7 +22,7 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 		}
 
 		const variantPath = path.join(context.packagePath, 'variants', variant);
-		const configResult = await readPackageConfig(variantPath, context.config.global.routes);
+		const configResult = await readPackageConfig(variantPath, context.global.routes);
 		if(configResult.fails) {
 			return configResult;
 		}

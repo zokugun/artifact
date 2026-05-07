@@ -4,7 +4,7 @@ import { type Transform } from '../parsers/jsonc/transform.js';
 import { type BinaryFile } from './binary-file.js';
 import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform } from './config.js';
 import { type Indent, type Format } from './format.js';
-import { type Journey } from './travel.js';
+import { type JourneyPlan, type Route, type Journey } from './travel.js';
 
 export type ExistingAction = 'merge' | 'overwrite' | 'skip';
 export type MissingAction = 'continue' | 'skip';
@@ -20,6 +20,7 @@ export type Context = {
 	config: InstallConfig;
 	filters: (file: string) => string[] | undefined;
 	formats: Format[];
+	global: Global;
 	incomingName?: string;
 	incomingVersion?: string;
 	incomingVariant?: string;
@@ -28,6 +29,7 @@ export type Context = {
 	incomingPackage?: PackageManifest;
 	incomingPath: string;
 	mergedTextFiles: TextFile[];
+	mode: Mode;
 	onExisting: (file: string) => ExistingAction;
 	onMissing: (file: string) => MissingAction;
 	options: Options;
@@ -43,7 +45,18 @@ export type Context = {
 	transforms: (file: string) => FileTransform[] | undefined;
 };
 
-export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, options: Options) => AsyncDResult<Context | undefined>;
+export enum Mode {
+	Default,
+	Overwritten,
+}
+
+export type Global = {
+	journeys: Record<string, JourneyPlan>;
+	overwrittenTextFiles: string[];
+	routes: Record<string, Route<any>>;
+};
+
+export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
 export type CommonFlow = (name: string, version: string, variant: string | undefined, branch: string | undefined, incomingPath: string, commonContext: Context) => AsyncDResult<Context | undefined>;
 
 export type Options = {
