@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.0 | 2026-05-07
+- add `journeys` and `routes` configs
+- when a file is overwritten, any following artifact that isn't newer, will be executed for that file
+
 ## v0.8.0 | 2026-05-02
 - add `outdated` command
 - the `remove` command prompts for a selection if no artifact has been passed
