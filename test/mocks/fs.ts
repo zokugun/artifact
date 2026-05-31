@@ -57,9 +57,6 @@ const fs = {
 	},
 };
 
-// @ts-expect-error `fs-extra` is using `realpath.native`
-fs.realpath.native = mfs.realpath;
-
 export {
 	fs,
 };

@@ -1,11 +1,15 @@
 import { logger } from '@zokugun/cli-utils';
 import { type Spinner } from '@zokugun/cli-utils/logger';
+import fse from '@zokugun/fs-extra-plus/async';
 import pacote from 'pacote';
-import tempy from 'tempy';
 
 export async function loadPackage(spec: string, spinner: Spinner, options: { force?: boolean; skip?: boolean; verbose?: boolean }): Promise<string | null> {
-	const dir = tempy.directory();
-	const pkgResult = await pacote.extract(spec, dir);
+	const dir = await fse.makeTempDir();
+	if(dir.fails) {
+		logger.fatal('Cannot generate temporary directory');
+	}
+
+	const pkgResult = await pacote.extract(spec, dir.value);
 
 	if(!pkgResult.resolved) {
 		if(options.force || options.skip) {
@@ -22,5 +26,5 @@ export async function loadPackage(spec: string, spinner: Spinner, options: { for
 		}
 	}
 
-	return dir;
+	return dir.value;
 }

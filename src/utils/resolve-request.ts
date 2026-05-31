@@ -1,10 +1,10 @@
+import fse from '@zokugun/fs-extra-plus/async';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import untildify from 'untildify';
 import { type Request } from '../types/config.js';
 
 export function resolveRequest(spec: string): DResult<Request> { // {{{
 	if(spec.startsWith('~')) {
-		spec = untildify(spec);
+		spec = fse.untildify(spec);
 	}
 	else if(spec.startsWith('/')) {
 		// skip

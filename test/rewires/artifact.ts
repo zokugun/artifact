@@ -1,4 +1,5 @@
 import process from 'node:process';
+// import { ok } from '@zokugun/xtry';
 import rewiremock from 'rewiremock';
 // eslint-disable-next-line import/order
 import { fs } from '../mocks/fs.js';
@@ -9,6 +10,10 @@ rewiremock('fs').with(fs);
 rewiremock('fs/promises').with(fs.promises);
 rewiremock('node:fs').with(fs);
 rewiremock('node:fs/promises').with(fs.promises);
+rewiremock('node:process').with({
+	cwd: () => '/target',
+	env: {},
+});
 rewiremock('npm').with({
 	config: {
 		get: () => null,
@@ -17,6 +22,9 @@ rewiremock('npm').with({
 		// do nothing
 	},
 	log: {},
+});
+rewiremock('pacote').with({
+	extract: () => ({ resolved: true }),
 });
 rewiremock('@zokugun/cli-utils').with({
 	c: {
@@ -47,20 +55,6 @@ rewiremock('@zokugun/cli-utils').with({
 		},
 	},
 });
-rewiremock('pacote').with({
-	extract: () => ({ resolved: true }),
-});
-rewiremock('process').with({
-	cwd: () => '/target',
-	env: {},
-});
-rewiremock('node:process').with({
-	cwd: () => '/target',
-	env: {},
-});
-rewiremock('tempy').with({
-	directory: () => '/incoming',
-});
 rewiremock('../utils/load-package.js').with({
 	loadPackage: (spec: string) => {
 		const index = spec.lastIndexOf('@');
@@ -73,10 +67,6 @@ rewiremock('../utils/load-package.js').with({
 		}
 	},
 });
-
-// unload to it can use mocked's fs
-const name = require.resolve('fast-glob/out/settings.js');
-delete require.cache[name];
 
 rewiremock.enable();
 

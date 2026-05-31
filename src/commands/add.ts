@@ -1,8 +1,8 @@
 import process from 'node:process';
 import { logger, c, enquirer, confirm } from '@zokugun/cli-utils';
+import fse from '@zokugun/fs-extra-plus/async';
 import { xtry } from '@zokugun/xtry/async';
 import pacote from 'pacote';
-import tempy from 'tempy';
 import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { readListingConfig } from '../configs/package/read-listing-config.js';
 import { composeSteps, steps } from '../steps/index.js';
@@ -50,8 +50,13 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 	if(specs.length === 1 && /^@\w+$/.test(specs[0])) {
 		const request = `${specs.shift()}/artifact-listing`;
 		const spinner = logger.createSpinner(`${c.cyan.bold(request)}`);
-		const dir = tempy.directory();
-		const pkgResult = await xtry(pacote.extract(request, dir));
+
+		const dir = await fse.makeTempDir();
+		if(dir.fails) {
+			logger.fatal('Cannot generate temporary directory');
+		}
+
+		const pkgResult = await xtry(pacote.extract(request, dir.value));
 
 		if(pkgResult.fails) {
 			logger.fatal(`The artifact '${request}' couldn't be found.`);
@@ -61,7 +66,7 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 
 		logger.stopProgress();
 
-		const listing = await readListingConfig(dir);
+		const listing = await readListingConfig(dir.value);
 		if(listing.fails) {
 			logger.fatal(listing.error);
 		}
@@ -79,6 +84,9 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 
 		if(!marked || marked.length === 0) {
 			logger.warn('No artifacts marked for addition');
+
+			// eslint-disable-next-line unicorn/no-process-exit
+			process.exit(0);
 		}
 		else {
 			const { value } = await xtry(enquirer.prompt<{ addition: boolean }>(

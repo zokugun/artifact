@@ -1,4 +1,4 @@
-import { isEqual, uniqWith } from 'lodash-es';
+import { isEqual, uniqWith } from 'es-toolkit';
 
 export async function listConcat({ current, incoming }: { current: unknown[] | undefined; incoming: unknown[] | undefined }): Promise<any[]> {
 	if(!incoming) {

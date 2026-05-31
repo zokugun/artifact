@@ -1,6 +1,6 @@
 import path from 'node:path';
+import { isNullable } from '@zokugun/is-it-type';
 import { type AsyncDResult, err, OK } from '@zokugun/xtry';
-import { isNil } from 'lodash-es';
 import { readPackageConfig } from '../configs/index.js';
 import { type Context } from '../types/context.js';
 
@@ -12,7 +12,7 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 		let variant: string;
 		let alias: boolean;
 
-		if(isNil(context.incomingConfig!.variants[context.incomingVariant])) {
+		if(isNullable(context.incomingConfig!.variants[context.incomingVariant])) {
 			variant = context.incomingVariant;
 			alias = false;
 		}

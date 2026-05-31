@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash-es';
+import { isEqual } from 'es-toolkit';
 import { listConcat } from '../../routes/list-concat.js';
 import { type Command } from '../../types/command.js';
 

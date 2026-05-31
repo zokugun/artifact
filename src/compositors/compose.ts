@@ -1,4 +1,5 @@
-import { has, isNil, without } from 'lodash-es';
+import { isNullable } from '@zokugun/is-it-type';
+import { without } from 'es-toolkit';
 import { type Route } from '../types/travel.js';
 
 async function apply(map: ComposeMap, keys: string[], current: Record<string, any>, incoming: Record<string, any>, result: Record<string, any>): Promise<void> {
@@ -17,8 +18,8 @@ async function apply(map: ComposeMap, keys: string[], current: Record<string, an
 		const currentValue = current[key] as unknown;
 		const transform = map[key] ?? map.$$default;
 
-		if(!transform || !has(incoming, key) || ignores.includes(key)) {
-			if(!isNil(currentValue)) {
+		if(!transform || !(key in incoming) || ignores.includes(key)) {
+			if(!isNullable(currentValue)) {
 				result[key] = currentValue;
 			}
 
@@ -44,11 +45,11 @@ type ComposeMap = {
 
 export function compose(map: ComposeMap): Route<Record<string, any>> {
 	return async ({ current, incoming, filters }) => {
-		if(isNil(incoming)) {
+		if(isNullable(incoming)) {
 			return current ?? {};
 		}
 
-		if(isNil(current) || typeof current !== typeof incoming) {
+		if(isNullable(current) || typeof current !== typeof incoming) {
 			return incoming;
 		}
 

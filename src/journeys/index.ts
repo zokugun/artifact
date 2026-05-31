@@ -1,4 +1,4 @@
-import path from 'path';
+import path from '@zokugun/fs-extra-plus/path';
 import { type JourneyPlan, type Journey } from '../types/travel.js';
 import commitlintJourney from './commitlint/index.js';
 import configTSJourney from './config.ts/index.js';
@@ -23,7 +23,7 @@ const DEFAULT_PLANS = [
 ];
 
 export function getJourney(filename: string, plans: JourneyPlan[] = DEFAULT_PLANS): Journey | undefined {
-	const basename = path.basename(filename);
+	const basename = path.leafName(filename);
 
 	for(const plan of plans) {
 		const journey = plan(basename);

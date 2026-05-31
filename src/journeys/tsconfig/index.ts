@@ -1,4 +1,4 @@
-import { isPlainObject } from 'lodash-es';
+import { isArray, isRecord } from '@zokugun/is-it-type';
 import { compose, fork, json } from '../../compositors/index.js';
 import { listConcat, mapConcat, primitive } from '../../routes/index.js';
 import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
@@ -9,15 +9,15 @@ const mainRoute = compose({
 		lib: listConcat,
 
 		$$default: fork(
-			[Array.isArray, listConcat],
-			[isPlainObject, mapConcat],
+			[isArray, listConcat],
+			[isRecord, mapConcat],
 			primitive,
 		),
 	}),
 
 	$$default: fork(
-		[Array.isArray, listConcat],
-		[isPlainObject, mapConcat],
+		[isArray, listConcat],
+		[isRecord, mapConcat],
 		primitive,
 	),
 });

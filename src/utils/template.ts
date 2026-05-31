@@ -1,11 +1,9 @@
-import path from 'path';
 import fse from '@zokugun/fs-extra-plus/sync';
-import { isNonEmptyString, isPrimitive, type Primitive } from '@zokugun/is-it-type';
+import { isNonEmptyString, isNullable, isPrimitive, isRecord, type Primitive } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import gitUrlParse from 'git-url-parse';
-import { isNil, isPlainObject } from 'lodash-es';
 import * as YAML from '../parsers/yaml.js';
 
 dayjs.extend(utc);
@@ -60,13 +58,13 @@ export class TemplateEngine {
 		let match: RegExpExecArray | null;
 
 		while((match = PATH_PROPERTY_REGEX.exec(currentPath))) {
-			if(!isPlainObject(currentValue)) {
+			if(!isRecord(currentValue)) {
 				return err(`Property path not found: ${propertyPath}`);
 			}
 
-			currentValue = (currentValue as Record<string, unknown>)[match[1]];
+			currentValue = currentValue[match[1]];
 
-			if(isNil(currentValue)) {
+			if(isNullable(currentValue)) {
 				return err(`Property not found: ${propertyPath}`);
 			}
 
@@ -139,7 +137,7 @@ export class TemplateEngine {
 		}
 
 		const content = result.value;
-		const extension = path.extname(filename).toLowerCase();
+		const extension = fse.leafExt(filename).toLowerCase();
 
 		try {
 			if(extension === '.json') {
@@ -163,7 +161,7 @@ export class TemplateEngine {
 			return ok(this.fileCache.get(filename)!);
 		}
 
-		const filePath = path.resolve(this.basePath, filename);
+		const filePath = fse.resolve(this.basePath, filename);
 
 		const result = this.parseFile(filePath);
 		if(result.fails) {
@@ -204,7 +202,7 @@ export class TemplateEngine {
 				return evalResult;
 			}
 
-			if(isNil(evalResult.value)) {
+			if(isNullable(evalResult.value)) {
 				return err(expression);
 			}
 

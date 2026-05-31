@@ -1,6 +1,6 @@
 import { isNonEmptyArray } from '@zokugun/is-it-type';
 import { type DResult, err, OK } from '@zokugun/xtry';
-import { isEqual } from 'lodash-es';
+import { isEqual } from 'es-toolkit';
 import { type UpsertFileConfig } from '../../types/config.js';
 
 export function mergeUpsertProperty(file: UpsertFileConfig, configs: UpsertFileConfig[]): DResult {

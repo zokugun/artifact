@@ -1,4 +1,4 @@
-import { isPlainObject } from 'lodash-es';
+import { isRecord } from '@zokugun/is-it-type';
 import { type Transform } from './transform.js';
 
 export function stringify(data: unknown, transform: Transform = {}): string {
@@ -17,7 +17,7 @@ function format(data: unknown, indentValue: string, transform: Transform, separa
 			result += ',';
 		}
 	}
-	else if(isPlainObject(data)) {
+	else if(isRecord(data)) {
 		result = formatObject(data as Record<string, any>, indentValue, transform);
 
 		if(separator) {

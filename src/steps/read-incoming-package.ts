@@ -1,8 +1,8 @@
 import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
+import { isRecord } from '@zokugun/is-it-type';
 import { err, OK, stringifyError } from '@zokugun/xtry';
 import { type AsyncDResult } from '@zokugun/xtry/sync';
-import { isNil, isPlainObject } from 'lodash-es';
 import { type PackageManifest } from '../types/config.js';
 import { type Context } from '../types/context.js';
 
@@ -24,11 +24,9 @@ export async function readIncomingPackage(context: Context): AsyncDResult {
 }
 
 function isPackageManifest(value: unknown): value is PackageManifest {
-	if(isNil(value) || !isPlainObject(value)) {
+	if(!isRecord(value)) {
 		return false;
 	}
 
-	const manifest = value as Record<string, unknown>;
-
-	return typeof manifest.name === 'string' && typeof manifest.version === 'string';
+	return typeof value.name === 'string' && typeof value.version === 'string';
 }

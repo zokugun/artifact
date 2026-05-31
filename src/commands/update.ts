@@ -1,6 +1,5 @@
-import process from 'process';
+import process from 'node:process';
 import { c, logger } from '@zokugun/cli-utils';
-import { last } from 'lodash-es';
 import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
@@ -61,7 +60,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 
 	for(const [name, artifact] of Object.entries(config.artifacts)) {
 		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
-		const request: Request = artifact.requires ? { name, variant: last(artifact.requires) } : { name };
+		const request: Request = artifact.requires ? { name, variant: artifact.requires.at(-1) } : { name };
 		const dir = await loadPackage(request.name, spinner, options);
 
 		if(!dir) {

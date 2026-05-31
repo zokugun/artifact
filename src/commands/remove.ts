@@ -1,4 +1,4 @@
-import process from 'process';
+import process from 'node:process';
 import { c, logger, enquirer, confirm } from '@zokugun/cli-utils';
 import { xtry } from '@zokugun/xtry/async';
 import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';

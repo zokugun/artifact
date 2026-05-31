@@ -1,5 +1,4 @@
-import path from 'node:path';
-import process from 'process';
+import process from 'node:process';
 import { c, logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { stringifyError } from '@zokugun/xtry';
@@ -26,7 +25,7 @@ export async function list(): Promise<void> {
 		logger.fatal(configResult.error);
 	}
 
-	const packageResult = await fse.readJSON(path.resolve(targetPath, './package.json'));
+	const packageResult = await fse.readJSON(fse.resolve(targetPath, './package.json'));
 	if(packageResult.fails) {
 		logger.fatal(stringifyError(packageResult.error));
 	}
