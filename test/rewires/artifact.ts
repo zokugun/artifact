@@ -48,6 +48,8 @@ rewiremock('@zokugun/cli-utils').with({
 			throw new Error(message);
 		},
 		finishTimer: () => {},
+		info: () => {},
+		newLine: () => {},
 		print: (message: string) => {
 			if(DEBUG) {
 				console.log(message);

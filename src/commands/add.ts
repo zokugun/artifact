@@ -39,12 +39,13 @@ const { mainFlow } = composeSteps(
 type CLIOptions = {
 	dryRun?: boolean;
 	force?: boolean;
+	minReleaseAge?: number;
 	skip?: boolean;
 	var?: Array<{ name: string; value: string }>;
 	verbose?: boolean;
 };
 
-export async function add(specs: string[], inputOptions?: CLIOptions): Promise<void> {
+export async function add(specs: string[], inputOptions: CLIOptions = {}): Promise<void> {
 	logger.beginTimer();
 
 	if(specs.length === 1 && /^@\w+$/.test(specs[0])) {
@@ -110,18 +111,26 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 	const targetPath = process.cwd();
 
 	const options: Options = {
-		dryRun: inputOptions?.dryRun ?? false,
-		force: inputOptions?.force ?? false,
-		skip: inputOptions?.skip ?? false,
+		dryRun: inputOptions.dryRun ?? false,
+		force: inputOptions.force ?? false,
+		skip: inputOptions.skip ?? false,
 		variables: {},
-		verbose: inputOptions?.verbose ?? false,
+		verbose: inputOptions.verbose ?? false,
 	};
 
-	if(inputOptions?.var) {
+	if(inputOptions.var) {
 		for(const { name, value } of inputOptions.var) {
 			options.variables[name] = value;
 		}
 	}
+
+	const minAgeHours = inputOptions.minReleaseAge ?? 24;
+
+	logger.newLine();
+	logger.info(`min-release-age: ${minAgeHours}h`);
+	logger.newLine();
+
+	const before = new Date(Date.now() - (minAgeHours * 3_600_000));
 
 	const configResult = await readInstallConfig(targetPath);
 	if(configResult.fails) {
@@ -165,7 +174,7 @@ export async function add(specs: string[], inputOptions?: CLIOptions): Promise<v
 
 	for(const [name, { version }] of Object.entries(config.artifacts)) {
 		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
-		const dir = await loadPackage(`${name}@${version}`, spinner, options);
+		const dir = await loadPackage(`${name}@${version}`, spinner, { ...options, before });
 
 		if(!dir) {
 			continue;

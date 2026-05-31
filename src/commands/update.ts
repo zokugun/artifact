@@ -6,6 +6,13 @@ import { type Request } from '../types/config.js';
 import { type Options, type Global } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 
+type CLIOptions = {
+	dryRun?: boolean;
+	force?: boolean;
+	minReleaseAge?: number;
+	verbose?: boolean;
+};
+
 const { mainFlow } = composeSteps(
 	[
 		steps.readIncomingPackage,
@@ -32,18 +39,26 @@ const { mainFlow } = composeSteps(
 	],
 );
 
-export async function update(inputOptions?: { force?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
+export async function update(inputOptions: CLIOptions = {}): Promise<void> {
 	logger.beginTimer();
 
 	const targetPath = process.cwd();
 
 	const options: Options = {
-		dryRun: inputOptions?.dryRun ?? false,
-		force: inputOptions?.force ?? false,
+		dryRun: inputOptions.dryRun ?? false,
+		force: inputOptions.force ?? false,
 		skip: false,
 		variables: {},
-		verbose: inputOptions?.verbose ?? false,
+		verbose: inputOptions.verbose ?? false,
 	};
+
+	const minAgeHours = inputOptions.minReleaseAge ?? 24;
+
+	logger.newLine();
+	logger.info(`min-release-age: ${minAgeHours}h`);
+	logger.newLine();
+
+	const before = new Date(Date.now() - (minAgeHours * 3_600_000));
 
 	const configResult = await readInstallConfig(targetPath);
 	if(configResult.fails) {
@@ -61,7 +76,7 @@ export async function update(inputOptions?: { force?: boolean; verbose?: boolean
 	for(const [name, artifact] of Object.entries(config.artifacts)) {
 		const spinner = logger.createSpinner(`${c.cyan.bold(name)}`);
 		const request: Request = artifact.requires ? { name, variant: artifact.requires.at(-1) } : { name };
-		const dir = await loadPackage(request.name, spinner, options);
+		const dir = await loadPackage(request.name, spinner, { ...options, before });
 
 		if(!dir) {
 			continue;
