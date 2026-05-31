@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.10.0 | 2026-05-31
+- add `self-upgrade` and `version` commands
+- add `min-release-age` options
+- reduce dependencies
+
 ## v0.9.0 | 2026-05-07
 - add `journeys` and `routes` configs
 - when a file is overwritten, any following artifact that isn't newer, will be executed for that file
