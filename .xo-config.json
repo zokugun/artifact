@@ -4,9 +4,6 @@
 		"*.config.js",
 		"*.config.ts"
 	],
-	"plugins": [
-		"chai-friendly"
-	],
 	"overrides": [
 		{
 			"files": "**/*.test.ts",
@@ -15,6 +12,9 @@
 				"chai-friendly/no-unused-expressions": "error"
 			}
 		}
+	],
+	"plugins": [
+		"chai-friendly"
 	],
 	"rules": {
 		"@typescript-eslint/ban-types": "off",
@@ -181,7 +181,8 @@
 					"mod": false,
 					"num": false,
 					"pkg": false,
-					"str": false
+					"str": false,
+					"temp": false
 				}
 			}
 		]
