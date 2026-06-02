@@ -87,6 +87,7 @@
 						"list(concat)",
 						"list(dedup-first)",
 						"map(concat)",
+						"map(sort, concat)",
 						"overwrite",
 						"primitive",
 						"ts(merge)"

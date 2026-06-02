@@ -65,9 +65,22 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 					}
 				}
 			}
-			// eslint-disable-next-line logical-assignment-operators
 			else if(route['map(sort)']) {
 				route['map(sort)'] = normalizeRoute(route['map(sort)'], version);
+			}
+			else if(route['map(sort, compose)']) {
+				const map = route['map(sort, compose)'];
+
+				for(const name of Object.keys(map)) {
+					if(name !== '$$ignore' && name !== '$$remove') {
+						map[name] = normalizeRoute(map[name], version);
+					}
+				}
+
+				route['map(sort)'] = {
+					'map(compose)': map,
+				};
+				route['map(sort, compose)'] = undefined;
 			}
 		}
 		else {
@@ -90,12 +103,17 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 		return route;
 	}
 
-	if(version >= 3) {
-		return route;
-	}
-
 	if(isString(route)) {
-		return ROUTE_V2_TO_V3[route] ?? route;
+		if(version >= 3) {
+			if(route === 'map(sort, concat)') {
+				return {
+					'map(sort)': 'map(concat)',
+				};
+			}
+		}
+		else {
+			return ROUTE_V2_TO_V3[route] ?? route;
+		}
 	}
 
 	return route;
