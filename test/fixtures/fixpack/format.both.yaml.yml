@@ -21,14 +21,14 @@ action:
             - json
             - yaml
       route:
-        mapSort:
-          compose:
+        map(sort):
+          map(compose):
             $$default:
               fork:
-                array: listConcat
+                array: list(concat)
                 object:
-                  - mapConcat
-                  - mapSort
+                  - map(sort)
+                  - map(concat)
                 default: primitive
 /registry/artifact-awesome-config/package.json: |
   {
@@ -43,7 +43,7 @@ action:
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
   artifacts:
     artifact-awesome-config:
       version: 1.0.0

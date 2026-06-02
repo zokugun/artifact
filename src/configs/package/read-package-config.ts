@@ -15,6 +15,7 @@ import { mergeUpsertProperty } from '../utils/merge-upsert-property.js';
 import { normalizeFileAlways } from '../utils/normalize-file-always.js';
 import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
+import { normalizeRoute } from '../utils/normalize-route.js';
 
 export async function readPackageConfig(targetPath: string, gRoutes: Record<string, Route<any>>): AsyncDResult<PackageConfig> {
 	let content: string | undefined;
@@ -80,13 +81,15 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 		return err(`Config file ${source} must export an object.`);
 	}
 
+	let version = 999;
+
 	if(isString(data.$schema)) {
 		const match = VERSION_PACKAGE_REGEX.exec(data.$schema);
 		if(!match) {
 			return err(`Cannot validate the "$schema" in the package's "${source}".`);
 		}
 
-		const version = Number.parseInt(match[2], 10);
+		version = Number.parseInt(match[2], 10);
 		if(version > MAX_VERSION) {
 			return err(`Don't support newer version (v${version}) in the package's "${source}".`);
 		}
@@ -113,7 +116,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 	if(isRecord(data.install)) {
 		for(const [key, value] of Object.entries(data.install)) {
-			const normalized = normalizeFileUpsert(key, value, 'install', journeys, routes);
+			const normalized = normalizeFileUpsert(key, value, 'install', version, journeys, routes);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -127,7 +130,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeFileUpsert(key, value, 'update', journeys, routes);
+			const normalized = normalizeFileUpsert(key, value, 'update', version, journeys, routes);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -149,7 +152,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 	if(isRecord(data.upsert)) {
 		for(const [key, value] of Object.entries(data.upsert)) {
-			const normalized = normalizeFileUpsert(key, value, 'upsert', journeys, routes);
+			const normalized = normalizeFileUpsert(key, value, 'upsert', version, journeys, routes);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -207,7 +210,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 	if(isRecord(data.routes)) {
 		for(const [key, value] of Object.entries(data.routes)) {
-			const route = buildRoute(value);
+			const route = buildRoute(normalizeRoute(value, version));
 			if(route.fails) {
 				return route;
 			}
@@ -235,7 +238,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 			}
 
 			if(!route) {
-				const result = buildRoute(value.route);
+				const result = buildRoute(normalizeRoute(value.route, version));
 				if(result.fails) {
 					return result;
 				}

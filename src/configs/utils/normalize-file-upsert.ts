@@ -6,8 +6,9 @@ import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
 import { buildRoute } from '../../utils/build-route.js';
 import { buildTravelPlan } from '../../utils/build-travel-plan.js';
 import { isTransform } from './is-transform.js';
+import { normalizeRoute } from './normalize-route.js';
 
-export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert', journeys?: Record<string, JourneyPlan>, routes?: Record<string, Route<any>>): DResult<UpsertFileConfig> { // {{{
+export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert', version: number, journeys?: Record<string, JourneyPlan>, routes?: Record<string, Route<any>>): DResult<UpsertFileConfig> { // {{{
 	if(!isRecord(data)) {
 		return err(`"${name}" must be an object.`);
 	}
@@ -45,8 +46,8 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		rename = data.rename;
 	}
 
-	if(journeys && routes && isRecord(data.route)) {
-		const route = buildRoute(data.route);
+	if(journeys && routes && isRecord(data.route) && version < 2) {
+		const route = buildRoute(normalizeRoute(data.route, version));
 		if(route.fails) {
 			return route;
 		}

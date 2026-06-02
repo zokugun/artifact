@@ -25,12 +25,12 @@ action:
 /registry/artifact-awesome-config/.artifactrc.yml: |
   routes:
     main:
-      mapSort:
-        compose:
+      map(sort):
+        map(compose):
           $$default:
             fork:
-              array: listConcat
-              object: mapConcat
+              array: list(concat)
+              object: map(concat)
               default: primitive
   journeys:
     - name: taze
@@ -56,7 +56,7 @@ action:
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
   artifacts:
     artifact-awesome-config:
       version: 1.0.0

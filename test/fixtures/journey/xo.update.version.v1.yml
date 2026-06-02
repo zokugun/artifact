@@ -30,6 +30,7 @@ action:
 
 
 /registry/artifact-awesome-config/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.6.0/schemas/v1/package.json
   update:
     .xo-config.json:
       route:
@@ -60,7 +61,7 @@ action:
 
 
 /merged/.artifactrc: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
   artifacts:
     artifact-awesome-config:
       version: 1.0.0

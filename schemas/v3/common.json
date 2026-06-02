@@ -1,0 +1,190 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json",
+	"$defs": {
+		"always": {
+			"type": "object",
+			"properties": {
+				"if_exists": {
+					"type": "string",
+					"enum": [
+						"merge",
+						"overwrite",
+						"remove",
+						"skip"
+					]
+				},
+				"transforms": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/transform"
+					}
+				}
+			},
+			"additionalProperties": false
+		},
+		"install": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/upsert"
+				}
+			]
+		},
+		"route": {
+			"oneOf": [
+				{
+					"type": "array",
+					"items": [
+						{
+							"$ref": "#/$defs/route"
+						}
+					],
+  					"unevaluatedItems": false
+				},
+				{
+					"type": "object",
+					"properties": {
+						"fork": {
+							"type": "object",
+							"properties": {
+								"array": {
+									"$ref": "#/$defs/route"
+								},
+								"object": {
+									"$ref": "#/$defs/route"
+								},
+								"default": {
+									"$ref": "#/$defs/route"
+								},
+								"$$default": {
+									"$ref": "#/$defs/route"
+								}
+							},
+							"additionalProperties": false
+						},
+						"json": {
+							"$ref": "#/$defs/route"
+						},
+						"map(compose)": {
+							"$ref": "#/$defs/route:map(compose)"
+						},
+						"map(sort)": {
+							"$ref": "#/$defs/route"
+						},
+						"map(sort, compose)": {
+							"$ref": "#/$defs/route:map(compose)"
+						},
+						"yaml": {
+							"$ref": "#/$defs/route"
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"enum": [
+						"command",
+						"line(concat)",
+						"list(concat)",
+						"list(dedup-first)",
+						"map(concat)",
+						"overwrite",
+						"primitive",
+						"ts(merge)"
+					]
+				}
+			]
+		},
+		"route:map(compose)": {
+			"type": "object",
+			"properties": {
+				"$$default": {
+					"$ref": "#/$defs/route"
+				},
+				"$$ignore": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"$$remove": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			},
+			"additionalProperties": {
+				"$ref": "#/$defs/route"
+			}
+		},
+		"transform": {
+			"type": "object",
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"jq": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"jq"
+			],
+			"additionalProperties": false
+		},
+		"uninstall": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/always"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"if_exists": {
+							"type": "string",
+							"enum": [
+								"remove",
+								"skip",
+								"unmerge"
+							]
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"update": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/upsert"
+				}
+			]
+		},
+		"upsert": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/always"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"filter": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"if_missing": {
+							"type": "string",
+							"enum": [
+								"merge",
+								"skip"
+							]
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		}
+	}
+}

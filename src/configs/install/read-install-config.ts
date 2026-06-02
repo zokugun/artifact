@@ -95,13 +95,15 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 		return err(`Config file ${file.name} must export an object.`);
 	}
 
+	let version = 999;
+
 	if(isString(data.$schema)) {
 		const match = VERSION_INSTALL_REGEX.exec(data.$schema);
 		if(!match) {
 			return err(`Cannot validate the "$schema" in the project's "${file.name}".`);
 		}
 
-		const version = Number.parseInt(match[2], 10);
+		version = Number.parseInt(match[2], 10);
 		if(version > MAX_VERSION) {
 			return err(`Don't support newer version (v${version}) in the project's "${file.name}".`);
 		}
@@ -146,7 +148,7 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeFileUpsert(key, value, 'update');
+			const normalized = normalizeFileUpsert(key, value, 'update', version);
 			if(normalized.fails) {
 				return normalized;
 			}

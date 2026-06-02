@@ -1,0 +1,120 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/package.json",
+	"type": "object",
+	"properties": {
+		"constants": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		},
+		"extends": {
+			"type": "string"
+		},
+		"install": {
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/install"
+			}
+		},
+		"journeys": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"travels": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"path": {
+									"type": "string"
+								},
+								"format": {
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "array",
+											"items": {
+												"type": "string"
+											}
+										}
+									]
+								},
+								"additionalProperties": false
+							}
+						}
+					},
+					"route": {
+						"oneOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "object",
+								"additionalProperties": {
+									"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/route"
+								}
+							}
+						]
+					}
+				},
+				"additionalProperties": false
+			}
+		},
+		"orphan": {
+			"type": "boolean"
+		},
+		"routes": {
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/route"
+					}
+				}
+			]
+		},
+		"uninstall": {
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/uninstall"
+			}
+		},
+		"update": {
+			"oneOf": [
+				{
+					"const": false
+				},
+				{
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/update"
+					}
+				}
+			]
+		},
+		"variables": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		},
+		"variants": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "string"
+			}
+		}
+	},
+	"additionalProperties": false
+}

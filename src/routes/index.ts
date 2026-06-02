@@ -1,9 +1,9 @@
 export { command } from './command.js';
 export { linesConcat } from './lines-concat.js';
 export { listConcat } from './list-concat.js';
-export { listConcatAfter } from './list-concat-after.js';
+export { listDedupFirst } from './list-dedup-first.js';
 export { mapConcat } from './map-concat.js';
 export { mapDelete } from './map-delete.js';
-export { mergeDotJs } from './merge-dot-js.js';
+export { mergeDotTS } from './merge-dot-ts.js';
 export { overwrite } from './overwrite.js';
 export { primitive } from './primitive.js';
