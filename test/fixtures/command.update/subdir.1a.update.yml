@@ -1,0 +1,50 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc: |
+  artifacts:
+    - name: artifact-awesome-config
+      version: 0.1.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/target/src/utils/hello.ts: |
+  export function hello(name: string): string {
+    return `Hello ${name}!`;
+  }
+
+
+/registry/artifact-awesome-config/.artifactrc: |
+  update:
+    src/*:
+      update: false
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/src/utils/hello.ts: |
+  export function hello(firstname: string, lastname: string): string {
+    return `Hello ${firstname} ${lastname}!`;
+  }
+
+
+
+/merged/.artifactrc: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.9.0/schemas/v2/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/src/utils/hello.ts: |
+  export function hello(firstname: string, lastname: string): string {
+    return `Hello ${firstname} ${lastname}!`;
+  }
