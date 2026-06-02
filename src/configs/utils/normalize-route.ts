@@ -1,4 +1,6 @@
 import { isRecord, isString } from '@zokugun/is-it-type';
+import { patch } from 'ultrapatch';
+import { getPreset } from '../presets/get-preset.js';
 
 const ROUTE_V2_TO_V3 = {
 	linesConcat: 'line(concat)',
@@ -82,6 +84,19 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 				};
 				route['map(sort, compose)'] = undefined;
 			}
+			else if(isString(route.$$preset)) {
+				const preset = getPreset(route.$$preset);
+
+				if(preset) {
+					if(route.patches) {
+						const patched = patch(preset, route.patches as Parameters<typeof patch>[1]);
+
+						return normalizeRoute(patched, version);
+					}
+
+					return preset;
+				}
+			}
 		}
 		else {
 			if(isRecord(route.compose)) {
@@ -105,7 +120,12 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 
 	if(isString(route)) {
 		if(version >= 3) {
-			if(route === 'map(sort, concat)') {
+			const preset = getPreset(route);
+
+			if(preset) {
+				return preset;
+			}
+			else if(route === 'map(sort, concat)') {
 				return {
 					'map(sort)': 'map(concat)',
 				};

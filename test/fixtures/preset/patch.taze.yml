@@ -1,0 +1,79 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  artifacts:
+    artifact-awesome-config:
+      version: 0.1.0
+/target/.tazerc.json: |
+  {
+    "force": true,
+    "includeLocked": true,
+    "maturityPeriod": 7,
+    "packageMode": {
+      "typescript": "minor"
+    },
+    "write": true
+  }
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/.artifactrc.yml: |
+  journeys:
+    - name: taze
+      travels:
+        - path: .tazerc.json
+      route:
+        $$preset: default(sort)
+        patches:
+          - op: add
+            path: /map(sort)/map(compose)/$$remove
+            value:
+              - write
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/.tazerc.json: |
+  {
+    "exclude": [
+      "xo"
+    ],
+    "packageMode": {
+      "@types/node": "minor"
+    }
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/.tazerc.json: |
+  {
+    "exclude": [
+      "xo"
+    ],
+    "force": true,
+    "includeLocked": true,
+    "maturityPeriod": 7,
+    "packageMode": {
+      "@types/node": "minor",
+      "typescript": "minor"
+    }
+  }

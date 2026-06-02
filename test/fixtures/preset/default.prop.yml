@@ -1,0 +1,69 @@
+action:
+  command: add
+  arguments:
+    - - awesome-config
+
+
+
+/target/.fixpackrc: |
+  sortToTop:
+    - name
+    - displayName
+    - description
+    - version
+    - homepage
+    - repository
+
+
+
+/registry/artifact-awesome-config/.artifactrc: |
+  journeys:
+    - name: fixpack
+      travels:
+        - path: .fixpackrc
+          format: yaml
+      route:
+        $$preset: default(sort)
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/.fixpackrc: |
+  required:
+    - dependencies
+  sortToTop:
+    - name
+    - displayName
+    - description
+    - version
+    - private
+    - author
+    - publisher
+    - license
+    - homepage
+    - repository
+  finalNewLine: true
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/.fixpackrc: |
+  finalNewLine: true
+  required:
+    - dependencies
+  sortToTop:
+    - name
+    - displayName
+    - description
+    - version
+    - homepage
+    - repository
+    - private
+    - author
+    - publisher
+    - license

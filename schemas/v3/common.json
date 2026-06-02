@@ -30,6 +30,91 @@
 				}
 			]
 		},
+		"json:patches": {
+			"type": "array",
+			"items": {
+				"oneOf": [
+					{
+						"type": "object",
+						"properties": {
+							"path": {
+								"$ref": "#/$defs/json:path"
+							},
+							"op": {
+								"description": "The operation to perform.",
+								"type": "string",
+								"enum": [
+									"add",
+									"replace",
+									"test"
+								]
+							},
+							"value": {
+								"description": "The value to add, replace or test."
+							}
+						},
+						"required": [
+							"value",
+							"op",
+							"path"
+						],
+						"additionalProperties": false
+					},
+					{
+						"type": "object",
+						"properties": {
+							"path": {
+								"$ref": "#/$defs/json:path"
+							},
+							"op": {
+								"description": "The operation to perform.",
+								"type": "string",
+								"enum": [
+									"remove"
+								]
+							}
+						},
+						"required": [
+							"op",
+							"path"
+						],
+						"additionalProperties": false
+					},
+					{
+						"type": "object",
+						"properties": {
+							"path": {
+								"$ref": "#/$defs/json:path"
+							},
+							"op": {
+								"description": "The operation to perform.",
+								"type": "string",
+								"enum": [
+									"move",
+									"copy"
+								]
+							},
+							"from": {
+								"$ref": "#/$defs/json:path",
+								"description": "A JSON Pointer path pointing to the location to move/copy from.",
+								"pattern": "^#?(|(/([^/~]|~[01])*)*)$"
+							}
+						},
+						"required": [
+							"from",
+							"op",
+							"path"
+						],
+						"additionalProperties": false
+					}
+				]
+			}
+		},
+		"json:path": {
+			"description": "A JSON Pointer path.",
+			"pattern": "^#?(|(/([^/~]|~[01])*)*)$",
+			"type": "string"
+		},
 		"route": {
 			"oneOf": [
 				{
@@ -39,7 +124,7 @@
 							"$ref": "#/$defs/route"
 						}
 					],
-  					"unevaluatedItems": false
+					"unevaluatedItems": false
 				},
 				{
 					"type": "object",
@@ -81,6 +166,21 @@
 					"additionalProperties": false
 				},
 				{
+					"type": "object",
+					"properties": {
+						"$$preset": {
+							"type": "string"
+						},
+						"patches": {
+							"$ref": "#/$defs/json:patches"
+						}
+					},
+					"required": [
+						"$$preset"
+					],
+					"additionalProperties": false
+				},
+				{
 					"enum": [
 						"command",
 						"line(concat)",
@@ -92,6 +192,9 @@
 						"primitive",
 						"ts(merge)"
 					]
+				},
+				{
+					"type": "string"
 				}
 			]
 		},
