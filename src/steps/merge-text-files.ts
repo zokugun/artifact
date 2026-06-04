@@ -14,7 +14,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 		}
 
 		const journey = routes(file.name)
-			?? getJourney(file.name, Object.values(incomingConfig!.journeys))
+			?? getJourney(file.name, incomingConfig!.journeys.map(({ plan }) => plan))
 			?? getJourney(file.name, Object.values(global.journeys))
 			?? getJourney(file.name);
 

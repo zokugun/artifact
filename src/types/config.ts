@@ -15,9 +15,9 @@ export type PackageManifest = {
 export type PackageConfig = {
 	extends?: string;
 	install: InstallFileConfig[];
-	journeys: Record<string, JourneyPlan>;
+	journeys: ScopedJourneySpec[];
 	orphan: boolean;
-	routes: Record<string, Route<any>>;
+	routes: Record<string, ScopedRouteSpec>;
 	uninstall: UninstallFileConfig[];
 	update: false | UpdateFileConfig[];
 	variables: Record<string, Primitive>;
@@ -65,9 +65,31 @@ export type UpsertFileConfig = AlwaysFileConfig & {
 	filter?: string[];
 	ifMissing: 'merge' | 'skip';
 	rename?: string;
+	route?: RouteMeta;
 };
 
 export type FileTransform = {
 	description?: string;
 	jq: string;
 };
+
+export type Scope = {
+	scope: 'global' | 'local';
+};
+
+export type RouteMeta = Record<string, unknown> | string;
+
+export type RouteSpec = {
+	meta: RouteMeta;
+	name?: string;
+	route?: Route<any>;
+};
+
+export type ScopedRouteSpec = RouteSpec & Scope;
+
+export type JourneySpec = {
+	name: string;
+	plan: JourneyPlan;
+};
+
+export type ScopedJourneySpec = JourneySpec & Scope;

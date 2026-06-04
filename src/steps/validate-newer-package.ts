@@ -1,6 +1,6 @@
 import { type AsyncDResult, OK, OK_FALSE, OK_TRUE } from '@zokugun/xtry';
 import { gt } from 'semver';
-import { Mode, type Context } from '../types/context.js';
+import { OperationMode, type Context } from '../types/context.js';
 
 export async function validateNewerPackage(context: Context): AsyncDResult<boolean | void> {
 	const { incomingPackage, config, global, options } = context;
@@ -18,7 +18,7 @@ export async function validateNewerPackage(context: Context): AsyncDResult<boole
 			return OK_FALSE;
 		}
 		else if(global.overwrittenTextFiles.length > 0) {
-			context.mode = Mode.Overwritten;
+			context.operationMode = OperationMode.OnlyOverwritten;
 		}
 		else {
 			return OK_TRUE;

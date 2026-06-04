@@ -7,11 +7,12 @@ import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstall
 import { readListingConfig } from '../configs/package/read-listing-config.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
-import { type Options, type Global } from '../types/context.js';
+import { type Options, type Global, OperationType } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
+	OperationType.Install,
 	[
 		steps.readIncomingPackage,
 		steps.readIncomingConfig,
@@ -180,17 +181,21 @@ export async function add(specs: string[], inputOptions: CLIOptions = {}): Promi
 			continue;
 		}
 
-		const result = await readPackageConfig(dir, global.routes);
+		const result = await readPackageConfig(dir, global.routes, OperationType.Install);
 		if(result.fails) {
 			logger.fatal(result.error);
 		}
 
-		for(const [name, journey] of Object.entries(result.value.journeys)) {
-			global.journeys[name] = journey;
+		for(const { name, plan, scope } of result.value.journeys) {
+			if(scope === 'global') {
+				global.journeys[name] = plan;
+			}
 		}
 
-		for(const [name, route] of Object.entries(result.value.routes)) {
-			global.routes[name] = route;
+		for(const [name, spec] of Object.entries(result.value.routes)) {
+			if(spec.scope === 'global') {
+				global.routes[name] = spec;
+			}
 		}
 
 		spinner.succeed();

@@ -153,6 +153,33 @@
 						"map(compose)": {
 							"$ref": "#/$defs/route:map(compose)"
 						},
+						"map(filter)": {
+							"type": "object",
+							"properties": {
+								"$$default": {
+									"$ref": "#/$defs/route"
+								}
+							},
+							"additionalProperties": {
+								"type": "object",
+								"properties": {
+									"if_exists": {
+										"type": "string",
+										"enum": [
+											"remove",
+											"skip"
+										]
+									},
+									"if_missing": {
+										"type": "string",
+										"enum": [
+											"skip"
+										]
+									}
+								},
+								"additionalProperties": false
+							}
+						},
 						"map(sort)": {
 							"$ref": "#/$defs/route"
 						},
@@ -168,19 +195,47 @@
 				{
 					"type": "object",
 					"properties": {
-						"$$preset": {
+						"$$extend": {
 							"type": "string"
+						},
+						"format": {
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							]
 						},
 						"patches": {
 							"$ref": "#/$defs/json:patches"
+						},
+						"scope": {
+							"$ref": "#/$defs/scope"
 						}
 					},
 					"required": [
-						"$$preset"
+						"$$extend"
 					],
 					"additionalProperties": false
 				},
 				{
+					"type": "object",
+					"properties": {
+						"$$scope": {
+							"$ref": "#/$defs/scope"
+						}
+					},
+					"additionalProperties": {
+						"$ref": "#/$defs/route"
+					}
+				},
+				{
+					"type": "string",
 					"enum": [
 						"command",
 						"line(concat)",
@@ -220,6 +275,13 @@
 			"additionalProperties": {
 				"$ref": "#/$defs/route"
 			}
+		},
+		"scope": {
+			"type": "string",
+			"enum": [
+				"global",
+				"local"
+			]
 		},
 		"transform": {
 			"type": "object",
@@ -284,6 +346,9 @@
 								"merge",
 								"skip"
 							]
+						},
+						"route": {
+							"$ref": "#/$defs/route"
 						}
 					},
 					"additionalProperties": false

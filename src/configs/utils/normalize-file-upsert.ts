@@ -1,14 +1,12 @@
-import { isArray, isBoolean, isRecord, isString } from '@zokugun/is-it-type';
+import { isArray, isBoolean, isNonNullable, isRecord, isString } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import { type FileTransform, type UpsertFileConfig } from '../../types/config.js';
-import { type JourneyPlan, type Route } from '../../types/travel.js';
-import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
-import { buildRoute } from '../../utils/build-route.js';
-import { buildTravelPlan } from '../../utils/build-travel-plan.js';
+import { cloneDeep } from 'es-toolkit';
+import { type RouteMeta, type RouteSpec, type ScopedJourneySpec, type ScopedRouteSpec, type FileTransform, type UpsertFileConfig } from '../../types/config.js';
+import { getPreset } from '../presets/get-preset.js';
 import { isTransform } from './is-transform.js';
 import { normalizeRoute } from './normalize-route.js';
 
-export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert', version: number, journeys?: Record<string, JourneyPlan>, routes?: Record<string, Route<any>>): DResult<UpsertFileConfig> { // {{{
+export function normalizeFileUpsert(pattern: string, data: unknown, name: 'install' | 'update' | 'upsert', version: number, journeys?: ScopedJourneySpec[], routes?: Record<string, ScopedRouteSpec>, gRoutes?: Record<string, RouteSpec>): DResult<UpsertFileConfig> { // {{{
 	if(!isRecord(data)) {
 		return err(`"${name}" must be an object.`);
 	}
@@ -17,6 +15,7 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 	let ifExists: 'force-merge' | 'merge' | 'overwrite' | 'remove' | 'skip' = 'merge';
 	let ifMissing: 'merge' | 'skip' = 'merge';
 	let rename: string | undefined;
+	let route: RouteMeta | undefined;
 	let transforms: FileTransform[] = [];
 
 	if(isArray<string>(data.filter, isString)) {
@@ -46,16 +45,22 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		rename = data.rename;
 	}
 
-	if(journeys && routes && isRecord(data.route) && version < 2) {
-		const route = buildRoute(normalizeRoute(data.route, version));
-		if(route.fails) {
-			return route;
+	if(isNonNullable(data.route)) {
+		const result = normalizeRoute(data.route, version, getPreset);
+		if(result.fails) {
+			return result;
 		}
 
-		const travel = buildTravelPlan([pattern, route.value]);
-		const journey = buildJourneyPlan(travel);
+		route = result.value;
 
-		journeys[pattern] = journey;
+		if(isString(route) && version >= 3 && routes && gRoutes) {
+			if(routes[route]) {
+				route = cloneDeep(routes[route].meta);
+			}
+			else if(gRoutes[route]) {
+				route = cloneDeep(gRoutes[route].meta);
+			}
+		}
 	}
 
 	if(isArray<FileTransform>(data.transforms, isTransform)) {
@@ -68,6 +73,7 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		ifMissing,
 		pattern,
 		rename,
+		route,
 		transforms,
 	});
 } // }}}

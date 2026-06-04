@@ -58,6 +58,7 @@ action:
 
   journeys:
     - name: taze
+      scope: global
       travels:
         - path: .tazerc.json
       route: main

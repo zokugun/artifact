@@ -26,6 +26,22 @@
 					"name": {
 						"type": "string"
 					},
+					"route": {
+						"oneOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "object",
+								"additionalProperties": {
+									"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/route"
+								}
+							}
+						]
+					},
+					"scope": {
+						"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/scope"
+					},
 					"travels": {
 						"type": "array",
 						"items": {
@@ -50,19 +66,6 @@
 								"additionalProperties": false
 							}
 						}
-					},
-					"route": {
-						"oneOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "object",
-								"additionalProperties": {
-									"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/route"
-								}
-							}
-						]
 					}
 				},
 				"additionalProperties": false
@@ -72,17 +75,10 @@
 			"type": "boolean"
 		},
 		"routes": {
-			"oneOf": [
-				{
-					"type": "string"
-				},
-				{
-					"type": "object",
-					"additionalProperties": {
-						"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/route"
-					}
-				}
-			]
+			"type": "object",
+			"additionalProperties": {
+				"$ref": "https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/common.json#/$defs/route"
+			}
 		},
 		"uninstall": {
 			"type": "object",

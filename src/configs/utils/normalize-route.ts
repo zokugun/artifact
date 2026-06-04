@@ -1,6 +1,7 @@
 import { isRecord, isString } from '@zokugun/is-it-type';
+import { type DResult, err, ok } from '@zokugun/xtry';
 import { patch } from 'ultrapatch';
-import { getPreset } from '../presets/get-preset.js';
+import { type RouteMeta } from '../../types/config.js';
 
 const ROUTE_V2_TO_V3 = {
 	linesConcat: 'line(concat)',
@@ -10,10 +11,10 @@ const ROUTE_V2_TO_V3 = {
 	mergeDotJs: 'ts(merge)',
 };
 
-export function normalizeRoute(route: unknown, version: number): unknown {
+export function normalizeRoute(route: unknown, version: number, getRoute: (name: string) => RouteMeta | undefined): DResult<RouteMeta> {
 	if(Array.isArray(route)) {
 		if(route.length === 0) {
-			return route;
+			return err(`Cannot build route "${JSON.stringify(route)}"`);
 		}
 
 		const reversedRoutes = version >= 3 ? route.reverse() : route;
@@ -26,35 +27,63 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 			};
 		}
 
-		return normalizeRoute(newRoute, version);
+		return normalizeRoute(newRoute, version, getRoute);
 	}
 
 	if(isRecord(route)) {
 		if(isRecord(route.fork)) {
-			// eslint-disable-next-line logical-assignment-operators
 			if(route.fork.array) {
-				route.fork.array = normalizeRoute(route.fork.array, version);
+				const result = normalizeRoute(route.fork.array, version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route.fork.array = result.value;
 			}
 
-			// eslint-disable-next-line logical-assignment-operators
 			if(route.fork.object) {
-				route.fork.object = normalizeRoute(route.fork.object, version);
+				const result = normalizeRoute(route.fork.object, version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route.fork.object = result.value;
 			}
 
 			if(route.fork.default) {
-				route.fork.default = normalizeRoute(route.fork.default, version);
+				const result = normalizeRoute(route.fork.default, version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route.fork.default = result.value;
 			}
-			// eslint-disable-next-line logical-assignment-operators
+
 			else if(route.fork.$$default) {
-				route.fork.$$default = normalizeRoute(route.fork.$$default, version);
+				const result = normalizeRoute(route.fork.$$default, version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route.fork.$$default = result.value;
 			}
 		}
 		else if(route.json) {
-			route.json = normalizeRoute(route.json, version);
+			const result = normalizeRoute(route.json, version, getRoute);
+			if(result.fails) {
+				return result;
+			}
+
+			route.json = result.value;
 		}
-		// eslint-disable-next-line logical-assignment-operators
+
 		else if(route.yaml) {
-			route.yaml = normalizeRoute(route.yaml, version);
+			const result = normalizeRoute(route.yaml, version, getRoute);
+			if(result.fails) {
+				return result;
+			}
+
+			route.yaml = result.value;
 		}
 
 		if(version >= 3) {
@@ -62,20 +91,43 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 				const map = route['map(compose)'];
 
 				for(const name of Object.keys(map)) {
-					if(name !== '$$ignore' && name !== '$$remove') {
-						map[name] = normalizeRoute(map[name], version);
+					if(!name.startsWith('$$') || name === '$$default') {
+						const result = normalizeRoute(map[name], version, getRoute);
+						if(result.fails) {
+							return result;
+						}
+
+						map[name] = result.value;
 					}
 				}
 			}
+			else if(isRecord(route['map(filter)'])) {
+				const result = normalizeRoute(route['map(filter)'].$$default, version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route['map(filter)'].$$default = result.value;
+			}
 			else if(route['map(sort)']) {
-				route['map(sort)'] = normalizeRoute(route['map(sort)'], version);
+				const result = normalizeRoute(route['map(sort)'], version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route['map(sort)'] = result.value;
 			}
 			else if(route['map(sort, compose)']) {
 				const map = route['map(sort, compose)'];
 
 				for(const name of Object.keys(map)) {
-					if(name !== '$$ignore' && name !== '$$remove') {
-						map[name] = normalizeRoute(map[name], version);
+					if(!name.startsWith('$$') || name === '$$default') {
+						const result = normalizeRoute(map[name], version, getRoute);
+						if(result.fails) {
+							return result;
+						}
+
+						map[name] = result.value;
 					}
 				}
 
@@ -84,25 +136,43 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 				};
 				route['map(sort, compose)'] = undefined;
 			}
-			else if(isString(route.$$preset)) {
-				const preset = getPreset(route.$$preset);
+			else if(isString(route.$$extend)) {
+				let newRoute = getRoute(route.$$extend);
 
-				if(preset) {
+				if(isRecord(newRoute)) {
 					if(route.patches) {
-						const patched = patch(preset, route.patches as Parameters<typeof patch>[1]);
+						const patched = patch(newRoute as Parameters<typeof patch>[0], route.patches as Parameters<typeof patch>[1]);
 
-						return normalizeRoute(patched, version);
+						const result = normalizeRoute(patched, version, getRoute);
+						if(result.fails) {
+							return result;
+						}
+
+						newRoute = result.value as Record<string, unknown>;
 					}
 
-					return preset;
+					if(route.format) {
+						newRoute.$$format = route.format;
+					}
+
+					if(route.scope) {
+						newRoute.$$scope = route.scope;
+					}
+
+					return ok(newRoute);
 				}
 			}
 		}
 		else {
 			if(isRecord(route.compose)) {
 				for(const name of Object.keys(route.compose)) {
-					if(name !== '$$ignore' && name !== '$$remove') {
-						route.compose[name] = normalizeRoute(route.compose[name], version);
+					if(!name.startsWith('$$') || name === '$$default') {
+						const result = normalizeRoute(route.compose[name], version, getRoute);
+						if(result.fails) {
+							return result;
+						}
+
+						route.compose[name] = result.value;
 					}
 				}
 
@@ -110,31 +180,27 @@ export function normalizeRoute(route: unknown, version: number): unknown {
 				route.compose = undefined;
 			}
 			else if(route.mapSort) {
-				route['map(sort)'] = normalizeRoute(route.mapSort, version);
+				const result = normalizeRoute(route.mapSort, version, getRoute);
+				if(result.fails) {
+					return result;
+				}
+
+				route['map(sort)'] = result.value;
 				route.mapSort = undefined;
 			}
 		}
 
-		return route;
+		return ok(route);
 	}
 
 	if(isString(route)) {
 		if(version >= 3) {
-			const preset = getPreset(route);
-
-			if(preset) {
-				return preset;
-			}
-			else if(route === 'map(sort, concat)') {
-				return {
-					'map(sort)': 'map(concat)',
-				};
-			}
+			return ok(getRoute(route) ?? route);
 		}
 		else {
-			return ROUTE_V2_TO_V3[route] ?? route;
+			return ok(ROUTE_V2_TO_V3[route] ?? route);
 		}
 	}
 
-	return route;
+	return err(`Cannot build route "${JSON.stringify(route)}"`);
 }

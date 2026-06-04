@@ -3,7 +3,7 @@ import { c, logger } from '@zokugun/cli-utils';
 import { readInstallConfig, readPackageConfig, updateInstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Request } from '../types/config.js';
-import { type Options, type Global } from '../types/context.js';
+import { type Options, type Global, OperationType } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 
 type CLIOptions = {
@@ -14,6 +14,7 @@ type CLIOptions = {
 };
 
 const { mainFlow } = composeSteps(
+	OperationType.Update,
 	[
 		steps.readIncomingPackage,
 		steps.validateNewerPackage,
@@ -90,26 +91,34 @@ export async function update(inputOptions: CLIOptions = {}): Promise<void> {
 		const context = result.value;
 
 		if(context?.incomingConfig) {
-			for(const [name, journey] of Object.entries(context.incomingConfig.journeys)) {
-				global.journeys[name] = journey;
+			for(const { name, plan, scope } of context.incomingConfig.journeys) {
+				if(scope === 'global') {
+					global.journeys[name] = plan;
+				}
 			}
 
 			for(const [name, route] of Object.entries(context.incomingConfig.routes)) {
-				global.routes[name] = route;
+				if(route.scope === 'global') {
+					global.routes[name] = route;
+				}
 			}
 		}
 		else {
-			const result = await readPackageConfig(dir, global.routes);
+			const result = await readPackageConfig(dir, global.routes, OperationType.Update);
 			if(result.fails) {
 				logger.fatal(result.error);
 			}
 
-			for(const [name, journey] of Object.entries(result.value.journeys)) {
-				global.journeys[name] = journey;
+			for(const { name, plan, scope } of result.value.journeys) {
+				if(scope === 'global') {
+					global.journeys[name] = plan;
+				}
 			}
 
-			for(const [name, route] of Object.entries(result.value.routes)) {
-				global.routes[name] = route;
+			for(const [name, spec] of Object.entries(result.value.routes)) {
+				if(spec.scope === 'global') {
+					global.routes[name] = spec;
+				}
 			}
 		}
 

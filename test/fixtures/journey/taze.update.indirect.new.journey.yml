@@ -46,6 +46,7 @@ action:
 /registry/artifact-awesome-config/.artifactrc.yml: |
   journeys:
     - name: taze
+      scope: global
       travels:
         - path: .tazerc.json
       route:

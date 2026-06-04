@@ -5,19 +5,22 @@ import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import YAML from 'yaml';
 import { codec, json, yaml } from '../../compositors/index.js';
 import { toFormat } from '../../parsers/to-format.js';
-import { type UninstallFileConfig, type InstallFileConfig, type UpdateFileConfig, type PackageConfig } from '../../types/config.js';
-import { type JourneyPlan, type Route } from '../../types/travel.js';
+import { type UninstallFileConfig, type InstallFileConfig, type UpdateFileConfig, type PackageConfig, type ScopedRouteSpec, type RouteSpec, type ScopedJourneySpec, type RouteMeta } from '../../types/config.js';
+import { OperationType } from '../../types/context.js';
+import { type Route } from '../../types/travel.js';
 import { buildJourneyPlan } from '../../utils/build-journey-plan.js';
-import { buildRoute } from '../../utils/build-route.js';
 import { buildTravelPlan } from '../../utils/build-travel-plan.js';
+import { getPreset } from '../presets/get-preset.js';
 import { MAX_VERSION, CONFIG_LOCATIONS, VERSION_PACKAGE_REGEX } from '../utils/constants.js';
+import { getLifecycleRoute } from '../utils/get-lifecycle-route.js';
 import { mergeUpsertProperty } from '../utils/merge-upsert-property.js';
 import { normalizeFileAlways } from '../utils/normalize-file-always.js';
 import { normalizeFileUninstall } from '../utils/normalize-file-uninstall.js';
 import { normalizeFileUpsert } from '../utils/normalize-file-upsert.js';
 import { normalizeRoute } from '../utils/normalize-route.js';
+import { resolveRoute } from '../utils/resolve-route.js';
 
-export async function readPackageConfig(targetPath: string, gRoutes: Record<string, Route<any>>): AsyncDResult<PackageConfig> {
+export async function readPackageConfig(targetPath: string, gRoutes: Record<string, RouteSpec>, operationType: OperationType): AsyncDResult<PackageConfig> {
 	let content: string | undefined;
 	let name: string | undefined;
 	let type: string | undefined;
@@ -33,31 +36,31 @@ export async function readPackageConfig(targetPath: string, gRoutes: Record<stri
 	}
 
 	if(!content) {
-		return normalizeConfig(content, name!, gRoutes);
+		return normalizeConfig(content, name!, gRoutes, operationType);
 	}
 
 	if(type === 'json') {
-		return normalizeConfig(JSON.parse(content), name!, gRoutes);
+		return normalizeConfig(JSON.parse(content), name!, gRoutes, operationType);
 	}
 	else if(type === 'yaml') {
-		return normalizeConfig(YAML.parse(content), name!, gRoutes);
+		return normalizeConfig(YAML.parse(content), name!, gRoutes, operationType);
 	}
 	else {
 		try {
-			return normalizeConfig(JSON.parse(content), name!, gRoutes);
+			return normalizeConfig(JSON.parse(content), name!, gRoutes, operationType);
 		}
 		catch {
-			return normalizeConfig(YAML.parse(content), name!, gRoutes);
+			return normalizeConfig(YAML.parse(content), name!, gRoutes, operationType);
 		}
 	}
 }
 
-function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, Route<any>>): DResult<PackageConfig> { // {{{
+function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, RouteSpec>, operationType: OperationType): DResult<PackageConfig> { // {{{
 	let xtends: string | undefined;
 	const install: InstallFileConfig[] = [];
-	const journeys: Record<string, JourneyPlan> = {};
+	const journeys: ScopedJourneySpec[] = [];
 	let orphan: boolean = false;
-	const routes: Record<string, Route<any>> = {};
+	const routes: Record<string, ScopedRouteSpec> = {};
 	const uninstall: UninstallFileConfig[] = [];
 	let update: false | UpdateFileConfig[] = [];
 	let variables: Record<string, Primitive> = {};
@@ -114,9 +117,26 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 		variants = Object.fromEntries(Object.entries(data.variants).map(([key, value]) => [key, isNumber(value) ? String(value) : value]));
 	}
 
+	if(isRecord(data.routes)) {
+		for(const [name, value] of Object.entries(data.routes)) {
+			const result = normalizeRoute(value, version, getPreset);
+			if(result.fails) {
+				return result;
+			}
+
+			const scope = version <= 2 || (isRecord(data) && data.$$scope === 'global') ? 'global' : 'local';
+
+			routes[name] = {
+				name,
+				meta: result.value,
+				scope,
+			};
+		}
+	}
+
 	if(isRecord(data.install)) {
 		for(const [key, value] of Object.entries(data.install)) {
-			const normalized = normalizeFileUpsert(key, value, 'install', version, journeys, routes);
+			const normalized = normalizeFileUpsert(key, value, 'install', version, journeys, routes, gRoutes);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -130,7 +150,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 	}
 	else if(isRecord(data.update)) {
 		for(const [key, value] of Object.entries(data.update)) {
-			const normalized = normalizeFileUpsert(key, value, 'update', version, journeys, routes);
+			const normalized = normalizeFileUpsert(key, value, 'update', version, journeys, routes, gRoutes);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -152,7 +172,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 	if(isRecord(data.upsert)) {
 		for(const [key, value] of Object.entries(data.upsert)) {
-			const normalized = normalizeFileUpsert(key, value, 'upsert', version, journeys, routes);
+			const normalized = normalizeFileUpsert(key, value, 'upsert', version, journeys, routes, gRoutes);
 			if(normalized.fails) {
 				return normalized;
 			}
@@ -208,18 +228,16 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 		}
 	}
 
-	if(isRecord(data.routes)) {
-		for(const [key, value] of Object.entries(data.routes)) {
-			const route = buildRoute(normalizeRoute(value, version));
-			if(route.fails) {
-				return route;
+	if(isArray(data.journeys)) {
+		const getRoute: (name: string) => RouteMeta | undefined = (name) => {
+			const spec = routes[name] ?? gRoutes[name];
+			if(spec) {
+				return spec.meta;
 			}
 
-			routes[key] = route.value;
-		}
-	}
+			return getPreset(name) ?? name;
+		};
 
-	if(isArray(data.journeys)) {
 		for(const value of data.journeys) {
 			if(!isRecord(value)) {
 				return err('Journey must be an object.');
@@ -231,22 +249,46 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 			const { name } = value;
 
-			let route: Route<any> | undefined;
+			let routeSpec: RouteSpec | undefined;
 
-			if(isString(value.route)) {
-				route = routes[value.route] ?? gRoutes[value.route];
-			}
-
-			if(!route) {
-				const result = buildRoute(normalizeRoute(value.route, version));
+			if(isNonNullable(value.route)) {
+				const result = resolveRoute(value.route, version, getRoute);
 				if(result.fails) {
 					return result;
 				}
 
-				route = result.value;
+				routeSpec = result.value;
+			}
+			else if(operationType === OperationType.Install) {
+				if(isNonNullable(value.install)) {
+					const result = resolveRoute(value.install, version, getLifecycleRoute(value, ['update', 'uninstall'], getRoute));
+					if(result.fails) {
+						return result;
+					}
+
+					routeSpec = result.value;
+				}
+			}
+			else if(operationType === OperationType.Update) {
+				if(isNonNullable(value.update)) {
+					const result = resolveRoute(value.update, version, getLifecycleRoute(value, ['install', 'uninstall'], getRoute));
+					if(result.fails) {
+						return result;
+					}
+
+					routeSpec = result.value;
+				}
+			}
+			else if(operationType === OperationType.Uninstall && isNonNullable(value.uninstall)) {
+				const result = resolveRoute(value.uninstall, version, getLifecycleRoute(value, ['install', 'update'], getRoute));
+				if(result.fails) {
+					return result;
+				}
+
+				routeSpec = result.value;
 			}
 
-			if(!route) {
+			if(!routeSpec) {
 				return err('Cannot find journey\'s route.');
 			}
 
@@ -268,25 +310,25 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 					if(isNonNullable(data.format)) {
 						if(data.format === 'json') {
-							finalRoute = json(route);
+							finalRoute = json(routeSpec.route!);
 						}
 						else if(data.format === 'yaml') {
-							finalRoute = yaml(route);
+							finalRoute = yaml(routeSpec.route!);
 						}
 						else if(isArray<Parameters<typeof toFormat>[0]>(data.format, (value) => value === 'json' || value === 'jsonc' || value === 'yaml')) {
 							const codecs = data.format.map((value) => toFormat(value));
 
-							finalRoute = codec(codecs, route);
+							finalRoute = codec(codecs, routeSpec.route!);
 						}
 					}
 					else if(path.endsWith('.json')) {
-						finalRoute = json(route);
+						finalRoute = json(routeSpec.route!);
 					}
 					else if(path.endsWith('.yaml') || path.endsWith('.yml')) {
-						finalRoute = yaml(route);
+						finalRoute = yaml(routeSpec.route!);
 					}
 					else if(path.endsWith('.js') || path.endsWith('.cjs') || path.endsWith('.mjs') || path.endsWith('.ts')) {
-						finalRoute = route;
+						finalRoute = routeSpec.route!;
 					}
 
 					if(!finalRoute) {
@@ -300,7 +342,11 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 			const travel = buildTravelPlan(...travels);
 			const journey = buildJourneyPlan(travel);
 
-			journeys[name] = journey;
+			journeys.push({
+				name,
+				plan: journey,
+				scope: (version <= 2 || value.scope === 'global') ? 'global' : 'local',
+			});
 		}
 	}
 

@@ -3,11 +3,12 @@ import { c, logger, enquirer, confirm } from '@zokugun/cli-utils';
 import { xtry } from '@zokugun/xtry/async';
 import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';
 import { composeSteps, steps } from '../steps/index.js';
-import { type Options, type Global } from '../types/context.js';
+import { type Options, type Global, OperationType } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
 import { resolveRequest } from '../utils/resolve-request.js';
 
 const { mainFlow } = composeSteps(
+	OperationType.Uninstall,
 	[
 		steps.readIncomingPackage,
 		steps.validatePresentPackage,

@@ -23,7 +23,7 @@ action:
         - path: .fixpackrc
           format: yaml
       route:
-        $$preset: default(sort)
+        $$extend: default(sort)
 /registry/artifact-awesome-config/package.json: |
   {
     "name": "artifact-awesome-config",

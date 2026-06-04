@@ -1,7 +1,6 @@
 import { isRecord } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
-import { fork, type ForkParameter } from '../compositors/fork.js';
-import { compose, json, mapSort, yaml } from '../compositors/index.js';
+import { compose, fork, type ForkParameter, json, mapFilter, mapSort, yaml } from '../compositors/index.js';
 import { command, linesConcat, listConcat, listDedupFirst, mapConcat, mergeDotTS, overwrite, primitive } from '../routes/index.js';
 import { type Route } from '../types/travel.js';
 
@@ -74,6 +73,46 @@ export function buildRoute(route: unknown): DResult<Route<any>> { // {{{
 			}
 
 			return ok(compose(map));
+		}
+		else if(isRecord(route['map(filter)'])) {
+			if(!route['map(filter)'].$$default) {
+				return err('map(filter) is missing $$default');
+			}
+
+			const result = buildRoute(route['map(filter)'].$$default);
+			if(result.fails) {
+				return result;
+			}
+
+			const defaultRoute = result.value;
+
+			const removeExistings: string[] = [];
+			const skipExistings: string[] = [];
+			const skipMissings: string[] = [];
+			const entries = Object.entries(route['map(filter)']);
+
+			for(const [name, data] of entries) {
+				if(name === '$$default') {
+					continue;
+				}
+
+				if(!isRecord(data)) {
+					return err(`Cannot build route "${JSON.stringify(route)}"`);
+				}
+
+				if(data.if_exists === 'remove') {
+					removeExistings.push(name);
+				}
+				else if(data.if_exists === 'skip') {
+					skipExistings.push(name);
+				}
+
+				if(data.if_missing === 'skip') {
+					skipMissings.push(name);
+				}
+			}
+
+			return ok(mapFilter(defaultRoute, skipMissings, removeExistings, skipExistings));
 		}
 		else if(route['map(sort)']) {
 			const result = buildRoute(route['map(sort)']);

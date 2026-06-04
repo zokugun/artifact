@@ -1,0 +1,61 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  artifacts:
+    artifact-awesome-config:
+      version: 0.1.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/.artifactrc.yml: |
+  update:
+    package.json:
+      route:
+        $$extend: package
+        patches:
+          - op: replace
+            path: /map(compose)/dependencies/map(sort)
+            value:
+              map(filter):
+                execa:
+                  if_missing: skip
+                trash:
+                  if_missing: skip
+                $$default: primitive
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/package.json: |
+  {
+    "dependencies": {
+      "@zokugun/cli-utils": "0.3.2",
+      "execa": "9.6.1",
+      "trash": "10.1.1"
+    }
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "dependencies": {
+      "@zokugun/cli-utils": "0.3.2"
+    }
+  }

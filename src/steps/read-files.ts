@@ -3,18 +3,18 @@ import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { getEncoding, isText } from 'istextorbinary';
-import { Mode, type Options, type TextFile, type Context } from '../types/context.js';
+import { OperationMode, type Options, type TextFile, type Context } from '../types/context.js';
 import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 import { listWorkingFiles } from '../utils/list-working-files.js';
 import { readBuffer } from '../utils/read-buffer.js';
 
-export async function readFiles({ incomingPath, textFiles, binaryFiles, mode, global, options }: Context): AsyncDResult {
+export async function readFiles({ incomingPath, textFiles, binaryFiles, operationMode: mode, global, options }: Context): AsyncDResult {
 	const cwd = path.join(incomingPath, 'configs');
 
 	const files = await listWorkingFiles(cwd);
 
-	if(mode === Mode.Default) {
+	if(mode === OperationMode.Default) {
 		for(const file of files) {
 			const filePath = path.join(cwd, file);
 

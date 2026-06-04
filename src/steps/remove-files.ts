@@ -3,11 +3,11 @@ import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { isMatch } from 'micromatch';
-import { Mode, type Context } from '../types/context.js';
+import { OperationMode, type Context } from '../types/context.js';
 import { listWorkingFiles } from '../utils/list-working-files.js';
 
-export async function removeFiles({ removedPatterns, targetPath, mode, options }: Context): AsyncDResult {
-	if(removedPatterns.length === 0 || mode !== Mode.Default) {
+export async function removeFiles({ removedPatterns, targetPath, operationMode: mode, options }: Context): AsyncDResult {
+	if(removedPatterns.length === 0 || mode !== OperationMode.Default) {
 		return OK;
 	}
 

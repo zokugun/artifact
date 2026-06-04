@@ -2,9 +2,9 @@ import { type Primitive } from '@zokugun/is-it-type';
 import { type DResult, type AsyncDResult } from '@zokugun/xtry';
 import { type Transform } from '../parsers/jsonc/transform.js';
 import { type BinaryFile } from './binary-file.js';
-import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform } from './config.js';
+import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform, type RouteSpec } from './config.js';
 import { type Indent, type Format } from './format.js';
-import { type JourneyPlan, type Route, type Journey } from './travel.js';
+import { type JourneyPlan, type Journey } from './travel.js';
 
 export type ExistingAction = 'merge' | 'overwrite' | 'skip';
 export type MissingAction = 'continue' | 'skip';
@@ -29,9 +29,10 @@ export type Context = {
 	incomingPackage?: PackageManifest;
 	incomingPath: string;
 	mergedTextFiles: TextFile[];
-	mode: Mode;
 	onExisting: (file: string) => ExistingAction;
 	onMissing: (file: string) => MissingAction;
+	operationMode: OperationMode;
+	operationType: OperationType;
 	options: Options;
 	packagePath: string;
 	removedPatterns: string[];
@@ -45,15 +46,21 @@ export type Context = {
 	transforms: (file: string) => FileTransform[] | undefined;
 };
 
-export enum Mode {
+export enum OperationMode {
 	Default,
-	Overwritten,
+	OnlyOverwritten,
+}
+
+export enum OperationType {
+	Install = 'install',
+	Update = 'update',
+	Uninstall = 'uninstall',
 }
 
 export type Global = {
 	journeys: Record<string, JourneyPlan>;
 	overwrittenTextFiles: string[];
-	routes: Record<string, Route<any>>;
+	routes: Record<string, RouteSpec>;
 };
 
 export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
