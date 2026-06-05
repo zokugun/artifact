@@ -6,6 +6,7 @@ import { type RouteMeta } from '../../types/config.js';
 const ROUTE_V2_TO_V3 = {
 	linesConcat: 'line(concat)',
 	listConcat: 'list(concat)',
+	listConcatAfter: 'list(dedup-first)',
 	mapConcat: 'map(concat)',
 	mapSort: 'map(sort)',
 	mergeDotJs: 'ts(merge)',
