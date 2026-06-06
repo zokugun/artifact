@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.11.0 | 2026-09-06
+- rename routes (ex: `mapConcat` -> `map(concat)`)
+- add combined routes (`map(sort, concat)`, `map(sort, compose)`)
+- add preset routes (`default`, `default(sort)` and `package`)
+- add new route `map(filter)`
+- route can extending an existing route with `$$extend` and `patches` (json patch)
+- route in a journey can be split into each lifecycles (`install`, `update` and `uninstall`)
+
 ## v0.10.0 | 2026-05-31
 - add `self-upgrade` and `version` commands
 - add `min-release-age` options
