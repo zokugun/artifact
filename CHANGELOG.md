@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.11.0 | 2026-09-06
+## v0.11.0 | 2026-06-06
 - rename routes (ex: `mapConcat` -> `map(concat)`)
 - add combined routes (`map(sort, concat)`, `map(sort, compose)`)
 - add preset routes (`default`, `default(sort)` and `package`)
