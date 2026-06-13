@@ -1,26 +1,40 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
-import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
+import { type AsyncDResult, OK } from '@zokugun/xtry';
 import { getEncoding, isText } from 'istextorbinary';
-import { OperationMode, type Options, type TextFile, type Context } from '../types/context.js';
-import { detectIndent } from '../utils/detect-indent.js';
-import { hasFinalNewLine } from '../utils/has-final-new-line.js';
+import { OperationMode, type Context } from '../types/context.js';
 import { listWorkingFiles } from '../utils/list-working-files.js';
 import { readBuffer } from '../utils/read-buffer.js';
+import { readTextFile } from '../utils/read-text-file.js';
 
-export async function readFiles({ incomingPath, textFiles, binaryFiles, operationMode: mode, global, options }: Context): AsyncDResult {
-	const cwd = path.join(incomingPath, 'configs');
+export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFiles, operationMode: mode, global, options }: Context): AsyncDResult {
+	const cwd = fse.join(incomingPath, 'configs');
 
 	const files = await listWorkingFiles(cwd);
 
 	if(mode === OperationMode.Default) {
 		for(const file of files) {
-			const filePath = path.join(cwd, file);
+			const filePath = fse.join(cwd, file);
 
+			if(fse.leafName(file).startsWith('#') && (file.endsWith('.diff') || file.endsWith('.json-patch') || file.endsWith('.patch'))) {
+				patchFiles.push({
+					name: fse.join(fse.parentPath(file), fse.leafName(file, 1).slice(1)),
+					patchName: file,
+					type: file.endsWith('json-patch') ? 'json-patch' : 'patch',
+				});
+
+				if(options.verbose) {
+					logger.debug(`${file} is a patch`);
+				}
+			}
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-			if(isText(file) || getEncoding(await readBuffer(filePath, 24)) === 'utf8') {
-				await readTextFile(file, filePath, textFiles, options);
+			else if(isText(file) || getEncoding(await readBuffer(filePath, 24)) === 'utf8') {
+				const textFile = await readTextFile(file, filePath, options);
+				if(textFile.fails) {
+					return textFile;
+				}
+
+				textFiles.push(textFile.value);
 			}
 			else {
 				binaryFiles.push({
@@ -37,57 +51,17 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, operatio
 	else {
 		for(const file of files) {
 			if(global.overwrittenTextFiles.includes(file)) {
-				const filePath = path.join(cwd, file);
+				const filePath = fse.join(cwd, file);
 
-				await readTextFile(file, filePath, textFiles, options);
+				const textFile = await readTextFile(file, filePath, options);
+				if(textFile.fails) {
+					return textFile;
+				}
+
+				textFiles.push(textFile.value);
 			}
 		}
 	}
 
 	return OK;
 }
-
-async function readTextFile(file: string, filePath: string, textFiles: TextFile[], options: Options) { // {{{
-	const result = await fse.readFile(filePath, 'utf8');
-	if(result.fails) {
-		return err(stringifyError(result.error));
-	}
-
-	const data = result.value;
-	const finalNewLine = hasFinalNewLine(data);
-	const indent = detectIndent(data);
-
-	if(data.startsWith('#!')) {
-		// the text file might be executable
-		const result = await fse.stat(filePath);
-		if(result.fails) {
-			return err(stringifyError(result.error));
-		}
-
-		const { mode } = result.value;
-
-		textFiles.push({
-			name: file,
-			data,
-			finalNewLine,
-			indent,
-			mode,
-		});
-
-		if(options.verbose) {
-			logger.debug(`${file} is a shebang file`);
-		}
-	}
-	else {
-		textFiles.push({
-			name: file,
-			data,
-			finalNewLine,
-			indent,
-		});
-
-		if(options.verbose) {
-			logger.debug(`${file} is a text file`);
-		}
-	}
-} // }}}

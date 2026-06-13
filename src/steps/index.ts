@@ -3,6 +3,7 @@ import { ok, OK_UNDEFINED } from '@zokugun/xtry';
 import { OperationMode, type OperationType, type CommonFlow, type Context, type MainFlow } from '../types/context.js';
 import { type Step } from '../types/step.js';
 import { applyFormatting } from './apply-formatting.js';
+import { applyPatchFiles } from './apply-patch-files.js';
 import { configureBranches } from './configure-branches.js';
 import { configureInstallFileActions } from './configure-install-file-actions.js';
 import { configureUninstallFileActions } from './configure-uninstall-file-actions.js';
@@ -27,6 +28,7 @@ import { writeTextFiles } from './write-text-files.js';
 
 export const steps = {
 	applyFormatting,
+	applyPatchFiles,
 	configureBranches,
 	configureInstallFileActions,
 	configureUninstallFileActions,
@@ -69,6 +71,7 @@ export function composeSteps(operationType: OperationType, validations: Step[], 
 			operationType,
 			options,
 			packagePath: incomingPath,
+			patchFiles: [],
 			removedPatterns: [],
 			renamedPatterns: [],
 			request,

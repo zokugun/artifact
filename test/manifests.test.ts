@@ -19,6 +19,7 @@ generateTestsFromManifests(
 	'npmignore',
 	'nvm',
 	'package',
+	'patch',
 	'route',
 	'template',
 	'tsconfig',

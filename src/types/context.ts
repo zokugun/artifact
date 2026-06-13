@@ -1,7 +1,6 @@
 import { type Primitive } from '@zokugun/is-it-type';
 import { type DResult, type AsyncDResult } from '@zokugun/xtry';
 import { type Transform } from '../parsers/jsonc/transform.js';
-import { type BinaryFile } from './binary-file.js';
 import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform, type RouteSpec } from './config.js';
 import { type Indent, type Format } from './format.js';
 import { type JourneyPlan, type Journey } from './travel.js';
@@ -35,6 +34,7 @@ export type Context = {
 	operationType: OperationType;
 	options: Options;
 	packagePath: string;
+	patchFiles: PatchFile[];
 	removedPatterns: string[];
 	renamedPatterns: RenameAction[];
 	request: Request;
@@ -82,6 +82,11 @@ export type Block = {
 	incomingPath: string;
 };
 
+export type BinaryFile = {
+	source: string;
+	target: string;
+};
+
 export type TextFile = {
 	data: string;
 	finalNewLine: boolean;
@@ -98,4 +103,10 @@ export type ParseResult = DResult<{
 export type Codec = {
 	parse: (data: string) => ParseResult;
 	stringify: (data: Record<string, unknown>, transform?: Transform) => string;
+};
+
+export type PatchFile = {
+	name: string;
+	patchName: string;
+	type: 'json-patch' | 'patch';
 };

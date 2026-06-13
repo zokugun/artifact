@@ -12,6 +12,6 @@ export function parse(data: string): ParseResult {
 	return ok({ data: result.value });
 }
 
-export function stringify(data: Record<string, unknown>, _transform?: Transform): string {
+export function stringify(data: unknown, _transform?: Transform): string {
 	return JSON.stringify(data, null, '\t');
 }

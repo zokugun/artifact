@@ -28,3 +28,8 @@ indent_size = 2
 [test/fixtures/json/format/space4.json]
 indent_style = space
 indent_size = 4
+
+[test/fixtures/patch/*.yml]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false

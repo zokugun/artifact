@@ -9,7 +9,7 @@ import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 import { listWorkingFiles } from '../utils/list-working-files.js';
 
-export async function transformUntouchedFiles({ formats, options, routes, targetPath, textFiles, transformedFiles, transforms }: Context): AsyncDResult {
+export async function transformUntouchedFiles({ mergedTextFiles, options, routes, targetPath, transformedFiles, transforms }: Context): AsyncDResult {
 	if(transforms.length === 0) {
 		return OK;
 	}
@@ -18,7 +18,7 @@ export async function transformUntouchedFiles({ formats, options, routes, target
 	const files = await listWorkingFiles(cwd);
 
 	for(const file of files) {
-		if(textFiles.some(({ name }) => name === file)) {
+		if(mergedTextFiles.some(({ name }) => name === file)) {
 			continue;
 		}
 

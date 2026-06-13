@@ -27,6 +27,7 @@ const { mainFlow } = composeSteps(
 		steps.readEditorConfig,
 		steps.replaceTemplates,
 		steps.mergeTextFiles,
+		steps.applyPatchFiles,
 		steps.transformUntouchedFiles,
 		steps.insertFinalNewLine,
 		steps.applyFormatting,
