@@ -2,7 +2,7 @@ import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
-import { isMatch } from 'micromatch';
+import { minimatch } from 'minimatch';
 import { OperationMode, type Context } from '../types/context.js';
 import { listWorkingFiles } from '../utils/list-working-files.js';
 
@@ -15,7 +15,7 @@ export async function removeFiles({ removedPatterns, targetPath, operationMode: 
 	const files = await listWorkingFiles(cwd);
 
 	for(const file of files) {
-		if(isMatch(file, removedPatterns)) {
+		if(removedPatterns.some((pattern) => minimatch(file, pattern))) {
 			if(!options.dryRun) {
 				const filePath = path.join(cwd, file);
 

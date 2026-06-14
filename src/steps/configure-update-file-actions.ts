@@ -1,6 +1,6 @@
 import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
-import { isMatch } from 'micromatch';
+import { minimatch } from 'minimatch';
 import { type FileTransform } from '../types/config.js';
 import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
@@ -72,13 +72,13 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		}
 
 		if(skipMissings.length > 0) {
-			context.onMissing = (file) => isMatch(file, skipMissings) ? 'skip' : 'continue';
+			context.onMissing = (file) => skipMissings.some((pattern) => minimatch(file, pattern)) ? 'skip' : 'continue';
 		}
 
 		if(existingActions.length > 0) {
 			context.onExisting = (file) => {
 				for(const { pattern, action } of existingActions) {
-					if(isMatch(file, pattern)) {
+					if(minimatch(file, pattern)) {
 						return action;
 					}
 				}
@@ -90,7 +90,7 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		if(isNonEmptyRecord(filters)) {
 			context.filters = (file) => {
 				for(const [pattern, value] of Object.entries(filters)) {
-					if(isMatch(file, pattern)) {
+					if(minimatch(file, pattern)) {
 						return value;
 					}
 				}
@@ -102,7 +102,7 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		if(isNonEmptyRecord(routes)) {
 			context.routes = (file) => {
 				for(const [pattern, route] of Object.entries(routes)) {
-					if(isMatch(file, pattern)) {
+					if(minimatch(file, pattern)) {
 						return route;
 					}
 				}
@@ -114,7 +114,7 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		if(isNonEmptyRecord(transformations)) {
 			context.transforms = (file) => {
 				for(const [pattern, transforms] of Object.entries(transformations)) {
-					if(isMatch(file, pattern)) {
+					if(minimatch(file, pattern)) {
 						return transforms;
 					}
 				}

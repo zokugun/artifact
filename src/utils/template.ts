@@ -2,7 +2,8 @@ import fse from '@zokugun/fs-extra-plus/sync';
 import { isNonEmptyString, isNullable, isPrimitive, isRecord, type Primitive } from '@zokugun/is-it-type';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+// eslint-disable-next-line import/extensions
+import utc from 'dayjs/plugin/utc.js';
 import gitUrlParse from 'git-url-parse';
 import * as YAML from '../parsers/yaml.js';
 
