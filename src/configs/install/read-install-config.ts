@@ -135,7 +135,7 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 					normalized.requires = artifact.requires;
 				}
 				else if(isArray<string>(artifact.provides, isString)) {
-					normalized.requires = artifact.provides;
+					normalized.provides = artifact.provides;
 				}
 
 				artifacts[key] = normalized;

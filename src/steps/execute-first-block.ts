@@ -97,7 +97,7 @@ export async function executeFirstBlock(context: Context): AsyncDResult<boolean 
 		context.result = {
 			name,
 			version,
-			requires: [root],
+			provides: [root],
 		};
 
 		const incomingPath = path.join(context.packagePath, 'variants', root);

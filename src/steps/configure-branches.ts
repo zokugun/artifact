@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
+import { isArray } from '@zokugun/is-it-type';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import globby from 'globby';
 import { type Block, type Context } from '../types/context.js';
@@ -28,12 +29,12 @@ export async function configureBranches(context: Context): AsyncDResult {
 
 				if(artifact) {
 					if(variant) {
-						if(Array.isArray(artifact.requires)) {
+						if(isArray(artifact.requires)) {
 							if(artifact.requires.includes(variant)) {
 								found = true;
 							}
 						}
-						else if(Array.isArray(artifact.provides)) {
+						else if(isArray(artifact.provides)) {
 							if(artifact.provides.includes(variant)) {
 								found = true;
 							}
