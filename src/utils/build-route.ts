@@ -97,7 +97,7 @@ export function buildRoute(route: unknown): DResult<Route<any>> { // {{{
 				}
 
 				if(!isRecord(data)) {
-					return err(`Cannot build route "${JSON.stringify(route)}"`);
+					return err(`Cannot build map(filter)'s route "${JSON.stringify(route['map(filter)'])}"`);
 				}
 
 				if(data.if_exists === 'remove') {

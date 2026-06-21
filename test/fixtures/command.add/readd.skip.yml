@@ -27,10 +27,9 @@ action:
 
 
 /merged/.artifactrc.yml: |
-  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.11.0/schemas/v3/install.json
   artifacts:
-    artifact-awesome-config:
-      version: 1.0.0
+    - name: artifact-awesome-config
+      version: 0.1.0
 /merged/package.json: |
   {
     "name": "my-awesome-project",

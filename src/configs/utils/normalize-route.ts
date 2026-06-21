@@ -15,7 +15,7 @@ const ROUTE_V2_TO_V3 = {
 export function normalizeRoute(route: unknown, version: number, getRoute: (name: string) => RouteMeta | undefined): DResult<RouteMeta> {
 	if(Array.isArray(route)) {
 		if(route.length === 0) {
-			return err(`Cannot build route "${JSON.stringify(route)}"`);
+			return err(`Cannot normalize route "${JSON.stringify(route)}"`);
 		}
 
 		const reversedRoutes = version >= 3 ? route.reverse() : route;
@@ -162,6 +162,9 @@ export function normalizeRoute(route: unknown, version: number, getRoute: (name:
 
 					return ok(newRoute);
 				}
+				else {
+					return err(`Cannot find route "${route.$$extend}" for "${JSON.stringify(route)}"`);
+				}
 			}
 		}
 		else {
@@ -203,5 +206,5 @@ export function normalizeRoute(route: unknown, version: number, getRoute: (name:
 		}
 	}
 
-	return err(`Cannot build route "${JSON.stringify(route)}"`);
+	return err(`Cannot normalize route "${JSON.stringify(route)}"`);
 }

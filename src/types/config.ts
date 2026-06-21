@@ -14,6 +14,7 @@ export type PackageManifest = {
 
 export type PackageConfig = {
 	extends?: string;
+	features: string[];
 	install: InstallFileConfig[];
 	journeys: ScopedJourneySpec[];
 	orphan: boolean;
@@ -26,6 +27,7 @@ export type PackageConfig = {
 
 export type Artifact = {
 	version: string;
+	features?: string[];
 	provides?: string[];
 	requires?: string[];
 };

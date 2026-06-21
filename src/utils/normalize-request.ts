@@ -2,7 +2,7 @@ import fse from '@zokugun/fs-extra-plus/async';
 import { type DResult, err, ok } from '@zokugun/xtry';
 import { type Request } from '../types/config.js';
 
-export function resolveRequest(spec: string): DResult<Request> { // {{{
+export function normalizeRequest(spec: string): DResult<Request> { // {{{
 	if(spec.startsWith('~')) {
 		spec = fse.untildify(spec);
 	}

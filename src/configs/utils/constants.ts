@@ -16,7 +16,7 @@ export const CONFIG_LOCATIONS = [
 	},
 ];
 
-export const MAX_VERSION = 3;
+export const MAX_VERSION = 4;
 export const VERSION_INSTALL_REGEX = /https:\/\/raw.githubusercontent.com\/zokugun\/artifact\/v([\d.]+)\/schemas\/v(\d+)\/install.json/;
 export const VERSION_PACKAGE_REGEX = /https:\/\/raw.githubusercontent.com\/zokugun\/artifact\/v([\d.]+)\/schemas\/v(\d+)\/package.json/;
-export const VERSION_RELEASE = '0.11.0';
+export const VERSION_RELEASE = '0.12.0';

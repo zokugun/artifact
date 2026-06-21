@@ -57,6 +57,7 @@ export async function readPackageConfig(targetPath: string, gRoutes: Record<stri
 
 function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, RouteSpec>, operationType: OperationType): DResult<PackageConfig> { // {{{
 	let xtends: string | undefined;
+	const features: string[] = [];
 	const install: InstallFileConfig[] = [];
 	const journeys: ScopedJourneySpec[] = [];
 	let orphan: boolean = false;
@@ -69,6 +70,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 	if(!data) {
 		return ok({
 			extends: xtends,
+			features,
 			install,
 			journeys,
 			orphan,
@@ -103,6 +105,10 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 	}
 	else if(isNumber(data.extends)) {
 		xtends = String(data.extends);
+	}
+
+	if(isArray<string>(data.features, isString)) {
+		features.push(...data.features);
 	}
 
 	if(data.orphan === true) {
@@ -352,6 +358,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 	return ok({
 		extends: xtends,
+		features,
 		install,
 		journeys,
 		orphan,

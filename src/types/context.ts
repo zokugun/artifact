@@ -1,7 +1,7 @@
 import { type Primitive } from '@zokugun/is-it-type';
 import { type DResult, type AsyncDResult } from '@zokugun/xtry';
 import { type Transform } from '../parsers/jsonc/transform.js';
-import { type Request, type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform, type RouteSpec } from './config.js';
+import { type InstallConfig, type PackageConfig, type ArtifactResult, type PackageManifest, type FileTransform, type RouteSpec } from './config.js';
 import { type Indent, type Format } from './format.js';
 import { type JourneyPlan, type Journey } from './travel.js';
 
@@ -15,7 +15,6 @@ export type RenameAction = {
 export type Context = {
 	binaryFiles: BinaryFile[];
 	blocks: Block[];
-	commonFlow: CommonFlow;
 	config: InstallConfig;
 	filters: (file: string) => string[] | undefined;
 	formats: Format[];
@@ -37,7 +36,6 @@ export type Context = {
 	patchFiles: PatchFile[];
 	removedPatterns: string[];
 	renamedPatterns: RenameAction[];
-	request: Request;
 	result?: ArtifactResult;
 	routes: (file: string) => Journey | undefined;
 	targetPath: string;
@@ -58,13 +56,26 @@ export enum OperationType {
 }
 
 export type Global = {
+	before?: Date;
 	journeys: Record<string, JourneyPlan>;
 	overwrittenTextFiles: string[];
 	routes: Record<string, RouteSpec>;
 };
 
-export type MainFlow = (targetPath: string, incomingPath: string, request: Request, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
-export type CommonFlow = (name: string, version: string, variant: string | undefined, branch: string | undefined, incomingPath: string, commonContext: Context) => AsyncDResult<Context | undefined>;
+export type CommonFlow = (targetPath: string, incoming: { name: string; version: string; variant: string | undefined; branch: string | undefined; dir: string; config: PackageConfig; label: string }, operationMode: OperationMode, result: ArtifactResult | undefined, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
+
+export type FlowEntry = {
+	branch?: string;
+	config: PackageConfig;
+	dir: string;
+	name: string;
+	operationMode: OperationMode;
+	result?: ArtifactResult;
+	variant?: string;
+	version: string;
+};
+
+export type ConfigUpdater = (config: InstallConfig, artifact: ArtifactResult) => void;
 
 export type Options = {
 	force: boolean;

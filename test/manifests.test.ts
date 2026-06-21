@@ -12,6 +12,7 @@ generateTestsFromManifests(
 	'dependabot',
 	'editorconfig',
 	'extend',
+	'features',
 	'fixpack',
 	'gitignore',
 	'journey',

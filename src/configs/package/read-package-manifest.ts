@@ -1,13 +1,10 @@
-import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
 import { isRecord } from '@zokugun/is-it-type';
-import { err, OK, stringifyError } from '@zokugun/xtry';
-import { type AsyncDResult } from '@zokugun/xtry/sync';
-import { type PackageManifest } from '../types/config.js';
-import { type Context } from '../types/context.js';
+import { type AsyncDResult, err, ok, stringifyError } from '@zokugun/xtry/async';
+import { type PackageManifest } from '../../types/config.js';
 
-export async function readIncomingPackage(context: Context): AsyncDResult {
-	const filePath = path.resolve(context.incomingPath, './package.json');
+export async function readPackageManifest(targetPath: string): AsyncDResult<PackageManifest> {
+	const filePath = fse.resolve(targetPath, 'package.json');
 
 	const result = await fse.readJSON(filePath);
 	if(result.fails) {
@@ -18,9 +15,7 @@ export async function readIncomingPackage(context: Context): AsyncDResult {
 		return err('The package of the incoming artifact can\'t be found.');
 	}
 
-	context.incomingPackage = result.value;
-
-	return OK;
+	return ok(result.value);
 }
 
 function isPackageManifest(value: unknown): value is PackageManifest {

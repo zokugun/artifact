@@ -1,0 +1,66 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  artifacts:
+    artifact-lang-js:
+      version: 0.1.0
+      requires:
+        - "20"
+    artifact-lang-ts:
+      version: 0.1.0
+/target/.nvmrc: |
+  v20.0.0
+/target/package.json: |
+  {
+    "devDependencies": {
+      "@types/node": "20.0.0"
+    }
+  }
+
+
+/registry/artifact-lang-js/package.json: |
+  {
+    "name": "artifact-lang-js",
+    "version": "1.0.0"
+  }
+/registry/artifact-lang-js/.artifactrc.yml: |
+  variants:
+    root: 20
+/registry/artifact-lang-js/variants/20/configs/.nvmrc: |
+  v20.20.2
+/registry/artifact-lang-js/variants/22/configs/.nvmrc: |
+  v22.22.2
+/registry/artifact-lang-ts/package.json: |
+  {
+    "name": "artifact-lang-ts",
+    "version": "1.0.0"
+  }
+/registry/artifact-lang-ts/branches/[lang-js:20]/configs/package.json: |
+  {
+    "devDependencies": {
+      "@types/node": "20.19.43"
+    }
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-lang-js:
+      version: 1.0.0
+      requires:
+        - "20"
+    artifact-lang-ts:
+      version: 1.0.0
+/merged/.nvmrc: |
+  v20.20.2
+/merged/package.json: |
+  {
+    "devDependencies": {
+      "@types/node": "20.19.43"
+    }
+  }

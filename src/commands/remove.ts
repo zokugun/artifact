@@ -1,32 +1,23 @@
 import process from 'node:process';
 import { c, logger, enquirer, confirm } from '@zokugun/cli-utils';
 import { xtry } from '@zokugun/xtry/async';
-import { readInstallConfig, updateUninstallConfig, writeInstallConfig } from '../configs/index.js';
+import { readInstallConfig, updateUninstallConfig } from '../configs/index.js';
+import { resolveAndRunFlow } from '../flow/resolve-and-run-flow.js';
+import { validatePresentPackage } from '../flow/validators/validate-present-package.js';
 import { composeSteps, steps } from '../steps/index.js';
 import { type Options, type Global, OperationType } from '../types/context.js';
-import { loadPackage } from '../utils/load-package.js';
-import { resolveRequest } from '../utils/resolve-request.js';
+import { normalizeRequest } from '../utils/normalize-request.js';
+import { toIterator } from '../utils/to-iterator.js';
 
-const { mainFlow } = composeSteps(
+const commonFlow = composeSteps(
 	OperationType.Uninstall,
-	[
-		steps.readIncomingPackage,
-		steps.validatePresentPackage,
-		steps.readIncomingConfig,
-		steps.executeFirstBlock,
-	],
-	[
-		steps.readIncomingConfig,
-		steps.configureBranches,
-		steps.configureUninstallFileActions,
-		steps.unmergeTextFiles,
-		steps.transformUntouchedFiles,
-		steps.insertFinalNewLine,
-		steps.applyFormatting,
-		steps.writeTextFiles,
-		steps.removeFiles,
-		steps.executeNextBlock,
-	],
+	steps.configureUninstallFileActions,
+	steps.unmergeTextFiles,
+	steps.transformUntouchedFiles,
+	steps.insertFinalNewLine,
+	steps.applyFormatting,
+	steps.writeTextFiles,
+	steps.removeFiles,
 );
 
 export async function remove(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
@@ -87,36 +78,9 @@ export async function remove(specs: string[], inputOptions?: { force?: boolean; 
 		routes: {},
 	};
 
-	for(const spec of specs) {
-		const requestResult = resolveRequest(spec);
-		if(requestResult.fails) {
-			logger.fatal(requestResult.error);
-		}
-
-		const request = requestResult.value;
-		const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
-		const dir = await loadPackage(request.name, spinner, options);
-
-		if(!dir) {
-			continue;
-		}
-
-		const flowResult = await mainFlow(targetPath, dir, request, config, global, options);
-		if(flowResult.fails) {
-			logger.fatal(flowResult.error);
-		}
-
-		if(!flowResult.value?.result) {
-			spinner.succeed();
-
-			continue;
-		}
-
-		updateUninstallConfig(config, flowResult.value.result);
-
-		await writeInstallConfig(config, flowResult.value.formats, targetPath, options);
-
-		spinner.succeed();
+	const result = await resolveAndRunFlow(toIterator(normalizeRequest, specs), false, false, OperationType.Uninstall, validatePresentPackage, targetPath, commonFlow, updateUninstallConfig, config, global, options);
+	if(result.fails) {
+		logger.fatal(result.error);
 	}
 
 	logger.finishTimer();

@@ -134,8 +134,13 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 				if(isArray<string>(artifact.requires, isString)) {
 					normalized.requires = artifact.requires;
 				}
-				else if(isArray<string>(artifact.provides, isString)) {
+
+				if(isArray<string>(artifact.provides, isString)) {
 					normalized.provides = artifact.provides;
+				}
+
+				if(isArray<string>(artifact.features, isString)) {
+					normalized.features = artifact.features;
 				}
 
 				artifacts[key] = normalized;
@@ -170,4 +175,4 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 		update,
 		variables,
 	});
-}
+} // }}}

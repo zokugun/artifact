@@ -1,0 +1,359 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/common.json",
+	"$defs": {
+		"always": {
+			"type": "object",
+			"properties": {
+				"if_exists": {
+					"type": "string",
+					"enum": [
+						"merge",
+						"overwrite",
+						"remove",
+						"skip"
+					]
+				},
+				"transforms": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/transform"
+					}
+				}
+			},
+			"additionalProperties": false
+		},
+		"install": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/upsert"
+				}
+			]
+		},
+		"json:patches": {
+			"type": "array",
+			"items": {
+				"oneOf": [
+					{
+						"type": "object",
+						"properties": {
+							"path": {
+								"$ref": "#/$defs/json:path"
+							},
+							"op": {
+								"description": "The operation to perform.",
+								"type": "string",
+								"enum": [
+									"add",
+									"replace",
+									"test"
+								]
+							},
+							"value": {
+								"description": "The value to add, replace or test."
+							}
+						},
+						"required": [
+							"value",
+							"op",
+							"path"
+						],
+						"additionalProperties": false
+					},
+					{
+						"type": "object",
+						"properties": {
+							"path": {
+								"$ref": "#/$defs/json:path"
+							},
+							"op": {
+								"description": "The operation to perform.",
+								"type": "string",
+								"enum": [
+									"remove"
+								]
+							}
+						},
+						"required": [
+							"op",
+							"path"
+						],
+						"additionalProperties": false
+					},
+					{
+						"type": "object",
+						"properties": {
+							"path": {
+								"$ref": "#/$defs/json:path"
+							},
+							"op": {
+								"description": "The operation to perform.",
+								"type": "string",
+								"enum": [
+									"move",
+									"copy"
+								]
+							},
+							"from": {
+								"$ref": "#/$defs/json:path",
+								"description": "A JSON Pointer path pointing to the location to move/copy from.",
+								"pattern": "^#?(|(/([^/~]|~[01])*)*)$"
+							}
+						},
+						"required": [
+							"from",
+							"op",
+							"path"
+						],
+						"additionalProperties": false
+					}
+				]
+			}
+		},
+		"json:path": {
+			"description": "A JSON Pointer path.",
+			"pattern": "^#?(|(/([^/~]|~[01])*)*)$",
+			"type": "string"
+		},
+		"route": {
+			"oneOf": [
+				{
+					"type": "array",
+					"items": [
+						{
+							"$ref": "#/$defs/route"
+						}
+					],
+					"unevaluatedItems": false
+				},
+				{
+					"type": "object",
+					"properties": {
+						"fork": {
+							"type": "object",
+							"properties": {
+								"array": {
+									"$ref": "#/$defs/route"
+								},
+								"object": {
+									"$ref": "#/$defs/route"
+								},
+								"default": {
+									"$ref": "#/$defs/route"
+								},
+								"$$default": {
+									"$ref": "#/$defs/route"
+								}
+							},
+							"additionalProperties": false
+						},
+						"json": {
+							"$ref": "#/$defs/route"
+						},
+						"map(compose)": {
+							"$ref": "#/$defs/route:map(compose)"
+						},
+						"map(filter)": {
+							"type": "object",
+							"properties": {
+								"$$default": {
+									"$ref": "#/$defs/route"
+								}
+							},
+							"additionalProperties": {
+								"type": "object",
+								"properties": {
+									"if_exists": {
+										"type": "string",
+										"enum": [
+											"remove",
+											"skip"
+										]
+									},
+									"if_missing": {
+										"type": "string",
+										"enum": [
+											"skip"
+										]
+									}
+								},
+								"additionalProperties": false
+							}
+						},
+						"map(sort)": {
+							"$ref": "#/$defs/route"
+						},
+						"map(sort, compose)": {
+							"$ref": "#/$defs/route:map(compose)"
+						},
+						"yaml": {
+							"$ref": "#/$defs/route"
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"properties": {
+						"$$extend": {
+							"type": "string"
+						},
+						"format": {
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							]
+						},
+						"patches": {
+							"$ref": "#/$defs/json:patches"
+						},
+						"scope": {
+							"$ref": "#/$defs/scope"
+						}
+					},
+					"required": [
+						"$$extend"
+					],
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"properties": {
+						"$$scope": {
+							"$ref": "#/$defs/scope"
+						}
+					},
+					"additionalProperties": {
+						"$ref": "#/$defs/route"
+					}
+				},
+				{
+					"type": "string",
+					"enum": [
+						"command",
+						"line(concat)",
+						"list(concat)",
+						"list(dedup-first)",
+						"map(concat)",
+						"map(sort, concat)",
+						"overwrite",
+						"primitive",
+						"ts(merge)"
+					]
+				},
+				{
+					"type": "string"
+				}
+			]
+		},
+		"route:map(compose)": {
+			"type": "object",
+			"properties": {
+				"$$default": {
+					"$ref": "#/$defs/route"
+				},
+				"$$ignore": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"$$remove": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			},
+			"additionalProperties": {
+				"$ref": "#/$defs/route"
+			}
+		},
+		"scope": {
+			"type": "string",
+			"enum": [
+				"global",
+				"local"
+			]
+		},
+		"transform": {
+			"type": "object",
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"jq": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"jq"
+			],
+			"additionalProperties": false
+		},
+		"uninstall": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/always"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"if_exists": {
+							"type": "string",
+							"enum": [
+								"remove",
+								"skip",
+								"unmerge"
+							]
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"update": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/upsert"
+				}
+			]
+		},
+		"upsert": {
+			"allOf": [
+				{
+					"$ref": "#/$defs/always"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"filter": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"if_missing": {
+							"type": "string",
+							"enum": [
+								"merge",
+								"skip"
+							]
+						},
+						"route": {
+							"$ref": "#/$defs/route"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		}
+	}
+}

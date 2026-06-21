@@ -1,0 +1,68 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 0.1.0
+      requires:
+        - test
+
+
+
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/.artifactrc.yml: |
+  variants:
+    root: default
+/registry/artifact-awesome-config/variants/default/configs/.github/workflows/ci-pr.yml: |
+  name: "CI - Pull Request: Build & Lint"
+/registry/artifact-awesome-config/variants/default/branches/[#all:test]/configs/.github/workflows/#ci-pr.yml.patch: |
+  --- a/.github/workflows/ci-pr.yml
+  +++ b/.github/workflows/ci-pr.yml
+  @@ -1,1 +1,1 @@
+  -name: "CI - Pull Request: Build & Lint"
+  +name: "CI - Pull Request: Build, Test & Lint"
+/registry/artifact-awesome-config/variants/test/.artifactrc.yml: |
+  features:
+    - test
+/registry/artifact-awesome-config/variants/test/configs/package.json: |
+  {
+    "scripts": {
+      "test": "vitest run"
+    },
+    "devDependencies": {
+      "vitest": "4.1.8"
+    }
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+      requires:
+        - test
+      provides:
+        - default
+      features:
+        - test
+/merged/.github/workflows/ci-pr.yml: |
+  name: "CI - Pull Request: Build, Test & Lint"
+/merged/package.json: |
+  {
+    "scripts": {
+      "test": "vitest run"
+    },
+    "devDependencies": {
+      "vitest": "4.1.8"
+    }
+  }
