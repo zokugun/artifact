@@ -32,6 +32,7 @@ const mainRoute = compose({
 	engines: mapSort(mapConcat),
 	dependencies: mapSort(mapConcat),
 	devDependencies: mapSort(mapConcat),
+	overrides: mapSort(mapConcat),
 	peerDependencies: mapSort(mapConcat),
 	optionalDependencies: mapSort(mapConcat),
 	bundledDependencies: mapSort(mapConcat),
