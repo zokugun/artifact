@@ -1,0 +1,42 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  artifacts:
+    - name: artifact-awesome-config
+      version: 0.1.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/.artifactrc: |
+  peerDependencies:
+    - "artifact-depending-config"
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+
+/registry/artifact-depending-config/package.json: |
+  {
+    "name": "artifact-depending-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-depending-config/configs/package.json: |
+  {
+    "license": {
+      "type": "MIT",
+      "url": "https://www.opensource.org/licenses/mit-license.php"
+    }
+  }
+
+
+
+error: 'Missing peerDependency "artifact-depending-config" for "artifact-awesome-config"'

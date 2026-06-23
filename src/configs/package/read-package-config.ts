@@ -61,6 +61,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 	const install: InstallFileConfig[] = [];
 	const journeys: ScopedJourneySpec[] = [];
 	let orphan: boolean = false;
+	const peerDependencies: string[] = [];
 	const routes: Record<string, ScopedRouteSpec> = {};
 	const uninstall: UninstallFileConfig[] = [];
 	let update: false | UpdateFileConfig[] = [];
@@ -74,6 +75,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 			install,
 			journeys,
 			orphan,
+			peerDependencies,
 			routes,
 			uninstall,
 			update,
@@ -113,6 +115,10 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 
 	if(data.orphan === true) {
 		orphan = true;
+	}
+
+	if(isArray<string>(data.peerDependencies, isString)) {
+		peerDependencies.push(...data.peerDependencies);
 	}
 
 	if(isRecord<Primitive>(data.variables, (_key, value) => isPrimitive(value))) {
@@ -362,6 +368,7 @@ function normalizeConfig(data: unknown, source: string, gRoutes: Record<string, 
 		install,
 		journeys,
 		orphan,
+		peerDependencies,
 		routes,
 		uninstall,
 		update,

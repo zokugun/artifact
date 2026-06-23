@@ -10,6 +10,7 @@ generateTestsFromManifests(
 	'commitlint',
 	'conflict',
 	'dependabot',
+	'dependencies.peer',
 	'editorconfig',
 	'extend',
 	'features',

@@ -11,6 +11,7 @@ import { type RequestValidator, resolveRequest } from './resolve-request.js';
 
 export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, resolveInstalled: boolean, setupInstalled: boolean, operationType: OperationType, validate: RequestValidator, targetPath: string, commonFlow: CommonFlow, updateConfig: ConfigUpdater, config: InstallConfig, global: Global, options: Options): AsyncDResult {
 	const entries: FlowEntry[] = [];
+	const availables: string[] = [];
 	const features: string[] = [];
 
 	for(const request of requests) {
@@ -18,44 +19,34 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 			return request;
 		}
 
-		const result = await resolveRequest(request.value, entries, features, operationType, validate, config, global, options);
+		const result = await resolveRequest(request.value, entries, availables, features, operationType, validate, config, global, options);
 		if(result.fails) {
 			return result;
 		}
 	}
 
 	const allEntries: FlowEntry[] = [...entries];
-	const variants: string[] = [];
-
-	for(const { name, variant } of entries) {
-		variants.push(name);
-
-		if(variant) {
-			variants.push(`${name}:${variant}`);
-		}
-	}
-
-	const skipEntries: string[] = [];
+	const resolvedBranches: string[] = [];
 
 	if(resolveInstalled) {
 		const requested: string[] = [];
 
 		for(const [name, { provides, requires }] of Object.entries(config.artifacts)) {
-			if(variants.includes(name)) {
+			if(availables.includes(name)) {
 				requested.push(name);
 			}
 			else {
-				variants.push(name);
+				availables.push(name);
 
 				if(requires) {
 					for(const variant of requires) {
-						variants.push(`${name}:${variant}`);
+						availables.push(`${name}:${variant}`);
 					}
 				}
 
 				if(provides) {
 					for(const variant of provides) {
-						variants.push(`${name}:${variant}`);
+						availables.push(`${name}:${variant}`);
 					}
 				}
 			}
@@ -77,35 +68,43 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 			const dir = await loadPackage(`${name}@${version}`, spinner, options);
 
 			if(!dir) {
+				spinner?.succeed();
+
 				continue;
 			}
 
-			const result = await resolveBranchesForInstalledPackage(dir, name, version, undefined, setupInstalled, operationType, allEntries, variants, features, config, global, options);
+			const result = await resolveBranchesForInstalledPackage(dir, name, version, undefined, setupInstalled, operationType, allEntries, availables, features, config, global, options);
 			if(result.fails) {
+				spinner?.fail();
+
 				return result;
 			}
 
-			skipEntries.push(name);
+			resolvedBranches.push(name);
 
 			if(artifact.requires) {
 				for(const variant of artifact.requires) {
-					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, allEntries, variants, features, config, global, options);
+					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, allEntries, availables, features, config, global, options);
 					if(result.fails) {
+						spinner?.fail();
+
 						return result;
 					}
 
-					skipEntries.push(`${name}:${variant}`);
+					resolvedBranches.push(`${name}:${variant}`);
 				}
 			}
 
 			if(artifact.provides) {
 				for(const variant of artifact.provides) {
-					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, allEntries, variants, features, config, global, options);
+					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, allEntries, availables, features, config, global, options);
 					if(result.fails) {
+						spinner?.fail();
+
 						return result;
 					}
 
-					skipEntries.push(`${name}:${variant}`);
+					resolvedBranches.push(`${name}:${variant}`);
 				}
 			}
 
@@ -113,11 +112,11 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 		}
 
 		for(const entry of entries) {
-			if(skipEntries.includes(entry.variant ? `${entry.name}:${entry.variant}` : entry.name)) {
+			if(resolvedBranches.includes(entry.variant ? `${entry.name}:${entry.variant}` : entry.name)) {
 				continue;
 			}
 
-			const result = await resolveBranches(entry, operationType, allEntries, variants, features, config, global, options);
+			const result = await resolveBranches(entry, allEntries, availables, features, options);
 			if(result.fails) {
 				return result;
 			}
@@ -130,6 +129,8 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 
 		const flowResult = await commonFlow(targetPath, { name, version, variant, branch, label, dir, config: incomingConfig }, operationMode, result, config, global, options);
 		if(flowResult.fails) {
+			spinner.fail();
+
 			return flowResult;
 		}
 
@@ -151,7 +152,9 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 		else {
 			const result = await readPackageConfig(dir, global.routes, OperationType.Update);
 			if(result.fails) {
-				logger.fatal(result.error);
+				spinner.fail();
+
+				return result;
 			}
 
 			for(const { name, plan, scope } of result.value.journeys) {
@@ -177,6 +180,8 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 
 		const writeResult = await writeInstallConfig(config, flowResult.value.formats, targetPath, options);
 		if(writeResult.fails) {
+			spinner.fail();
+
 			return writeResult;
 		}
 
@@ -215,5 +220,5 @@ async function resolveBranchesForInstalledPackage(dir: string, name: string, ver
 		version,
 	};
 
-	return resolveBranches(entry, operationType, entries, variants, features, config, global, options);
+	return resolveBranches(entry, entries, variants, features, options);
 }

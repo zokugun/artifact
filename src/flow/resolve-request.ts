@@ -7,11 +7,12 @@ import { readPackageManifest } from '../configs/package/read-package-manifest.js
 import { type ArtifactResult, type InstallConfig, type PackageConfig, type PackageManifest, type Request } from '../types/config.js';
 import { type FlowEntry, type OperationType, type Global, OperationMode, type Options } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
+import { normalizeRequest } from '../utils/normalize-request.js';
 import { pushEntry } from './push-entry.js';
 
 export type RequestValidator = (requestPackage: PackageManifest, installConfig: InstallConfig, global: Global, options: Options) => DResult<{ operationMode?: OperationMode } | undefined>;
 
-export async function resolveRequest(request: Request, entries: FlowEntry[], features: string[], operationType: OperationType, validate: RequestValidator, installConfig: InstallConfig, global: Global, options: Options): AsyncDResult {
+export async function resolveRequest(request: Request, entries: FlowEntry[], availables: string[], features: string[], operationType: OperationType, validate: RequestValidator, installConfig: InstallConfig, global: Global, options: Options): AsyncDResult {
 	const spinner = logger.createSpinner(`${c.cyan.bold(request.name)}`);
 	const packagePath = await loadPackage(request.name, spinner, { ...options, before: global.before });
 
@@ -67,7 +68,7 @@ export async function resolveRequest(request: Request, entries: FlowEntry[], fea
 
 		const result = toResult(name, version, request);
 
-		const pushResult = await pushVariant(packagePath, config, root, { name, version, operationMode }, variant, true, result, entries, features, operationType, global);
+		const pushResult = await pushVariant(packagePath, config, root, { name, version, operationMode }, variant, true, result, entries, availables, features, operationType, validate, installConfig, global, options);
 		if(pushResult.fails) {
 			spinner.fail();
 
@@ -77,7 +78,7 @@ export async function resolveRequest(request: Request, entries: FlowEntry[], fea
 	else if(root.length > 0) {
 		const result = toResult(name, version, request);
 
-		const pushResult = await pushEntry({ name, version, variant: root, dir: fse.join(packagePath, 'variants', root), operationMode }, true, result, entries, features, operationType, global);
+		const pushResult = await pushVariant(packagePath, config, root, { name, version, operationMode }, root, true, result, entries, availables, features, operationType, validate, installConfig, global, options);
 		if(pushResult.fails) {
 			spinner.fail();
 
@@ -85,7 +86,7 @@ export async function resolveRequest(request: Request, entries: FlowEntry[], fea
 		}
 	}
 	else {
-		const pushResult = await pushEntry({ name, version, dir: packagePath, config, operationMode }, true, { name, version }, entries, features, operationType, global);
+		const pushResult = await validateAndPushEntry({ name, version, dir: packagePath, config, operationMode }, true, { name, version }, entries, availables, features);
 		if(pushResult.fails) {
 			spinner.fail();
 
@@ -111,7 +112,8 @@ function toResult(name: string, version: string, request: Request): ArtifactResu
 	return result;
 }
 
-async function pushVariant(packagePath: string, config: PackageConfig, root: string, entry: { name: string; version: string; operationMode: OperationMode }, variant: string, top: boolean, result: ArtifactResult, entries: FlowEntry[], features: string[], operationType: OperationType, global: Global): AsyncDResult {
+// eslint-disable-next-line max-params
+async function pushVariant(packagePath: string, config: PackageConfig, root: string, entry: { name: string; version: string; operationMode: OperationMode }, variant: string, top: boolean, result: ArtifactResult, entries: FlowEntry[], availables: string[], features: string[], operationType: OperationType, validate: RequestValidator, installConfig: InstallConfig, global: Global, options: Options): AsyncDResult {
 	const variantPath = fse.join(packagePath, 'variants', variant);
 	const configResult = await readPackageConfig(variantPath, global.routes, operationType);
 	if(configResult.fails) {
@@ -121,7 +123,7 @@ async function pushVariant(packagePath: string, config: PackageConfig, root: str
 	const variantConfig = configResult.value;
 
 	if(variantConfig.orphan) {
-		const variantResult = await pushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, features, operationType, global);
+		const variantResult = await validateAndPushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, availables, features);
 		if(variantResult.fails) {
 			return variantResult;
 		}
@@ -129,12 +131,12 @@ async function pushVariant(packagePath: string, config: PackageConfig, root: str
 	else if(variantConfig.extends) {
 		const extend = config.variants[variantConfig.extends] ?? variantConfig.extends;
 
-		const extendResult = await pushVariant(packagePath, config, root, entry, extend, false, result, entries, features, operationType, global);
+		const extendResult = await pushVariant(packagePath, config, root, entry, extend, false, result, entries, availables, features, operationType, validate, installConfig, global, options);
 		if(extendResult.fails) {
 			return extendResult;
 		}
 
-		const variantResult = await pushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, features, operationType, global);
+		const variantResult = await validateAndPushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, availables, features);
 		if(variantResult.fails) {
 			return variantResult;
 		}
@@ -145,18 +147,18 @@ async function pushVariant(packagePath: string, config: PackageConfig, root: str
 		}
 
 		if(root === variant) {
-			const variantResult = await pushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, features, operationType, global);
+			const variantResult = await validateAndPushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, availables, features);
 			if(variantResult.fails) {
 				return variantResult;
 			}
 		}
 		else {
-			const rootResult = await pushVariant(packagePath, config, root, entry, root, false, result, entries, features, operationType, global);
+			const rootResult = await pushVariant(packagePath, config, root, entry, root, false, result, entries, availables, features, operationType, validate, installConfig, global, options);
 			if(rootResult.fails) {
 				return rootResult;
 			}
 
-			const variantResult = await pushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, features, operationType, global);
+			const variantResult = await validateAndPushEntry({ ...entry, variant, dir: variantPath, config: variantConfig }, top, result, entries, availables, features);
 			if(variantResult.fails) {
 				return variantResult;
 			}
@@ -164,4 +166,24 @@ async function pushVariant(packagePath: string, config: PackageConfig, root: str
 	}
 
 	return OK;
+}
+
+async function validateAndPushEntry(entry: FlowEntry, top: boolean, result: ArtifactResult | undefined, entries: FlowEntry[], availables: string[], features: string[]): AsyncDResult {
+	if(entry.config.peerDependencies.length > 0) {
+		for(const dependency of entry.config.peerDependencies) {
+			const request = normalizeRequest(dependency);
+			if(request.fails) {
+				return request;
+			}
+
+			const { name, variant } = request.value;
+			const id = variant ? `${name}:${variant}` : name;
+
+			if(!availables.includes(id)) {
+				return err(`Missing peerDependency "${id}" for "${entry.variant ? `${entry.name}:${entry.variant}` : entry.name}"`);
+			}
+		}
+	}
+
+	return pushEntry(entry, top, result, entries, availables, features);
 }

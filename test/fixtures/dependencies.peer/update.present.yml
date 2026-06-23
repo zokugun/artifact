@@ -1,0 +1,59 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  artifacts:
+    artifact-depending-config:
+      version: 1.0.0
+    artifact-awesome-config:
+      version: 0.1.0
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/.artifactrc: |
+  peerDependencies:
+    - "artifact-depending-config"
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/package.json: |
+  {
+    "license": {
+      "type": "MIT",
+      "url": "https://www.opensource.org/licenses/mit-license.php"
+    }
+  }
+
+/registry/artifact-depending-config/package.json: |
+  {
+    "name": "artifact-depending-config",
+    "version": "1.0.0"
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-depending-config:
+      version: 1.0.0
+    artifact-awesome-config:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0",
+    "license": {
+      "type": "MIT",
+      "url": "https://www.opensource.org/licenses/mit-license.php"
+    }
+  }

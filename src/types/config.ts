@@ -18,6 +18,7 @@ export type PackageConfig = {
 	install: InstallFileConfig[];
 	journeys: ScopedJourneySpec[];
 	orphan: boolean;
+	peerDependencies: string[];
 	routes: Record<string, ScopedRouteSpec>;
 	uninstall: UninstallFileConfig[];
 	update: false | UpdateFileConfig[];

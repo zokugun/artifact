@@ -9,6 +9,13 @@ import { type Options, type Global, OperationType } from '../types/context.js';
 import { normalizeRequest } from '../utils/normalize-request.js';
 import { toIterator } from '../utils/to-iterator.js';
 
+type CLIOptions = {
+	dryRun?: boolean;
+	force?: boolean;
+	skip?: boolean;
+	verbose?: boolean;
+};
+
 const commonFlow = composeSteps(
 	OperationType.Uninstall,
 	steps.configureUninstallFileActions,
@@ -20,7 +27,7 @@ const commonFlow = composeSteps(
 	steps.removeFiles,
 );
 
-export async function remove(specs: string[], inputOptions?: { force?: boolean; skip?: boolean; verbose?: boolean; dryRun?: boolean }): Promise<void> {
+export async function remove(specs: string[], inputOptions?: CLIOptions): Promise<void> {
 	logger.beginTimer();
 
 	const targetPath = process.cwd();

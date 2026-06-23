@@ -2,11 +2,10 @@ import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import globby from 'globby';
-import { type InstallConfig } from '../types/config.js';
-import { type FlowEntry, type OperationType, type Options, type Global } from '../types/context.js';
+import { type FlowEntry, type Options } from '../types/context.js';
 import { pushEntry } from './push-entry.js';
 
-export async function resolveBranches(entry: FlowEntry, operationType: OperationType, entries: FlowEntry[], variants: string[], features: string[], _config: InstallConfig, global: Global, options: Options): AsyncDResult {
+export async function resolveBranches(entry: FlowEntry, entries: FlowEntry[], availables: string[], features: string[], options: Options): AsyncDResult {
 	const cwd = fse.join(entry.dir, 'branches');
 
 	if(await fse.isExisting(cwd)) {
@@ -24,14 +23,14 @@ export async function resolveBranches(entry: FlowEntry, operationType: Operation
 				const packageName = name
 					.replaceAll(/^(?!@)(artifact-)?/g, 'artifact-')
 					.replaceAll(/:(artifact-)?/g, '/artifact-');
-				const found = variants.includes(variant ? `${packageName}:${variant}` : packageName);
+				const found = availables.includes(variant ? `${packageName}:${variant}` : packageName);
 
 				if(found) {
 					if(options.verbose) {
 						logger.debug(`- branch: ${name}${variant ? `:${variant}` : ''} has been matched`);
 					}
 
-					const result = await pushEntry({ ...entry, branch, dir: fse.join(cwd, directory) }, false, undefined, entries, features, operationType, global);
+					const result = await pushEntry({ ...entry, branch, dir: fse.join(cwd, directory) }, false, undefined, entries, availables, features);
 					if(result.fails) {
 						return result;
 					}
@@ -96,7 +95,7 @@ export async function resolveBranches(entry: FlowEntry, operationType: Operation
 						logger.debug(`- branch: ${entry.name}${entry.variant ? `:${entry.variant}` : ''} has been matched`);
 					}
 
-					const result = await pushEntry({ ...entry, branch, dir: fse.join(cwd, directory) }, false, undefined, entries, features, operationType, global);
+					const result = await pushEntry({ ...entry, branch, dir: fse.join(cwd, directory) }, false, undefined, entries, availables, features);
 					if(result.fails) {
 						return result;
 					}

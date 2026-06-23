@@ -80,6 +80,12 @@
 		"orphan": {
 			"type": "boolean"
 		},
+		"peerDependencies": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
 		"routes": {
 			"type": "object",
 			"additionalProperties": {

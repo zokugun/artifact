@@ -111,7 +111,18 @@ function generateDirectory(directory: string): void {
 				action = async () => remove(specs, { verbose: DEBUG });
 			}
 			else if(manifest.action.command === 'update') {
-				action = async () => update();
+				if(isArray(manifest.action.arguments)) {
+					const options = manifest.action.arguments[0] ?? {};
+
+					if(!isRecord(options)) {
+						throw new Error(`The file "${path.relative(root, filePath)}" requires an "action.arguments[0]" to be the options.`);
+					}
+
+					action = async () => update(options);
+				}
+				else {
+					action = async () => update();
+				}
 			}
 			else {
 				throw new Error(`Unknown action "${manifest.action.command}"`);
