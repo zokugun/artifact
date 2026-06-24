@@ -47,7 +47,7 @@
 		"watch:test": "tsc-watch -p test"
 	},
 	"dependencies": {
-		"@zokugun/cli-utils": "0.3.2",
+		"@zokugun/cli-utils": "0.3.3",
 		"@zokugun/configdotts-merge": "0.3.0",
 		"@zokugun/fs-extra-plus": "0.5.0",
 		"@zokugun/is-it-type": "0.8.1",
@@ -115,7 +115,9 @@
 		}
 	},
 	"allowScripts": {
-		"@zokugun/cli-utils": true
+		"@zokugun/cli-utils": true,
+		"core-js": false,
+		"fsevents": true
 	},
 	"keywords": [
 		"artifact",

@@ -24,6 +24,8 @@ export async function resolveRequest(request: Request, entries: FlowEntry[], ava
 
 	const manifestResult = await readPackageManifest(packagePath);
 	if(manifestResult.fails) {
+		spinner.fail();
+
 		return manifestResult;
 	}
 
@@ -49,6 +51,8 @@ export async function resolveRequest(request: Request, entries: FlowEntry[], ava
 
 	const configResult = await readPackageConfig(packagePath, global.routes, operationType);
 	if(configResult.fails) {
+		spinner.fail();
+
 		return configResult;
 	}
 
