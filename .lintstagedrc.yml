@@ -1,3 +1,4 @@
-./package.json: fixpack
+./package.json:
+  - fixpack
 .github/workflows/*.yml: zizmor
 "*.ts": xo
