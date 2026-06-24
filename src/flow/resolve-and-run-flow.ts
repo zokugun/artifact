@@ -73,7 +73,7 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 				continue;
 			}
 
-			const result = await resolveBranchesForInstalledPackage(dir, name, version, undefined, setupInstalled, operationType, allEntries, availables, features, config, global, options);
+			const result = await resolveBranchesForInstalledPackage(dir, name, version, undefined, setupInstalled, operationType, availables, features, config, global, options);
 			if(result.fails) {
 				spinner?.fail();
 
@@ -82,9 +82,19 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 
 			resolvedBranches.push(name);
 
+			if(result.value.length > 0) {
+				let index = allEntries.findIndex((entry) => entry.name === name) + 1;
+
+				while(index < allEntries.length && allEntries[index].name === name) {
+					index += 1;
+				}
+
+				allEntries.splice(index, 0, ...result.value);
+			}
+
 			if(artifact.requires) {
 				for(const variant of artifact.requires) {
-					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, allEntries, availables, features, config, global, options);
+					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, availables, features, config, global, options);
 					if(result.fails) {
 						spinner?.fail();
 
@@ -92,12 +102,18 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 					}
 
 					resolvedBranches.push(`${name}:${variant}`);
+
+					if(result.value.length > 0) {
+						const index = allEntries.findIndex((entry) => entry.name === name && entry.variant === variant);
+
+						allEntries.splice(index + 1, 0, ...result.value);
+					}
 				}
 			}
 
 			if(artifact.provides) {
 				for(const variant of artifact.provides) {
-					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, allEntries, availables, features, config, global, options);
+					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, availables, features, config, global, options);
 					if(result.fails) {
 						spinner?.fail();
 
@@ -105,6 +121,12 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 					}
 
 					resolvedBranches.push(`${name}:${variant}`);
+
+					if(result.value.length > 0) {
+						const index = allEntries.findIndex((entry) => entry.name === name && entry.variant === variant);
+
+						allEntries.splice(index + 1, 0, ...result.value);
+					}
 				}
 			}
 
@@ -116,9 +138,15 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 				continue;
 			}
 
-			const result = await resolveBranches(entry, allEntries, availables, features, options);
+			const result = await resolveBranches(entry, availables, features, options);
 			if(result.fails) {
 				return result;
+			}
+
+			if(result.value.length > 0) {
+				const index = allEntries.indexOf(entry);
+
+				allEntries.splice(index + 1, 0, ...result.value);
 			}
 		}
 	}
@@ -191,7 +219,7 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 	return OK;
 }
 
-async function resolveBranchesForInstalledPackage(dir: string, name: string, version: string, variant: string | undefined, setupInstalled: boolean, operationType: OperationType, entries: FlowEntry[], variants: string[], features: string[], config: InstallConfig, global: Global, options: Options): AsyncDResult {
+async function resolveBranchesForInstalledPackage(dir: string, name: string, version: string, variant: string | undefined, setupInstalled: boolean, operationType: OperationType, variants: string[], features: string[], config: InstallConfig, global: Global, options: Options): AsyncDResult<FlowEntry[]> {
 	const packageConfig = await readPackageConfig(dir, global.routes, operationType);
 	if(packageConfig.fails) {
 		logger.fatal(packageConfig.error);
@@ -220,5 +248,5 @@ async function resolveBranchesForInstalledPackage(dir: string, name: string, ver
 		version,
 	};
 
-	return resolveBranches(entry, entries, variants, features, options);
+	return resolveBranches(entry, variants, features, options);
 }

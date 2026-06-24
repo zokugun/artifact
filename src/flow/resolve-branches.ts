@@ -1,12 +1,13 @@
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
-import { type AsyncDResult, OK } from '@zokugun/xtry';
+import { type AsyncDResult, ok } from '@zokugun/xtry';
 import globby from 'globby';
 import { type FlowEntry, type Options } from '../types/context.js';
 import { pushEntry } from './push-entry.js';
 
-export async function resolveBranches(entry: FlowEntry, entries: FlowEntry[], availables: string[], features: string[], options: Options): AsyncDResult {
+export async function resolveBranches(entry: FlowEntry, availables: string[], features: string[], options: Options): AsyncDResult<FlowEntry[]> {
 	const cwd = fse.join(entry.dir, 'branches');
+	const entries = [];
 
 	if(await fse.isExisting(cwd)) {
 		const directories = await globby('*', {
@@ -104,5 +105,5 @@ export async function resolveBranches(entry: FlowEntry, entries: FlowEntry[], av
 		}
 	}
 
-	return OK;
+	return ok(entries);
 }

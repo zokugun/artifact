@@ -40,10 +40,16 @@ rewiremock('@zokugun/cli-utils').with({
 				console.log(message);
 			}
 		},
-		createSpinner: () => ({
-			fail: () => {},
-			succeed: () => {},
-		}),
+		createSpinner: (message: string) => {
+			if(DEBUG) {
+				console.log(message);
+			}
+
+			return {
+				fail: () => {},
+				succeed: () => {},
+			};
+		},
 		fatal: (message: string) => {
 			throw new Error(message);
 		},
