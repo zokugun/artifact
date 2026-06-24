@@ -1,8 +1,8 @@
 import { uniq } from 'es-toolkit';
-import { type Artifact, type ArtifactResult, type InstallConfig } from '../../types/config.js';
+import { type ArtifactConfig, type ArtifactResult, type InstallConfig } from '../../types/config.js';
 
 export function updateInstallConfig(config: InstallConfig, { name, version, features, provides, requires }: ArtifactResult): void {
-	const artifact: Artifact = {
+	const artifact: ArtifactConfig = {
 		version,
 	};
 
@@ -16,6 +16,12 @@ export function updateInstallConfig(config: InstallConfig, { name, version, feat
 
 	if(features) {
 		artifact.features = uniq(features).sort((a, b) => a.localeCompare(b));
+	}
+
+	const oldArtifact = config.artifacts[name];
+
+	if(oldArtifact?.update) {
+		artifact.update = oldArtifact.update;
 	}
 
 	config.artifacts[name] = artifact;

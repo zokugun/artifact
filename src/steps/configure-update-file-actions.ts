@@ -1,15 +1,17 @@
 import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import { minimatch } from 'minimatch';
-import { type FileTransform } from '../types/config.js';
+import { mergeUpsertProperty } from '../configs/utils/merge-upsert-property.js';
+import { type UpsertFileConfig, type FileTransform } from '../types/config.js';
 import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
 import { buildTravel } from '../utils/build-travel.js';
 
 export async function configureUpdateFileActions(context: Context): AsyncDResult {
-	const { update } = context.incomingConfig!;
+	const { update: packageUpdates } = context.incomingConfig!;
+	const userUpdates = context.config.artifacts[context.incomingName!]?.update?.config;
 
-	if(update === false) {
+	if(packageUpdates === false || userUpdates === false) {
 		context.onExisting = () => 'skip';
 		context.onMissing = () => 'skip';
 	}
@@ -20,9 +22,23 @@ export async function configureUpdateFileActions(context: Context): AsyncDResult
 		const routes: Record<string, Journey> = {};
 		const transformations: Record<string, FileTransform[]> = {};
 
-		for(const file of update) {
-			const { filter, ifExists, ifMissing, pattern, rename, route, transforms } = file;
+		const updates: UpsertFileConfig[] = [];
 
+		if(userUpdates) {
+			updates.push(...userUpdates);
+
+			for(const update of packageUpdates) {
+				const result = mergeUpsertProperty(update, updates);
+				if(result.fails) {
+					return result;
+				}
+			}
+		}
+		else {
+			updates.push(...packageUpdates);
+		}
+
+		for(const { filter, ifExists, ifMissing, pattern, rename, route, transforms } of updates) {
 			if(rename) {
 				context.renamedPatterns.push({
 					from: pattern,

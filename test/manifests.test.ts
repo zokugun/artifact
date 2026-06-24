@@ -26,6 +26,7 @@ generateTestsFromManifests(
 	'template',
 	'tsconfig',
 	'transform',
+	'update.user',
 	'variant.add',
 	'variant.update',
 	'version',

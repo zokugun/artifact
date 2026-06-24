@@ -6,7 +6,7 @@ import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import yaml from 'yaml';
 import { applyFormatting } from '../../steps/apply-formatting.js';
 import { insertFinalNewLine } from '../../steps/insert-final-new-line.js';
-import { type Artifact, type UpdateFileConfig, type InstallConfig } from '../../types/config.js';
+import { type UpdateFileConfig, type InstallConfig } from '../../types/config.js';
 import { type Options } from '../../types/context.js';
 import { type Format } from '../../types/format.js';
 import { MAX_VERSION, VERSION_RELEASE } from '../utils/constants.js';
@@ -14,13 +14,23 @@ import { MAX_VERSION, VERSION_RELEASE } from '../utils/constants.js';
 export async function writeInstallConfig(config: InstallConfig, formats: Format[], targetPath: string, options: Options): AsyncDResult {
 	const exported: {
 		$schema: string;
-		artifacts: Record<string, Artifact>;
-		update?: boolean | Record<string, UpdateFileConfig>;
+		artifacts: Record<string, unknown>;
+		update?: false | Record<string, UpdateFileConfig>;
 		variables?: Record<string, Primitive>;
 	} = {
 		$schema: `https://raw.githubusercontent.com/zokugun/artifact/v${VERSION_RELEASE}/schemas/v${MAX_VERSION}/install.json`,
-		artifacts: config.artifacts,
+		artifacts: {},
 	};
+
+	for(const [name, artifact] of Object.entries(config.artifacts)) {
+		const { update, ...data } = artifact;
+
+		if(update) {
+			(data as any).update = update.data;
+		}
+
+		exported.artifacts[name] = data;
+	}
 
 	if(isNonEmptyRecord(config.update)) {
 		exported.update = config.update;

@@ -25,32 +25,12 @@ function merge(currentValue: UpsertFileConfig, newValue: UpsertFileConfig): DRes
 		}
 	}
 
-	if(newValue.ifExists && newValue.ifExists !== 'merge') {
-		if(currentValue.ifExists) {
-			if(currentValue.ifExists === 'merge' || currentValue.ifExists === newValue.ifExists) {
-				// pass
-			}
-			else {
-				return err('Not Implemented: ifExists');
-			}
-		}
-		else {
-			currentValue.ifExists = newValue.ifExists;
-		}
+	if(newValue.ifExists && newValue.ifExists !== 'merge' && currentValue.ifExists && currentValue.ifExists === 'merge') {
+		currentValue.ifExists = newValue.ifExists;
 	}
 
-	if(newValue.ifMissing && newValue.ifMissing !== 'merge') {
-		if(currentValue.ifMissing) {
-			if(currentValue.ifMissing === 'merge' || currentValue.ifMissing === newValue.ifMissing) {
-				// pass
-			}
-			else {
-				return err('Not Implemented: ifMissing');
-			}
-		}
-		else {
-			currentValue.ifMissing = newValue.ifMissing;
-		}
+	if(newValue.ifMissing && newValue.ifMissing !== 'merge' && currentValue.ifMissing && currentValue.ifMissing === 'merge') {
+		currentValue.ifMissing = newValue.ifMissing;
 	}
 
 	if(newValue.rename) {

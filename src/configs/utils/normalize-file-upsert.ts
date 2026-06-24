@@ -13,7 +13,7 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 
 	let filter: string[] | undefined;
 	let ifExists: 'force-merge' | 'merge' | 'overwrite' | 'remove' | 'skip' = 'merge';
-	let ifMissing: 'merge' | 'skip' = 'merge';
+	let ifMissing: 'force-merge' | 'merge' | 'skip' = 'merge';
 	let rename: string | undefined;
 	let route: RouteMeta | undefined;
 	let transforms: FileTransform[] = [];
@@ -26,6 +26,9 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		if(data.if_exists === 'overwrite' || data.if_exists === 'remove' || data.if_exists === 'skip') {
 			ifExists = data.if_exists;
 		}
+		else if(data.if_exists === 'merge') {
+			ifExists = 'force-merge';
+		}
 	}
 	else if(data.overwrite === true) {
 		ifExists = 'overwrite';
@@ -37,8 +40,16 @@ export function normalizeFileUpsert(pattern: string, data: unknown, name: 'insta
 		ifExists = data.update ? 'force-merge' : 'skip';
 	}
 
-	if(data.missing === false || data.if_missing === 'skip') {
-		ifMissing = 'skip';
+	if(isString(data.if_missing)) {
+		if(data.if_missing === 'skip') {
+			ifMissing = data.if_missing;
+		}
+		else if(data.if_missing === 'merge') {
+			ifMissing = 'force-merge';
+		}
+	}
+	else if(isBoolean(data.missing)) {
+		ifMissing = data.missing ? 'force-merge' : 'skip';
 	}
 
 	if(isString(data.rename)) {

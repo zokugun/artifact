@@ -3,10 +3,10 @@ import { c, logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { stringifyError } from '@zokugun/xtry';
 import { readInstallConfig } from '../configs/index.js';
-import { type Artifact, type PackageManifest } from '../types/config.js';
+import { type ArtifactConfig, type PackageManifest } from '../types/config.js';
 import { formatTable } from '../utils/format-table.js';
 
-function formatVariant(artifact: Artifact): string {
+function formatVariant(artifact: ArtifactConfig): string {
 	const variant = Array.isArray(artifact.requires) ? artifact.requires.at(-1) ?? '' : '';
 
 	if(variant.length > 0) {

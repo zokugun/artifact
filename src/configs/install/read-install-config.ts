@@ -3,7 +3,7 @@ import fse from '@zokugun/fs-extra-plus/async';
 import { isArray, isPrimitive, isRecord, isString, type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
 import yaml from 'yaml';
-import { type Artifact, type InstallFileConfig, type UpdateFileConfig, type InstallConfig } from '../../types/config.js';
+import { type ArtifactConfig, type InstallFileConfig, type UpdateFileConfig, type InstallConfig, type UpsertFileConfig } from '../../types/config.js';
 import { type JourneyPlan, type Route } from '../../types/travel.js';
 import { detectIndent } from '../../utils/detect-indent.js';
 import { hasFinalNewLine } from '../../utils/has-final-new-line.js';
@@ -72,7 +72,7 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<Instal
 }
 
 function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<InstallConfig> { // {{{
-	const artifacts: Record<string, Artifact> = {};
+	const artifacts: Record<string, ArtifactConfig> = {};
 	const install: Record<string, InstallFileConfig> = {};
 	const journeys: Record<string, JourneyPlan> = {};
 	const routes: Record<string, Route<any>> = {};
@@ -112,7 +112,7 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 	if(isArray(data.artifacts)) {
 		for(const artifact of data.artifacts) {
 			if(isRecord(artifact) && isString(artifact.name) && isString(artifact.version)) {
-				const normalized: Artifact = {
+				const normalized: ArtifactConfig = {
 					version: artifact.version,
 				};
 
@@ -127,7 +127,7 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 	else if(isRecord(data.artifacts)) {
 		for(const [key, artifact] of Object.entries(data.artifacts)) {
 			if(isRecord(artifact) && isString(artifact.version)) {
-				const normalized: Artifact = {
+				const normalized: ArtifactConfig = {
 					version: artifact.version,
 				};
 
@@ -141,6 +141,27 @@ function normalizeConfig(data: unknown, file: InstallConfig['file']): DResult<In
 
 				if(isArray<string>(artifact.features, isString)) {
 					normalized.features = artifact.features;
+				}
+
+				if(artifact.update === false) {
+					normalized.update = { data: false, config: false };
+				}
+				else if(isRecord(artifact.update)) {
+					const config: UpsertFileConfig[] = [];
+
+					for(const [key, value] of Object.entries(artifact.update)) {
+						const normalizedUpdate = normalizeFileUpsert(key, value, 'update', version);
+						if(normalizedUpdate.fails) {
+							return normalizedUpdate;
+						}
+
+						config.push(normalizedUpdate.value);
+					}
+
+					normalized.update = {
+						data: artifact.update,
+						config,
+					};
 				}
 
 				artifacts[key] = normalized;

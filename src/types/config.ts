@@ -26,14 +26,24 @@ export type PackageConfig = {
 	variants: Record<string, string>;
 };
 
-export type Artifact = {
-	version: string;
+export type ArtifactConfig = {
 	features?: string[];
 	provides?: string[];
 	requires?: string[];
+	update?: {
+		data: unknown;
+		config: false | UpdateFileConfig[];
+	};
+	version: string;
 };
 
-export type ArtifactResult = Artifact & { name: string };
+export type ArtifactResult = {
+	features?: string[];
+	name: string;
+	provides?: string[];
+	requires?: string[];
+	version: string;
+};
 
 export type InstallConfig = {
 	file: {
@@ -42,7 +52,7 @@ export type InstallConfig = {
 		indent?: Indent;
 		type: string;
 	};
-	artifacts: Record<string, Artifact>;
+	artifacts: Record<string, ArtifactConfig>;
 	install: Record<string, InstallFileConfig>;
 	journeys: Record<string, JourneyPlan>;
 	routes: Record<string, Route<any>>;
@@ -66,7 +76,7 @@ export type UpdateFileConfig = UpsertFileConfig;
 
 export type UpsertFileConfig = AlwaysFileConfig & {
 	filter?: string[];
-	ifMissing: 'merge' | 'skip';
+	ifMissing: 'force-merge' | 'merge' | 'skip';
 	rename?: string;
 	route?: RouteMeta;
 };
