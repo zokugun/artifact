@@ -1,4 +1,3 @@
-import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
 import { isArray, isPrimitive, isRecord, isString, type Primitive } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, err, ok } from '@zokugun/xtry';
@@ -16,7 +15,7 @@ export async function readInstallConfig(targetPath: string): AsyncDResult<Instal
 	let type: string | undefined;
 
 	for(const place of CONFIG_LOCATIONS) {
-		const result = await fse.readFile(path.join(targetPath, place.name), 'utf8');
+		const result = await fse.readFile(fse.join(targetPath, place.name), 'utf8');
 		if(!result.fails) {
 			content = result.value;
 

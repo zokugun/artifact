@@ -1,4 +1,3 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
@@ -11,13 +10,13 @@ export async function removeFiles({ removedPatterns, targetPath, operationMode: 
 		return OK;
 	}
 
-	const cwd = path.join(targetPath);
+	const cwd = fse.join(targetPath);
 	const files = await listWorkingFiles(cwd);
 
 	for(const file of files) {
 		if(removedPatterns.some((pattern) => minimatch(file, pattern))) {
 			if(!options.dryRun) {
-				const filePath = path.join(cwd, file);
+				const filePath = fse.join(cwd, file);
 
 				const result = await fse.unlink(filePath);
 				if(result.fails) {

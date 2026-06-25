@@ -1,4 +1,3 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { isEmptyArray } from '@zokugun/is-it-type';
@@ -14,7 +13,7 @@ export async function transformUntouchedFiles({ mergedTextFiles, options, routes
 		return OK;
 	}
 
-	const cwd = path.join(targetPath);
+	const cwd = fse.join(targetPath);
 	const files = await listWorkingFiles(cwd);
 
 	for(const file of files) {
@@ -38,7 +37,7 @@ export async function transformUntouchedFiles({ mergedTextFiles, options, routes
 			logger.debug(`${file} is going to be transformed`);
 		}
 
-		const filePath = path.join(cwd, file);
+		const filePath = fse.join(cwd, file);
 
 		const result = await fse.readFile(filePath, 'utf8');
 		if(result.fails) {

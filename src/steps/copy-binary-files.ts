@@ -1,15 +1,14 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
 export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, onExisting, onMissing, options }: Context): AsyncDResult {
-	const cwd = path.join(incomingPath, 'configs');
+	const cwd = fse.join(incomingPath, 'configs');
 
 	for(const file of binaryFiles) {
-		const source = path.join(cwd, file.source);
-		const target = path.join(targetPath, file.target);
+		const source = fse.join(cwd, file.source);
+		const target = fse.join(targetPath, file.target);
 
 		if(await fse.isExisting(target)) {
 			switch(onExisting(file.source)) {

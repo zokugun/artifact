@@ -1,4 +1,3 @@
-import path from 'node:path';
 import fse from '@zokugun/fs-extra-plus/async';
 import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
@@ -15,7 +14,7 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 		return OK;
 	}
 
-	const cwd = path.join(context.incomingPath, 'configs');
+	const cwd = fse.join(context.incomingPath, 'configs');
 	const transformations: Record<string, FileTransform[]> = {};
 
 	for(const file of uninstall) {
@@ -25,7 +24,7 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 			context.removedPatterns.push(pattern);
 		}
 		else if(ifExists === 'unmerge') {
-			const filePath = path.join(cwd, pattern);
+			const filePath = fse.join(cwd, pattern);
 
 			const result = await fse.readFile(filePath, 'utf8');
 			if(result.fails) {

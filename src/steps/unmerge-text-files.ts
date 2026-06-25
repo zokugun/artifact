@@ -1,4 +1,3 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { isArray, isRecord, type Primitive } from '@zokugun/is-it-type';
@@ -33,7 +32,7 @@ export async function unmergeTextFiles({ targetPath, textFiles, mergedTextFiles,
 			logger.debug(`${file.name} is going to be unmerged`);
 		}
 
-		const filePath = path.join(targetPath, file.name);
+		const filePath = fse.join(targetPath, file.name);
 
 		if(!await fse.isExisting(filePath)) {
 			continue;

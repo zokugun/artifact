@@ -1,4 +1,3 @@
-import path from 'path';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, OK } from '@zokugun/xtry';
 import * as editorconfig from 'editorconfig';
@@ -26,12 +25,12 @@ function buildFullGlob(glob: string) { // {{{
 } // }}}
 
 export async function readEditorConfig({ incomingPath, targetPath, formats }: Context): AsyncDResult {
-	const incomingFile = path.join(incomingPath, 'configs', '.editorconfig');
+	const incomingFile = fse.join(incomingPath, 'configs', '.editorconfig');
 
 	let readResult = await fse.readFile(incomingFile, 'utf8');
 
 	if(readResult.fails) {
-		const targetFile = path.join(targetPath, '.editorconfig');
+		const targetFile = fse.join(targetPath, '.editorconfig');
 
 		readResult = await fse.readFile(targetFile, 'utf8');
 	}

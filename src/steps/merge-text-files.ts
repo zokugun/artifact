@@ -1,4 +1,3 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
@@ -23,7 +22,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 				logger.debug(`${file.name}, no merger has been found`);
 			}
 
-			const filePath = path.join(targetPath, file.name);
+			const filePath = fse.join(targetPath, file.name);
 
 			if(await fse.isExisting(filePath)) {
 				switch(onExisting(file.name)) {
@@ -66,8 +65,8 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 			logger.debug(`${file.name}, a merger has been found`);
 		}
 
-		const fileName = journey.alias ? path.join(path.dirname(file.name), journey.alias) : file.name;
-		const filePath = path.join(targetPath, fileName);
+		const fileName = journey.alias ? fse.join(fse.parentPath(file.name), journey.alias) : file.name;
+		const filePath = fse.join(targetPath, fileName);
 
 		if(await fse.isExisting(filePath)) {
 			switch(onExisting(file.name)) {

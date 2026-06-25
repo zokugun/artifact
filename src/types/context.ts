@@ -14,7 +14,6 @@ export type RenameAction = {
 
 export type Context = {
 	binaryFiles: BinaryFile[];
-	blocks: Block[];
 	config: InstallConfig;
 	filters: (file: string) => string[] | undefined;
 	formats: Format[];
@@ -32,7 +31,6 @@ export type Context = {
 	operationMode: OperationMode;
 	operationType: OperationType;
 	options: Options;
-	packagePath: string;
 	patchFiles: PatchFile[];
 	removedPatterns: string[];
 	renamedPatterns: RenameAction[];
@@ -83,14 +81,6 @@ export type Options = {
 	verbose: boolean;
 	dryRun: boolean;
 	variables: Record<string, Primitive>;
-};
-
-export type Block = {
-	name: string;
-	version: string;
-	variant?: string;
-	branch?: string;
-	incomingPath: string;
 };
 
 export type BinaryFile = {

@@ -1,4 +1,3 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
@@ -14,7 +13,7 @@ export async function writeTextFiles({ mergedTextFiles, options, targetPath, tra
 	}
 	else {
 		for(const file of [...mergedTextFiles, ...transformedFiles]) {
-			const filePath = path.join(targetPath, file.name);
+			const filePath = fse.join(targetPath, file.name);
 
 			const result = await fse.outputFile(filePath, file.data, 'utf8');
 			if(result.fails) {

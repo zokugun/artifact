@@ -12,7 +12,6 @@ import { insertFinalNewLine } from './insert-final-new-line.js';
 import { mergeTextFiles } from './merge-text-files.js';
 import { readEditorConfig } from './read-editor-config.js';
 import { readFiles } from './read-files.js';
-import { readIncomingConfig } from './read-incoming-config.js';
 import { removeFiles } from './remove-files.js';
 import { renameFiles } from './rename-files.js';
 import { replaceTemplates } from './replace-templates.js';
@@ -31,7 +30,6 @@ export const steps = {
 	mergeTextFiles,
 	readEditorConfig,
 	readFiles,
-	readIncomingConfig,
 	removeFiles,
 	renameFiles,
 	replaceTemplates,
@@ -48,7 +46,6 @@ export function composeSteps(operationType: OperationType, ...processes: Step[])
 
 		const context: Context = {
 			binaryFiles: [],
-			blocks: [],
 			config,
 			filters: () => undefined,
 			formats: [],
@@ -65,7 +62,6 @@ export function composeSteps(operationType: OperationType, ...processes: Step[])
 			operationMode,
 			operationType,
 			options,
-			packagePath: incoming.dir,
 			patchFiles: [],
 			removedPatterns: [],
 			renamedPatterns: [],

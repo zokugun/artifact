@@ -1,4 +1,3 @@
-import path from 'path';
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { isNonEmptyRecord, type Primitive } from '@zokugun/is-it-type';
@@ -52,7 +51,7 @@ export async function writeInstallConfig(config: InstallConfig, formats: Format[
 	await applyFormatting({ mergedTextFiles: [file], formats });
 
 	if(!options.dryRun) {
-		const filePath = path.join(targetPath, name);
+		const filePath = fse.join(targetPath, name);
 
 		const result = await fse.outputFile(filePath, file.data, 'utf8');
 		if(result.fails) {
