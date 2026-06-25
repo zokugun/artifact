@@ -1,5 +1,6 @@
 import { c, logger } from '@zokugun/cli-utils';
-import { ok, OK_UNDEFINED } from '@zokugun/xtry';
+import fse from '@zokugun/fs-extra-plus/async';
+import { err, ok, OK_UNDEFINED } from '@zokugun/xtry';
 import { type OperationType, type CommonFlow, type Context } from '../types/context.js';
 import { type Step } from '../types/step.js';
 import { applyFormatting } from './apply-formatting.js';
@@ -39,9 +40,17 @@ export const steps = {
 };
 
 export function composeSteps(operationType: OperationType, ...processes: Step[]): CommonFlow {
-	return async (targetPath, incoming, operationMode, result, config, global, options) => {
+	return async (targetPath, incoming, incomingPath, label, operationMode, result, config, global, options) => {
 		if(options.verbose) {
-			logger.print(c.bgBlue(`\n=== ${incoming.label} ===\n`));
+			logger.print(c.bgBlue(`\n=== ${label} ===\n`));
+		}
+
+		if(!incomingPath) {
+			if(!incoming) {
+				return err('No path provided to compose steps');
+			}
+
+			incomingPath = fse.join(incoming.dir, 'configs');
 		}
 
 		const context: Context = {
@@ -50,12 +59,12 @@ export function composeSteps(operationType: OperationType, ...processes: Step[])
 			filters: () => undefined,
 			formats: [],
 			global,
-			incomingPath: incoming.dir,
-			incomingConfig: incoming.config,
-			incomingName: incoming.name,
-			incomingVersion: incoming.version,
-			incomingVariant: incoming.variant,
-			incomingBranch: incoming.branch,
+			incomingPath,
+			incomingConfig: incoming?.config,
+			incomingName: incoming?.name,
+			incomingVersion: incoming?.version,
+			incomingVariant: incoming?.variant,
+			incomingBranch: incoming?.branch,
 			mergedTextFiles: [],
 			onExisting: () => 'merge',
 			onMissing: () => 'continue',

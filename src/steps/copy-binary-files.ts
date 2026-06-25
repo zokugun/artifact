@@ -4,10 +4,8 @@ import { type AsyncDResult, err, OK, stringifyError } from '@zokugun/xtry';
 import { type Context } from '../types/context.js';
 
 export async function copyBinaryFiles({ binaryFiles, incomingPath, targetPath, onExisting, onMissing, options }: Context): AsyncDResult {
-	const cwd = fse.join(incomingPath, 'configs');
-
 	for(const file of binaryFiles) {
-		const source = fse.join(cwd, file.source);
+		const source = fse.join(incomingPath, file.source);
 		const target = fse.join(targetPath, file.target);
 
 		if(await fse.isExisting(target)) {

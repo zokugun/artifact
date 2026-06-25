@@ -8,13 +8,16 @@ import { detectIndent } from '../utils/detect-indent.js';
 import { hasFinalNewLine } from '../utils/has-final-new-line.js';
 
 export async function configureUninstallFileActions(context: Context): AsyncDResult {
-	const { uninstall } = context.incomingConfig!;
+	if(!context.incomingConfig) {
+		return OK;
+	}
+
+	const { uninstall } = context.incomingConfig;
 
 	if(!uninstall) {
 		return OK;
 	}
 
-	const cwd = fse.join(context.incomingPath, 'configs');
 	const transformations: Record<string, FileTransform[]> = {};
 
 	for(const file of uninstall) {
@@ -24,7 +27,7 @@ export async function configureUninstallFileActions(context: Context): AsyncDRes
 			context.removedPatterns.push(pattern);
 		}
 		else if(ifExists === 'unmerge') {
-			const filePath = fse.join(cwd, pattern);
+			const filePath = fse.join(context.incomingPath, pattern);
 
 			const result = await fse.readFile(filePath, 'utf8');
 			if(result.fails) {

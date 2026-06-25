@@ -6,7 +6,11 @@ import { type ExistingAction, type Context } from '../types/context.js';
 import { type Journey } from '../types/travel.js';
 
 export async function configureInstallFileActions(context: Context): AsyncDResult {
-	const { install } = context.incomingConfig!;
+	if(!context.incomingConfig) {
+		return OK;
+	}
+
+	const { install } = context.incomingConfig;
 
 	if(!install) {
 		return OK;

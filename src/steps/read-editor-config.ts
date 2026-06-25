@@ -25,7 +25,7 @@ function buildFullGlob(glob: string) { // {{{
 } // }}}
 
 export async function readEditorConfig({ incomingPath, targetPath, formats }: Context): AsyncDResult {
-	const incomingFile = fse.join(incomingPath, 'configs', '.editorconfig');
+	const incomingFile = fse.join(incomingPath, '.editorconfig');
 
 	let readResult = await fse.readFile(incomingFile, 'utf8');
 

@@ -8,13 +8,11 @@ import { readBuffer } from '../utils/read-buffer.js';
 import { readTextFile } from '../utils/read-text-file.js';
 
 export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFiles, operationMode: mode, global, options }: Context): AsyncDResult {
-	const cwd = fse.join(incomingPath, 'configs');
-
-	const files = await listWorkingFiles(cwd);
+	const files = await listWorkingFiles(incomingPath);
 
 	if(mode === OperationMode.Default) {
 		for(const file of files) {
-			const filePath = fse.join(cwd, file);
+			const filePath = fse.join(incomingPath, file);
 
 			if(fse.leafName(file).startsWith('#') && (file.endsWith('.diff') || file.endsWith('.json-patch') || file.endsWith('.patch'))) {
 				patchFiles.push({
@@ -51,7 +49,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFil
 	else {
 		for(const file of files) {
 			if(global.touchedTextFiles.includes(file)) {
-				const filePath = fse.join(cwd, file);
+				const filePath = fse.join(incomingPath, file);
 
 				const textFile = await readTextFile(file, filePath, options);
 				if(textFile.fails) {
@@ -59,6 +57,21 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFil
 				}
 
 				textFiles.push(textFile.value);
+			}
+			else if(fse.leafName(file).startsWith('#') && (file.endsWith('.diff') || file.endsWith('.json-patch') || file.endsWith('.patch'))) {
+				const name = fse.join(fse.parentPath(file), fse.leafName(file, 1).slice(1));
+
+				if(global.touchedTextFiles.includes(name)) {
+					patchFiles.push({
+						name,
+						patchName: file,
+						type: file.endsWith('json-patch') ? 'json-patch' : 'patch',
+					});
+
+					if(options.verbose) {
+						logger.debug(`${file} is a patch`);
+					}
+				}
 			}
 		}
 	}

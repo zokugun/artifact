@@ -9,10 +9,8 @@ import { IndentStyle } from '../types/format.js';
 import { readTextFile } from '../utils/read-text-file.js';
 
 export async function applyPatchFiles({ incomingPath, mergedTextFiles, patchFiles, targetPath, options }: Context): AsyncDResult {
-	const configPath = fse.join(incomingPath, 'configs');
-
 	for(const { name, patchName, type } of patchFiles) {
-		const patchPath = fse.join(configPath, patchName);
+		const patchPath = fse.join(incomingPath, patchName);
 		let matched = false;
 		let reject = '';
 

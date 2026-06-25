@@ -60,7 +60,7 @@ export type Global = {
 	touchedTextFiles: string[];
 };
 
-export type CommonFlow = (targetPath: string, incoming: { name: string; version: string; variant: string | undefined; branch: string | undefined; dir: string; config: PackageConfig; label: string }, operationMode: OperationMode, result: ArtifactResult | undefined, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
+export type CommonFlow = (targetPath: string, incoming: { name: string; version: string; variant: string | undefined; branch: string | undefined; dir: string; config: PackageConfig } | undefined, incomingPath: string | undefined, label: string, operationMode: OperationMode, result: ArtifactResult | undefined, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
 
 export type FlowEntry = {
 	branch?: string;

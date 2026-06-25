@@ -152,10 +152,10 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 	}
 
 	for(const { dir, config: incomingConfig, name, version, variant, branch, operationMode, result } of allEntries) {
-		const label = buildLabel(name, version, variant, branch);
+		const label = buildLabel(name, version, variant, branch, operationMode);
 		const spinner = logger.createSpinner(`${c.cyan.bold(label)}`);
 
-		const flowResult = await commonFlow(targetPath, { name, version, variant, branch, label, dir, config: incomingConfig }, operationMode, result, config, global, options);
+		const flowResult = await commonFlow(targetPath, { name, version, variant, branch, dir, config: incomingConfig }, undefined, label, operationMode, result, config, global, options);
 		if(flowResult.fails) {
 			spinner.fail();
 
@@ -211,6 +211,22 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 			spinner.fail();
 
 			return writeResult;
+		}
+
+		spinner.succeed();
+	}
+
+	const customDir = fse.join(targetPath, '.artifact');
+
+	if(await fse.isNonEmptyDir(customDir)) {
+		const label = '.artifact';
+		const spinner = logger.createSpinner(`${c.cyan.bold(label)}`);
+
+		const flowResult = await commonFlow(targetPath, undefined, customDir, label, OperationMode.OnlyTouched, undefined, config, global, options);
+		if(flowResult.fails) {
+			spinner.fail();
+
+			return flowResult;
 		}
 
 		spinner.succeed();

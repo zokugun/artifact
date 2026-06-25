@@ -8,7 +8,11 @@ import { type Journey } from '../types/travel.js';
 import { buildTravel } from '../utils/build-travel.js';
 
 export async function configureUpdateFileActions(context: Context): AsyncDResult {
-	const { update: packageUpdates } = context.incomingConfig!;
+	if(!context.incomingConfig) {
+		return OK;
+	}
+
+	const { update: packageUpdates } = context.incomingConfig;
 	const userUpdates = context.config.artifacts[context.incomingName!]?.update?.config;
 
 	if(packageUpdates === false || userUpdates === false) {
