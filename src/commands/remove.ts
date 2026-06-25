@@ -81,7 +81,7 @@ export async function remove(specs: string[], inputOptions?: CLIOptions): Promis
 
 	const global: Global = {
 		journeys: {},
-		overwrittenTextFiles: [],
+		touchedTextFiles: [],
 		routes: {},
 	};
 

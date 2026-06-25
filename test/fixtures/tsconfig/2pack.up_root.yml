@@ -1,0 +1,88 @@
+action:
+  command: update
+
+
+
+/target/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 0.1.0
+    artifact-awesome-config2:
+      version: 1.0.0
+/target/tsconfig.json: |
+  {
+    "compilerOptions": {
+      /* Basic Options */
+      "outDir": "out",
+      "rootDir": ".",
+      "composite": true,
+    },
+    "files": [
+      "package.json",
+    ],
+  }
+/target/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+
+
+
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/tsconfig.json: |
+  {
+    "compilerOptions": {
+      /* Basic Options */
+      "outDir": "lib",
+
+      /* Module Resolution Options */
+      "resolveJsonModule": true,
+    },
+  }
+/registry/artifact-awesome-config2/package.json: |
+  {
+    "name": "artifact-awesome-config2",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config2/configs/tsconfig.json: |
+  {
+    "compilerOptions": {
+      "outDir": "out",
+    },
+  }
+
+
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+    artifact-awesome-config2:
+      version: 1.0.0
+/merged/package.json: |
+  {
+    "name": "my-awesome-project",
+    "version": "1.0.0"
+  }
+/merged/tsconfig.json: |
+  {
+    "compilerOptions": {
+      /* Basic Options */
+      "outDir": "out",
+      "rootDir": ".",
+      "composite": true,
+
+      /* Module Resolution Options */
+      "resolveJsonModule": true,
+    },
+    "files": [
+      "package.json",
+    ],
+  }

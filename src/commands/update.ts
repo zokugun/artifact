@@ -61,7 +61,7 @@ export async function update(inputOptions: CLIOptions = {}): Promise<void> {
 	const global: Global = {
 		before: new Date(Date.now() - (minAgeHours * 3_600_000)),
 		journeys: {},
-		overwrittenTextFiles: [],
+		touchedTextFiles: [],
 		routes: {},
 	};
 

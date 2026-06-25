@@ -53,6 +53,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 			}
 
 			mergedTextFiles.push(file);
+			global.touchedTextFiles.push(file.name);
 
 			if(options.verbose) {
 				logger.debug(`${file.name} has been copied`);
@@ -93,6 +94,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 						indent,
 						mode: file.mode,
 					});
+					global.touchedTextFiles.push(fileName);
 
 					if(options.verbose) {
 						logger.debug(`${file.name} has been merged`);
@@ -103,7 +105,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 
 				case 'overwrite': {
 					mergedTextFiles.push(file);
-					global.overwrittenTextFiles.push(fileName);
+					global.touchedTextFiles.push(fileName);
 
 					if(options.verbose) {
 						logger.debug(`${file.name} has been overwritten`);
@@ -124,6 +126,7 @@ export async function mergeTextFiles({ targetPath, textFiles, mergedTextFiles, o
 						...file,
 						name: fileName,
 					});
+					global.touchedTextFiles.push(fileName);
 
 					if(options.verbose) {
 						logger.debug(`${file.name} has been copied`);

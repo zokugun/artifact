@@ -161,7 +161,7 @@ export async function add(specs: string[], inputOptions: CLIOptions = {}): Promi
 	const global: Global = {
 		before: new Date(Date.now() - (minAgeHours * 3_600_000)),
 		journeys: {},
-		overwrittenTextFiles: [],
+		touchedTextFiles: [],
 		routes: {},
 	};
 

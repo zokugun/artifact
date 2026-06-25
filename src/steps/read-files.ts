@@ -50,7 +50,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFil
 	}
 	else {
 		for(const file of files) {
-			if(global.overwrittenTextFiles.includes(file)) {
+			if(global.touchedTextFiles.includes(file)) {
 				const filePath = fse.join(cwd, file);
 
 				const textFile = await readTextFile(file, filePath, options);

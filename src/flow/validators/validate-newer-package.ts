@@ -18,7 +18,7 @@ export function validateNewerPackage(requestPackage: PackageManifest, installCon
 			return OK_VALID;
 		}
 		else if(eq(requestPackage.version, artifact.version)) {
-			return ok({ operationMode: OperationMode.OnlyOverwritten });
+			return ok({ operationMode: OperationMode.OnlyTouched });
 		}
 		else {
 			return OK_UNDEFINED;
