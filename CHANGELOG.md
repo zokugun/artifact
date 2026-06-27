@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.12.0 | 2026-06-27
+- support patch files (json-patch and unidiff)
+- add features
+- add peer dependencies
+- add an update to a project's artifact
+- add project's changes/patches
+- branches are added in order
+- apply changes for all touched files
+
 ## v0.11.0 | 2026-06-06
 - rename routes (ex: `mapConcat` -> `map(concat)`)
 - add combined routes (`map(sort, concat)`, `map(sort, compose)`)
