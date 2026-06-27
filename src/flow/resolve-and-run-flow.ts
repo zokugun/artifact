@@ -1,10 +1,12 @@
 import { c, logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
+import { isNonEmptyRecord } from '@zokugun/is-it-type';
 import { type AsyncDResult, type DResult, OK } from '@zokugun/xtry';
 import { readPackageConfig, writeInstallConfig } from '../configs/index.js';
 import { type InstallConfig, type Request } from '../types/config.js';
 import { OperationType, type Global, type FlowEntry, type Options, type CommonFlow, type ConfigUpdater, OperationMode } from '../types/context.js';
 import { loadPackage } from '../utils/load-package.js';
+import { applyPatchFiles } from './apply-patch-files.js';
 import { buildLabel } from './build-label.js';
 import { resolveBranches } from './resolve-branches.js';
 import { type RequestValidator, resolveRequest } from './resolve-request.js';
@@ -73,7 +75,10 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 				continue;
 			}
 
-			const result = await resolveBranchesForInstalledPackage(dir, name, version, undefined, setupInstalled, operationType, availables, features, config, global, options);
+			let index = allEntries.findIndex((entry) => entry.name === name);
+			const operationMode = index >= 0 ? allEntries[index].operationMode : OperationMode.Default;
+
+			const result = await resolveBranchesForInstalledPackage(dir, name, version, undefined, operationMode, setupInstalled, operationType, availables, features, config, global, options);
 			if(result.fails) {
 				spinner?.fail();
 
@@ -83,7 +88,7 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 			resolvedBranches.push(name);
 
 			if(result.value.length > 0) {
-				let index = allEntries.findIndex((entry) => entry.name === name) + 1;
+				index += 1;
 
 				while(index < allEntries.length && allEntries[index].name === name) {
 					index += 1;
@@ -94,7 +99,10 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 
 			if(artifact.requires) {
 				for(const variant of artifact.requires) {
-					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, availables, features, config, global, options);
+					const index = allEntries.findIndex((entry) => entry.name === name && entry.variant === variant);
+					const operationMode = index === -1 ? OperationMode.Default : allEntries[index].operationMode;
+
+					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, operationMode, setupInstalled, operationType, availables, features, config, global, options);
 					if(result.fails) {
 						spinner?.fail();
 
@@ -104,8 +112,6 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 					resolvedBranches.push(`${name}:${variant}`);
 
 					if(result.value.length > 0) {
-						const index = allEntries.findIndex((entry) => entry.name === name && entry.variant === variant);
-
 						allEntries.splice(index + 1, 0, ...result.value);
 					}
 				}
@@ -113,7 +119,10 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 
 			if(artifact.provides) {
 				for(const variant of artifact.provides) {
-					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, setupInstalled, operationType, availables, features, config, global, options);
+					const index = allEntries.findIndex((entry) => entry.name === name && entry.variant === variant);
+					const operationMode = index === -1 ? OperationMode.Default : allEntries[index].operationMode;
+
+					const result = await resolveBranchesForInstalledPackage(fse.join(dir, 'variants', variant), name, version, variant, operationMode, setupInstalled, operationType, availables, features, config, global, options);
 					if(result.fails) {
 						spinner?.fail();
 
@@ -123,8 +132,6 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 					resolvedBranches.push(`${name}:${variant}`);
 
 					if(result.value.length > 0) {
-						const index = allEntries.findIndex((entry) => entry.name === name && entry.variant === variant);
-
 						allEntries.splice(index + 1, 0, ...result.value);
 					}
 				}
@@ -232,10 +239,17 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 		spinner.succeed();
 	}
 
+	if(isNonEmptyRecord(global.patches)) {
+		const result = await applyPatchFiles(global.patches, targetPath, operationType, config, global, options);
+		if(result.fails) {
+			return result;
+		}
+	}
+
 	return OK;
 }
 
-async function resolveBranchesForInstalledPackage(dir: string, name: string, version: string, variant: string | undefined, setupInstalled: boolean, operationType: OperationType, variants: string[], features: string[], config: InstallConfig, global: Global, options: Options): AsyncDResult<FlowEntry[]> {
+async function resolveBranchesForInstalledPackage(dir: string, name: string, version: string, variant: string | undefined, operationMode: OperationMode, setupInstalled: boolean, operationType: OperationType, variants: string[], features: string[], config: InstallConfig, global: Global, options: Options): AsyncDResult<FlowEntry[]> {
 	const packageConfig = await readPackageConfig(dir, global.routes, operationType);
 	if(packageConfig.fails) {
 		logger.fatal(packageConfig.error);

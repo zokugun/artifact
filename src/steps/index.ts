@@ -1,10 +1,8 @@
 import { c, logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { err, ok, OK_UNDEFINED } from '@zokugun/xtry';
-import { type OperationType, type CommonFlow, type Context } from '../types/context.js';
-import { type Step } from '../types/step.js';
+import { type OperationType, type CommonFlow, type Context, type Step } from '../types/context.js';
 import { applyFormatting } from './apply-formatting.js';
-import { applyPatchFiles } from './apply-patch-files.js';
 import { configureInstallFileActions } from './configure-install-file-actions.js';
 import { configureUninstallFileActions } from './configure-uninstall-file-actions.js';
 import { configureUpdateFileActions } from './configure-update-file-actions.js';
@@ -22,7 +20,6 @@ import { writeTextFiles } from './write-text-files.js';
 
 export const steps = {
 	applyFormatting,
-	applyPatchFiles,
 	configureInstallFileActions,
 	configureUninstallFileActions,
 	configureUpdateFileActions,
@@ -71,7 +68,6 @@ export function composeSteps(operationType: OperationType, ...processes: Step[])
 			operationMode,
 			operationType,
 			options,
-			patchFiles: [],
 			removedPatterns: [],
 			renamedPatterns: [],
 			result,

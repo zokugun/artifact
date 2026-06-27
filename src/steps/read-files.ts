@@ -7,7 +7,7 @@ import { listWorkingFiles } from '../utils/list-working-files.js';
 import { readBuffer } from '../utils/read-buffer.js';
 import { readTextFile } from '../utils/read-text-file.js';
 
-export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFiles, operationMode: mode, global, options }: Context): AsyncDResult {
+export async function readFiles({ incomingPath, textFiles, binaryFiles, operationMode: mode, global, options }: Context): AsyncDResult {
 	const files = await listWorkingFiles(incomingPath);
 
 	if(mode === OperationMode.Default) {
@@ -15,11 +15,16 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFil
 			const filePath = fse.join(incomingPath, file);
 
 			if(fse.leafName(file).startsWith('#') && (file.endsWith('.diff') || file.endsWith('.json-patch') || file.endsWith('.patch'))) {
-				patchFiles.push({
-					name: fse.join(fse.parentPath(file), fse.leafName(file, 1).slice(1)),
-					patchName: file,
-					type: file.endsWith('json-patch') ? 'json-patch' : 'patch',
-				});
+				const textFile = await readTextFile(file, filePath, options);
+				if(textFile.fails) {
+					return textFile;
+				}
+
+				const targetFile = fse.join(fse.parentPath(file), fse.leafName(file, 1).slice(1));
+				const type = file.endsWith('.json-patch') ? 'json-patch' : 'unidiff';
+
+				global.patches[targetFile] ??= [];
+				global.patches[targetFile].push({ file: textFile.value, type });
 
 				if(options.verbose) {
 					logger.debug(`${file} is a patch`);
@@ -59,14 +64,18 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, patchFil
 				textFiles.push(textFile.value);
 			}
 			else if(fse.leafName(file).startsWith('#') && (file.endsWith('.diff') || file.endsWith('.json-patch') || file.endsWith('.patch'))) {
-				const name = fse.join(fse.parentPath(file), fse.leafName(file, 1).slice(1));
+				const targetFile = fse.join(fse.parentPath(file), fse.leafName(file, 1).slice(1));
 
-				if(global.touchedTextFiles.includes(name)) {
-					patchFiles.push({
-						name,
-						patchName: file,
-						type: file.endsWith('json-patch') ? 'json-patch' : 'patch',
-					});
+				if(global.touchedTextFiles.includes(targetFile) || global.patches[targetFile]) {
+					const textFile = await readTextFile(file, fse.join(incomingPath, file), options);
+					if(textFile.fails) {
+						return textFile;
+					}
+
+					const type = file.endsWith('.json-patch') ? 'json-patch' : 'unidiff';
+
+					global.patches[targetFile] ??= [];
+					global.patches[targetFile].push({ file: textFile.value, type });
 
 					if(options.verbose) {
 						logger.debug(`${file} is a patch`);

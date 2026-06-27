@@ -31,7 +31,6 @@ export type Context = {
 	operationMode: OperationMode;
 	operationType: OperationType;
 	options: Options;
-	patchFiles: PatchFile[];
 	removedPatterns: string[];
 	renamedPatterns: RenameAction[];
 	result?: ArtifactResult;
@@ -58,6 +57,7 @@ export type Global = {
 	journeys: Record<string, JourneyPlan>;
 	routes: Record<string, RouteSpec>;
 	touchedTextFiles: string[];
+	patches: Record<string, PatchFile[]>;
 };
 
 export type CommonFlow = (targetPath: string, incoming: { name: string; version: string; variant: string | undefined; branch: string | undefined; dir: string; config: PackageConfig } | undefined, incomingPath: string | undefined, label: string, operationMode: OperationMode, result: ArtifactResult | undefined, config: InstallConfig, global: Global, options: Options) => AsyncDResult<Context | undefined>;
@@ -107,7 +107,8 @@ export type Codec = {
 };
 
 export type PatchFile = {
-	name: string;
-	patchName: string;
-	type: 'json-patch' | 'patch';
+	file: TextFile;
+	type: 'json-patch' | 'unidiff';
 };
+
+export type Step = (context: Context) => AsyncDResult<boolean | void>;

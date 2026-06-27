@@ -23,7 +23,6 @@ const commonFlow = composeSteps(
 	steps.readEditorConfig,
 	steps.replaceTemplates,
 	steps.mergeTextFiles,
-	steps.applyPatchFiles,
 	steps.transformUntouchedFiles,
 	steps.insertFinalNewLine,
 	steps.applyFormatting,
@@ -61,6 +60,7 @@ export async function update(inputOptions: CLIOptions = {}): Promise<void> {
 	const global: Global = {
 		before: new Date(Date.now() - (minAgeHours * 3_600_000)),
 		journeys: {},
+		patches: {},
 		touchedTextFiles: [],
 		routes: {},
 	};

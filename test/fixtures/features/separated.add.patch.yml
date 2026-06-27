@@ -1,0 +1,68 @@
+action:
+  command: add
+  arguments:
+    - - artifact-awesome-config
+      - artifact-awesome-test-config
+
+
+
+/registry/artifact-awesome-config/package.json: |
+  {
+    "name": "artifact-awesome-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-config/configs/.github/workflows/ci-pr.yml: |
+  name: "CI - Pull Request: Build & Lint"
+/registry/artifact-awesome-config/branches/[#all:test]/configs/.github/workflows/#ci-pr.yml.patch: |
+  --- a/.github/workflows/ci-pr.yml
+  +++ b/.github/workflows/ci-pr.yml
+  @@ -1,1 +1,1 @@
+  -name: "CI - Pull Request: Build & Lint"
+  +name: "CI - Pull Request: Build, Test & Lint"
+
+/registry/artifact-awesome-test-config/package.json: |
+  {
+    "name": "artifact-awesome-test-config",
+    "version": "1.0.0"
+  }
+/registry/artifact-awesome-test-config/.artifactrc.yml: |
+  features:
+    - test
+/registry/artifact-awesome-test-config/configs/.github/workflows/#ci-pr.yml.patch: |
+  --- a/.github/workflows/ci-pr.yml
+  +++ b/.github/workflows/ci-pr.yml
+  @@ -1,1 +1,1 @@
+  -name: "CI - Pull Request: Build, Test & Lint"
+  +name: "CI - Pull Request: Build, VSX Test & Lint"
+/registry/artifact-awesome-test-config/configs/package.json: |
+  {
+    "scripts": {
+      "test": "vitest run"
+    },
+    "devDependencies": {
+      "vitest": "4.1.8"
+    }
+  }
+
+/merged/.artifactrc.yml: |
+  $schema: https://raw.githubusercontent.com/zokugun/artifact/v0.12.0/schemas/v4/install.json
+  artifacts:
+    artifact-awesome-config:
+      version: 1.0.0
+    artifact-awesome-test-config:
+      version: 1.0.0
+      features:
+        - test
+/merged/.github/workflows/ci-pr.yml.rej:
+  error: "ENOENT: no such file or directory"
+/merged/.github/workflows/ci-pr.yml: |
+  name: "CI - Pull Request: Build, VSX Test & Lint"
+/merged/package.json: |
+  {
+    "scripts": {
+      "test": "vitest run"
+    },
+    "devDependencies": {
+      "vitest": "4.1.8"
+    }
+  }

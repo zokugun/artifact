@@ -13,7 +13,8 @@ import fse from '@zokugun/fs-extra-plus/sync';
 
 use(chaiAsPromised);
 
-const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
+const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on' || process.env.DEBUG === 'vol';
+const DEBUG_VOL = process.env.DEBUG === 'vol';
 
 export function generateTestsFromManifests(...directories: string[]): void {
 	for(const directory of directories) {
@@ -141,13 +142,13 @@ function generateDirectory(directory: string): void {
 				it(name, async () => {
 					vol.fromJSON(fromJSON);
 
-					if(DEBUG) {
+					if(DEBUG_VOL) {
 						console.log(vol.toJSON());
 					}
 
 					await action();
 
-					if(DEBUG) {
+					if(DEBUG_VOL) {
 						console.log(vol.toJSON());
 					}
 
