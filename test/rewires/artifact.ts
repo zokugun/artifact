@@ -1,32 +1,43 @@
 import process from 'node:process';
-// import { ok } from '@zokugun/xtry';
-import rewiremock from 'rewiremock';
-// eslint-disable-next-line import/order
+import { vi } from 'vitest';
 import { fs } from '../mocks/fs.js';
 
-const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on';
+const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on' || process.env.DEBUG === 'vol';
 
-rewiremock('fs').with(fs);
-rewiremock('fs/promises').with(fs.promises);
-rewiremock('node:fs').with(fs);
-rewiremock('node:fs/promises').with(fs.promises);
-rewiremock('node:process').with({
-	cwd: () => '/target',
-	env: {},
-});
-rewiremock('npm').with({
+vi.resetModules();
+
+vi.doMock('node:fs', () => (
+	{
+		...fs,
+		default: fs,
+	}
+));
+vi.doMock('node:fs/promises', () => ({ default: fs.promises }));
+
+vi.doMock('node:process', () => ({
+	default: {
+		cwd: () => '/target',
+		env: {},
+	},
+}));
+
+vi.doMock('npm', () => ({
 	config: {
 		get: () => null,
 	},
-	async load() {
+	load: async () => {
 		// do nothing
 	},
 	log: {},
-});
-rewiremock('pacote').with({
-	extract: () => ({ resolved: true }),
-});
-rewiremock('@zokugun/cli-utils').with({
+}));
+
+vi.doMock('pacote', () => ({
+	default: {
+		extract: () => ({ resolved: true }),
+	},
+}));
+
+vi.doMock('@zokugun/cli-utils', () => ({
 	c: {
 		bgBlue: (value: string) => value,
 		cyan: {
@@ -40,21 +51,19 @@ rewiremock('@zokugun/cli-utils').with({
 				console.log(message);
 			}
 		},
-		createSpinner: (message: string) => {
-			if(DEBUG) {
-				console.log(message);
-			}
-
-			return {
-				fail: () => {},
-				succeed: () => {},
-			};
-		},
+		createSpinner: () => ({
+			fail: () => {},
+			succeed: () => {},
+		}),
 		fatal: (message: string) => {
 			throw new Error(message);
 		},
 		finishTimer: () => {},
-		info: () => {},
+		info: (message: string) => {
+			if(DEBUG) {
+				console.log(message);
+			}
+		},
 		newLine: () => {},
 		print: (message: string) => {
 			if(DEBUG) {
@@ -62,34 +71,34 @@ rewiremock('@zokugun/cli-utils').with({
 			}
 		},
 	},
-});
-rewiremock('../utils/load-package.js').with({
+}));
+
+vi.doMock('../../src/utils/load-package.js', () => ({
 	loadPackage: (spec: string) => {
 		const index = spec.lastIndexOf('@');
 
 		if(index === -1) {
 			return `/registry/${spec}`;
 		}
-		else {
-			return `/registry/${spec.slice(0, index)}`;
-		}
+
+		return `/registry/${spec.slice(0, index)}`;
 	},
-});
+}));
 
-rewiremock.enable();
+const { add } = await import('../../src/commands/add.js');
+const { remove } = await import('../../src/commands/remove.js');
+const { update } = await import('../../src/commands/update.js');
 
-/* eslint-disable import/first */
-import { add } from '../../src/commands/add.js';
-import { remove } from '../../src/commands/remove.js';
-import { update } from '../../src/commands/update.js';
-/* eslint-enable import/first */
+vi.unmock('node:fs');
+vi.unmock('node:fs/promises');
+vi.unmock('node:process');
+vi.unmock('npm');
+vi.unmock('pacote');
+vi.unmock('@zokugun/cli-utils');
+vi.unmock('../../src/utils/load-package.js');
 
-rewiremock.disable();
-
-/* eslint-disable unicorn/prefer-export-from */
 export {
 	add,
 	remove,
 	update,
 };
-/* eslint-enable unicorn/prefer-export-from */

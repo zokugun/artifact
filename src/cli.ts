@@ -1,5 +1,5 @@
 import { Command } from '@zokugun/cli-utils/commander';
-import pkg from '../package.json';
+import pkg from '../package.json' with { type: 'json' };
 import { add, list, outdated, remove, update, version, selfUpgrade } from './commands/index.js';
 
 const program = new Command();

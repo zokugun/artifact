@@ -9,9 +9,12 @@ import { readTextFile } from '../utils/read-text-file.js';
 
 export async function readFiles({ incomingPath, textFiles, binaryFiles, operationMode: mode, global, options }: Context): AsyncDResult {
 	const files = await listWorkingFiles(incomingPath);
+	if(files.fails) {
+		return files;
+	}
 
 	if(mode === OperationMode.Default) {
-		for(const file of files) {
+		for(const file of files.value) {
 			const filePath = fse.join(incomingPath, file);
 
 			if(fse.leafName(file).startsWith('#') && (file.endsWith('.diff') || file.endsWith('.json-patch') || file.endsWith('.patch'))) {
@@ -52,7 +55,7 @@ export async function readFiles({ incomingPath, textFiles, binaryFiles, operatio
 		}
 	}
 	else {
-		for(const file of files) {
+		for(const file of files.value) {
 			if(global.touchedTextFiles.includes(file)) {
 				const filePath = fse.join(incomingPath, file);
 

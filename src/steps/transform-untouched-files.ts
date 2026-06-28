@@ -15,8 +15,11 @@ export async function transformUntouchedFiles({ mergedTextFiles, options, routes
 
 	const cwd = fse.join(targetPath);
 	const files = await listWorkingFiles(cwd);
+	if(files.fails) {
+		return files;
+	}
 
-	for(const file of files) {
+	for(const file of files.value) {
 		if(mergedTextFiles.some(({ name }) => name === file)) {
 			continue;
 		}

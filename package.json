@@ -18,6 +18,7 @@
 	"engines": {
 		"node": ">=18.20"
 	},
+	"type": "module",
 	"bin": {
 		"artifact": "bin/artifact",
 		"atf": "bin/artifact"
@@ -29,6 +30,7 @@
 		"ci:lint:fix": "zizmor . --fix=all",
 		"clean": "rimraf .test lib",
 		"compile:src": "tsc -p src",
+		"compile:test": "tsc -p test",
 		"lint": "xo",
 		"lint:all": "npm run lint:package && npm run ci:lint && npm run lint",
 		"lint:fix": "xo --fix",
@@ -36,9 +38,10 @@
 		"prepack": "npm run build",
 		"prepare": "husky; npm run lint:package",
 		"release": "release-it",
-		"test": "tsc -p test && mocha",
-		"test:dev": "mocha",
-		"test:watch": "tsc-watch -p src -p test --onSuccess 'mocha -g=\"\"'",
+		"test": "vitest run --reporter tree",
+		"test:coverage": "vitest run --reporter tree --coverage --coverage.reporter text",
+		"test:ui": "vitest --ui --coverage",
+		"test:watch": "vitest",
 		"update:artifacts": "artifact update",
 		"update:ci": "PINACT_MIN_AGE=7 pinact run --update",
 		"update:deps": "taze --all",
@@ -49,7 +52,7 @@
 	"dependencies": {
 		"@zokugun/cli-utils": "0.3.3",
 		"@zokugun/configdotts-merge": "0.3.0",
-		"@zokugun/fs-extra-plus": "0.5.0",
+		"@zokugun/fs-extra-plus": "0.6.1",
 		"@zokugun/is-it-type": "0.8.1",
 		"@zokugun/unidiff-strict": "0.2.1",
 		"@zokugun/xtry": "0.11.6",
@@ -58,7 +61,6 @@
 		"editorconfig": "0.15.3",
 		"es-toolkit": "1.47.0",
 		"git-url-parse": "16.1.0",
-		"globby": "11.1.0",
 		"istextorbinary": "6.0.0",
 		"jq-wasm": "1.1.0-jq-1.8.1",
 		"jsonc-parser": "3.3.1",
@@ -72,44 +74,28 @@
 	"devDependencies": {
 		"@commitlint/cli": "20.5.3",
 		"@commitlint/config-conventional": "20.5.3",
-		"@types/chai": "4.3.20",
-		"@types/chai-as-promised": "7.1.8",
 		"@types/cli-progress": "3.11.6",
-		"@types/micromatch": "4.0.10",
-		"@types/mocha": "9.1.1",
 		"@types/node": "20.19.43",
 		"@types/npm": "7.19.3",
 		"@types/pacote": "11.1.8",
 		"@types/semver": "7.7.1",
 		"@types/universalify": "1.0.3",
-		"chai": "4.5.0",
-		"chai-as-promised": "7.1.2",
-		"eslint": "8.11.0",
-		"eslint-plugin-chai-friendly": "0.7.4",
+		"@vitest/coverage-v8": "4.1.8",
+		"@vitest/ui": "4.1.8",
 		"fixpack": "4.0.0",
 		"husky": "9.1.7",
 		"lint-staged": "16.4.0",
 		"memfs": "4.57.7",
-		"mocha": "9.2.2",
 		"release-it": "20.2.0",
-		"rewiremock": "3.14.6",
 		"rimraf": "6.1.3",
-		"source-map-support": "0.5.21",
 		"taze": "19.14.1",
 		"tsc-watch": "7.2.0",
 		"typescript": "5.9.3",
 		"universalify": "2.0.1",
+		"vitest": "4.1.8",
 		"xo": "0.60.0"
 	},
 	"overrides": {
-		"mocha": {
-			"diff": "5.2.2",
-			"glob": "8.1.0",
-			"js-yaml": "4.2.0",
-			"minimatch": "5.1.9",
-			"nanoid": "3.3.11",
-			"serialize-javascript": "7.0.5"
-		},
 		"release-it": {
 			"undici": "7.28.0"
 		}

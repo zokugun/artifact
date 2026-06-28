@@ -1,17 +1,12 @@
 import path from 'node:path';
 import process from 'node:process';
+import fse from '@zokugun/fs-extra-plus/sync';
 import { isArray, isRecord, isString } from '@zokugun/is-it-type';
-import { xtry } from '@zokugun/xtry/sync';
-import { expect, use } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { stringifyError, xtry } from '@zokugun/xtry';
 import { vol } from 'memfs';
+import { beforeEach, describe, expect, it } from 'vitest';
 import YAML from 'yaml';
 import { add, remove, update } from '../rewires/artifact.js';
-
-// eslint-disable-next-line import/order
-import fse from '@zokugun/fs-extra-plus/sync';
-
-use(chaiAsPromised);
 
 const DEBUG = process.env.DEBUG === '1' || process.env.DEBUG === 'true' || process.env.DEBUG === 'on' || process.env.DEBUG === 'vol';
 const DEBUG_VOL = process.env.DEBUG === 'vol';
@@ -135,7 +130,7 @@ function generateDirectory(directory: string): void {
 				it(name, async () => {
 					vol.fromJSON(fromJSON);
 
-					await expect(action()).to.be.rejectedWith(error);
+					await expect(action()).rejects.toThrow(error);
 				});
 			}
 			else {
@@ -156,10 +151,13 @@ function generateDirectory(directory: string): void {
 						const action = vol.promises.readFile(`/target/${file}`, 'utf8');
 
 						if(isString(data)) {
-							expect(await action).to.eql(data);
+							const result = await xtry(action, stringifyError);
+							// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+							expect(result.fails).to.be.false;
+							expect(result.value).to.eql(data);
 						}
 						else {
-							await expect(action).to.be.rejectedWith(`${(data as any).error}, open '/target/${file}'`);
+							await expect(action).rejects.toThrow(`${(data as any).error}, open '/target/${file}'`);
 						}
 					}
 				});

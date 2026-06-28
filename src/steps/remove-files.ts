@@ -12,8 +12,11 @@ export async function removeFiles({ removedPatterns, targetPath, operationMode: 
 
 	const cwd = fse.join(targetPath);
 	const files = await listWorkingFiles(cwd);
+	if(files.fails) {
+		return files;
+	}
 
-	for(const file of files) {
+	for(const file of files.value) {
 		if(removedPatterns.some((pattern) => minimatch(file, pattern))) {
 			if(!options.dryRun) {
 				const filePath = fse.join(cwd, file);

@@ -1,7 +1,6 @@
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
-import { type AsyncDResult, ok } from '@zokugun/xtry';
-import globby from 'globby';
+import { type AsyncDResult, err, ok, stringifyError } from '@zokugun/xtry';
 import { type FlowEntry, type Options } from '../types/context.js';
 import { pushEntry } from './push-entry.js';
 
@@ -10,13 +9,17 @@ export async function resolveBranches(entry: FlowEntry, availables: string[], fe
 	const entries = [];
 
 	if(await fse.isExisting(cwd)) {
-		const directories = await globby('*', {
-			cwd,
-			deep: 1,
+		const directories = await fse.walk(cwd, {
+			asPaths: true,
+			collect: true,
+			maxDepth: 1,
 			onlyDirectories: true,
 		});
+		if(directories.fails) {
+			return err(stringifyError(directories.error));
+		}
 
-		for(const directory of directories) {
+		for(const directory of directories.value) {
 			const depMatch = /^\[(@[\w-]+:[\w-]+|[\w-]+)(?::([\w-]+))?]$/.exec(directory);
 
 			if(depMatch) {

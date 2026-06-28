@@ -4,7 +4,7 @@ import { stringifyError } from '@zokugun/xtry';
 import { detect, resolveCommand } from 'package-manager-detector';
 import pacote from 'pacote';
 import { gt } from 'semver';
-import pkg from '../../package.json';
+import pkg from '../../package.json' with { type: 'json' };
 
 export async function selfUpgrade(inputOptions: { minReleaseAge?: number } = {}): Promise<void> {
 	logger.beginTimer();

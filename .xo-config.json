@@ -8,13 +8,9 @@
 		{
 			"files": "**/*.test.ts",
 			"rules": {
-				"@typescript-eslint/no-unused-expressions": "off",
-				"chai-friendly/no-unused-expressions": "error"
+				"@typescript-eslint/no-unused-expressions": "off"
 			}
 		}
-	],
-	"plugins": [
-		"chai-friendly"
 	],
 	"rules": {
 		"@typescript-eslint/ban-types": "off",

@@ -2,7 +2,7 @@ import { c, logger } from '@zokugun/cli-utils';
 import { stringifyError } from '@zokugun/xtry';
 import pacote from 'pacote';
 import { gt } from 'semver';
-import pkg from '../../package.json';
+import pkg from '../../package.json' with { type: 'json' };
 
 export async function version(): Promise<void> {
 	const { name } = pkg;
