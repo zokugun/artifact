@@ -1,4 +1,5 @@
 ./package.json:
   - fixpack
+  - npm audit
 .github/workflows/*.yml: zizmor
 "*.ts": xo

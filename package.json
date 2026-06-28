@@ -32,7 +32,7 @@
 		"compile:src": "tsc -p src",
 		"compile:test": "tsc -p test",
 		"lint": "xo",
-		"lint:all": "npm run lint:package && npm run ci:lint && npm run lint",
+		"lint:all": "npm run lint:package && npm audit && npm run ci:lint && npm run lint",
 		"lint:fix": "xo --fix",
 		"lint:package": "fixpack || true",
 		"prepack": "npm run build",
