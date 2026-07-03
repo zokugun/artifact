@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.12.1 | 2026-07-03
+- detect branches when adding artifact with variants
+
 ## v0.12.0 | 2026-06-27
 - support patch files (json-patch and unidiff)
 - add features
