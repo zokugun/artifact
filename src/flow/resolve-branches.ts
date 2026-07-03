@@ -1,11 +1,12 @@
 import { logger } from '@zokugun/cli-utils';
 import fse from '@zokugun/fs-extra-plus/async';
 import { type AsyncDResult, err, ok, stringifyError } from '@zokugun/xtry';
-import { type FlowEntry, type Options } from '../types/context.js';
+import { type PackageConfig } from '../types/config.js';
+import { type OperationMode, type FlowEntry, type Options } from '../types/context.js';
 import { pushEntry } from './push-entry.js';
 
-export async function resolveBranches(entry: FlowEntry, availables: string[], features: string[], options: Options): AsyncDResult<FlowEntry[]> {
-	const cwd = fse.join(entry.dir, 'branches');
+export async function resolveBranches(dir: string, name: string, version: string, variant: string | undefined, operationMode: OperationMode, config: PackageConfig, availables: string[], features: string[], options: Options): AsyncDResult<FlowEntry[]> {
+	const cwd = fse.join(dir, 'branches');
 	const entries = [];
 
 	if(await fse.isExisting(cwd)) {
@@ -23,18 +24,18 @@ export async function resolveBranches(entry: FlowEntry, availables: string[], fe
 			const depMatch = /^\[(@[\w-]+:[\w-]+|[\w-]+)(?::([\w-]+))?]$/.exec(directory);
 
 			if(depMatch) {
-				const [branch, name, variant] = depMatch;
-				const packageName = name
+				const [branch, mName, mVariant] = depMatch;
+				const packageName = mName
 					.replaceAll(/^(?!@)(artifact-)?/g, 'artifact-')
 					.replaceAll(/:(artifact-)?/g, '/artifact-');
-				const found = availables.includes(variant ? `${packageName}:${variant}` : packageName);
+				const found = availables.includes(mVariant ? `${packageName}:${mVariant}` : packageName);
 
 				if(found) {
 					if(options.verbose) {
-						logger.debug(`- branch: ${name}${variant ? `:${variant}` : ''} has been matched`);
+						logger.debug(`- branch: ${name}${branch ? `:${branch}` : ''} has been matched`);
 					}
 
-					const result = await pushEntry({ ...entry, branch, dir: fse.join(cwd, directory) }, false, undefined, entries, availables, features);
+					const result = await pushEntry({ dir: fse.join(cwd, directory), name, version, variant, branch, operationMode, config }, false, undefined, entries, availables, features);
 					if(result.fails) {
 						return result;
 					}
@@ -96,10 +97,10 @@ export async function resolveBranches(entry: FlowEntry, availables: string[], fe
 
 				if(found) {
 					if(options.verbose) {
-						logger.debug(`- branch: ${entry.name}${entry.variant ? `:${entry.variant}` : ''} has been matched`);
+						logger.debug(`- branch: ${name}${variant ? `:${variant}` : ''} has been matched`);
 					}
 
-					const result = await pushEntry({ ...entry, branch, dir: fse.join(cwd, directory) }, false, undefined, entries, availables, features);
+					const result = await pushEntry({ dir: fse.join(cwd, directory), name, version, variant, branch, operationMode, config }, false, undefined, entries, availables, features);
 					if(result.fails) {
 						return result;
 					}

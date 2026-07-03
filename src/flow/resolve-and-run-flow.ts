@@ -141,11 +141,30 @@ export async function resolveAndRunFlow(requests: Iterable<DResult<Request>>, re
 		}
 
 		for(const entry of entries) {
-			if(resolvedBranches.includes(entry.variant ? `${entry.name}:${entry.variant}` : entry.name)) {
+			const { dir, name, version, variant, operationMode, config } = entry;
+
+			if(entry.variant && !resolvedBranches.includes(entry.name)) {
+				const dir = await loadPackage(`${name}@${version}`, undefined, options);
+
+				if(dir) {
+					const result = await resolveBranches(dir, name, version, undefined, operationMode, config, availables, features, options);
+					if(result.fails) {
+						return result;
+					}
+
+					if(result.value.length > 0) {
+						const index = allEntries.indexOf(entry);
+
+						allEntries.splice(index + 1, 0, ...result.value);
+					}
+				}
+			}
+
+			if(resolvedBranches.includes(variant ? `${name}:${variant}` : name)) {
 				continue;
 			}
 
-			const result = await resolveBranches(entry, availables, features, options);
+			const result = await resolveBranches(dir, name, version, variant, operationMode, config, availables, features, options);
 			if(result.fails) {
 				return result;
 			}
@@ -269,14 +288,5 @@ async function resolveBranchesForInstalledPackage(dir: string, name: string, ver
 		}
 	}
 
-	const entry: FlowEntry = {
-		config: packageConfig.value,
-		dir,
-		name,
-		operationMode: OperationMode.Default,
-		variant,
-		version,
-	};
-
-	return resolveBranches(entry, variants, features, options);
+	return resolveBranches(dir, name, version, variant, OperationMode.Default, packageConfig.value, variants, features, options);
 }
